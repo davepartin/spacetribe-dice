@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#080b13" />
+    <meta name="description" content="Apogee Forge — a ten-round solo dice-forging score attack." />
+    <title>Apogee Forge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=1.0.5" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-attack" viewBox="0 0 24 24">
+        <path d="M12 2 9.7 8.2 3.5 5.6l4 5.2-5.5 3.4 6.7.4-.9 6.6 4.2-5 4.2 5-.9-6.6 6.7-.4-5.5-3.4 4-5.2-6.2 2.6L12 2Z" />
+      </symbol>
+      <symbol id="icon-energy" viewBox="0 0 24 24">
+        <path d="m13.3 2-8 11.2h5.2L9.7 22l9-12.6h-5.4V2Z" />
+      </symbol>
+      <symbol id="icon-tech" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3.1" />
+        <circle cx="5" cy="6" r="1.8" />
+        <circle cx="19" cy="6" r="1.8" />
+        <circle cx="12" cy="20" r="1.8" />
+        <path d="m7 7.6 2.7 2.5M17 7.6l-2.7 2.5M12 15.2V18" />
+      </symbol>
+      <symbol id="icon-forge" viewBox="0 0 24 24">
+        <path d="M3 5h11v4.1c0 2.7 2.1 4.9 4.8 5H21v3.1h-7.2V22H8.2v-4.8H3.5v-3.1h3.8A6.7 6.7 0 0 1 3 7.8V5Z" />
+      </symbol>
+      <symbol id="icon-flux" viewBox="0 0 24 24">
+        <path d="M12 1.8 15 9l7.2 3-7.2 3-3 7.2L9 15l-7.2-3L9 9l3-7.2Z" />
+      </symbol>
+      <symbol id="icon-wild" viewBox="0 0 24 24">
+        <path d="m12 2.2 2.2 6.2 6.5-1.6-3.8 5.5 5.3 4-6.7-.2-.3 6.7-3.5-5.7-5.6 3.6 2.7-6.1-6.2-2.4 6.5-1.4L12 2.2Z" />
+      </symbol>
+      <symbol id="icon-void" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="7.5" />
+        <path d="m6.7 17.3 10.6-10.6" />
+      </symbol>
+      <symbol id="icon-trophy" viewBox="0 0 24 24">
+        <path d="M8 3h8v4.5c0 3.6-1.6 5.7-4 5.7s-4-2.1-4-5.7V3Zm0 2H4v2.3c0 2.2 1.4 3.7 4.2 4.1M16 5h4v2.3c0 2.2-1.4 3.7-4.2 4.1M12 13.2V18m-4 3h8m-6-3h4" />
+      </symbol>
+      <symbol id="icon-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" /><path d="M12 10v7m0-10.6v.1" />
+      </symbol>
+      <symbol id="icon-sound" viewBox="0 0 24 24">
+        <path d="M4 10v4h4l5 4V6L8 10H4Zm12.5-1.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12" />
+      </symbol>
+      <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4" /></symbol>
+    </svg>
+
+    <div class="space-layer space-layer--far"></div>
+    <div class="space-layer space-layer--near"></div>
+
+    <header class="site-header">
+      <button class="brand" id="brand-button" type="button" aria-label="Return to launch screen">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span class="brand-copy"><strong>APOGEE</strong><small>FORGE</small></span>
+      </button>
+      <div class="header-actions">
+        <button class="icon-button" id="sound-button" type="button" aria-label="Toggle sound">
+          <svg><use href="#icon-sound"></use></svg>
+        </button>
+        <button class="text-button" id="how-button" type="button" aria-label="How to play">
+          <svg><use href="#icon-info"></use></svg><span>How to play</span>
+        </button>
+        <button class="text-button" id="scores-button" type="button" aria-label="Top 10 scores">
+          <svg><use href="#icon-trophy"></use></svg><span>Top 10</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="launch-screen" id="launch-screen">
+        <div class="launch-copy">
+          <p class="eyebrow">A SPACE TRIBES DICE GAME</p>
+          <h1>Forge the fleet.<br /><em>Break the sky.</em></h1>
+          <p class="lead">Ten rounds. One final strike. Every die face is a choice between power now and an engine that peaks at Apogee.</p>
+
+          <form class="launch-form" id="launch-form">
+            <label for="pilot-name">Pilot call sign</label>
+            <div class="name-entry">
+              <input id="pilot-name" name="pilotName" maxlength="18" autocomplete="nickname" placeholder="ENTER NAME" required />
+              <button class="primary-button" type="submit">
+                <span>Start new run</span><b>→</b>
+              </button>
+            </div>
+          </form>
+
+          <button class="resume-button" id="resume-button" type="button" hidden>
+            <span><small>ACTIVE RUN</small><strong>Resume the forge</strong></span>
+            <b>→</b>
+          </button>
+
+          <div class="launch-pills" aria-label="Game features">
+            <span>10 rounds</span><span>Solo strategy</span><span>d4 → d20</span><span>Global scores</span>
+          </div>
+        </div>
+
+        <div class="hero-forge" aria-hidden="true">
+          <div class="orbit orbit--outer"><i></i><i></i></div>
+          <div class="orbit orbit--inner"><i></i></div>
+          <div class="hero-die hero-die--d20"><span>20</span></div>
+          <div class="hero-die hero-die--d8"><span>8</span></div>
+          <div class="hero-die hero-die--d6"><span>6</span></div>
+          <div class="forge-glow"></div>
+          <p>APOGEE ENGINE // ONLINE</p>
+        </div>
+      </section>
+
+      <section class="game-screen" id="game-screen" hidden>
+        <div class="run-header">
+          <div>
+            <p class="eyebrow" id="phase-kicker">ROLL PHASE</p>
+            <h1 id="phase-title">Round <span>01</span> / 10</h1>
+          </div>
+          <div class="run-identity">
+            <small>PILOT</small><strong id="pilot-label">—</strong>
+          </div>
+        </div>
+
+        <div class="round-track" id="round-track" aria-label="Round progress"></div>
+
+        <section class="resource-rail" aria-label="Run resources">
+          <div class="score-cell">
+            <small>FLEET POWER</small>
+            <strong id="score-value">000</strong>
+          </div>
+          <div class="resource-cell resource-cell--attack">
+            <svg><use href="#icon-attack"></use></svg>
+            <span><small>BASE ATK</small><strong id="base-value">2</strong></span>
+          </div>
+          <div class="resource-cell resource-cell--energy">
+            <svg><use href="#icon-energy"></use></svg>
+            <span><small>ENERGY</small><strong id="energy-value">0</strong></span>
+          </div>
+          <div class="resource-cell resource-cell--tech">
+            <svg><use href="#icon-tech"></use></svg>
+            <span><small>TECH</small><strong id="tech-value">0</strong></span>
+          </div>
+          <div class="resource-cell resource-cell--forge">
+            <svg><use href="#icon-forge"></use></svg>
+            <span><small>FORGE</small><strong id="forge-value">0</strong></span>
+          </div>
+          <div class="resource-cell resource-cell--flux">
+            <svg><use href="#icon-flux"></use></svg>
+            <span><small>FLUX</small><strong id="flux-value">0</strong></span>
+          </div>
+        </section>
+
+        <section class="phase-panel roll-phase" id="roll-phase">
+          <div class="panel-heading">
+            <div>
+              <p class="section-number">01 // ACTIVE BAY</p>
+              <h2>Read the roll</h2>
+              <p>Select any dice to reroll. Wild faces can be tapped to cycle their assignment.</p>
+            </div>
+            <div class="reroll-gauge" id="reroll-gauge"></div>
+          </div>
+
+          <div class="roll-layout">
+            <div class="dice-stage">
+              <div class="dice-grid" id="dice-grid"></div>
+              <div class="message-ribbon" id="message-ribbon" aria-live="polite"></div>
+            </div>
+            <aside class="volley-card">
+              <p class="section-number">LIVE VOLLEY</p>
+              <div class="volley-total"><strong id="volley-total">0</strong><span>ATTACK</span></div>
+              <dl id="volley-breakdown"></dl>
+              <div class="gain-preview" id="gain-preview"></div>
+            </aside>
+          </div>
+
+          <div class="roll-actions">
+            <button class="secondary-button" id="reroll-button" type="button">
+              <span>Reroll selected</span><small id="reroll-cost">SELECT DICE</small>
+            </button>
+            <button class="secondary-button overclock-button" id="overclock-button" type="button">
+              <span>Overclock all</span><small>ONCE PER RUN</small>
+            </button>
+            <button class="primary-button commit-button" id="commit-button" type="button">
+              <span>Bank this volley</span><b>→</b>
+            </button>
+          </div>
+        </section>
+
+        <section class="phase-panel workshop-phase" id="workshop-phase" hidden>
+          <div class="panel-heading workshop-heading">
+            <div>
+              <p class="section-number">02 // ORBITAL WORKSHOP</p>
+              <h2>Build what comes next</h2>
+              <p>Spend what you rolled—or carry it forward for a larger conversion at Apogee.</p>
+            </div>
+            <div class="last-volley" id="last-volley"></div>
+          </div>
+
+          <div class="workshop-grid">
+            <section class="workshop-section tracks-section">
+              <div class="subheading"><span>STRATEGY TRACKS</span><small>MAX 5</small></div>
+              <div class="track-list" id="track-list"></div>
+            </section>
+
+            <section class="workshop-section bay-section">
+              <div class="subheading"><span>DICE BAY</span><small id="bay-capacity">3 / 6</small></div>
+              <div class="bay-list" id="bay-list"></div>
+            </section>
+
+            <section class="workshop-section market-section">
+              <div class="subheading"><span>ACQUIRE DICE</span><small>SPECIALIZED d4</small></div>
+              <div class="market-list" id="market-list"></div>
+            </section>
+          </div>
+
+          <div class="workshop-footer">
+          <p><span class="pulse-dot"></span><span id="workshop-tip">Every bank grants +1 tech salvage. Unspent resources carry forward.</span></p>
+            <button class="primary-button" id="next-round-button" type="button">
+              <span id="next-round-label">Launch round 02</span><b>→</b>
+            </button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+    <dialog class="modal rules-modal" id="rules-modal">
+      <button class="modal-close" data-close-modal type="button" aria-label="Close">×</button>
+      <p class="eyebrow">FIELD MANUAL // 01</p>
+      <h2>Build an engine in ten rounds.</h2>
+      <div class="rules-loop">
+        <div><b>1</b><span><strong>Roll</strong><small>Every face makes attack or resources.</small></span></div>
+        <i>→</i>
+        <div><b>2</b><span><strong>Shape</strong><small>Spend energy to reroll selected dice.</small></span></div>
+        <i>→</i>
+        <div><b>3</b><span><strong>Forge</strong><small>Upgrade dice, faces, and strategy tracks.</small></span></div>
+      </div>
+      <div class="rules-columns">
+        <section>
+          <h3>Every symbol has a job</h3>
+          <div id="symbol-legend" class="symbol-legend"></div>
+        </section>
+        <section>
+          <h3>Two ways to go big</h3>
+          <p><strong>Steady fire:</strong> Arsenal adds reliable base attack to every one of the ten volleys. Banking rounds 1–9 also grants +1 tech salvage.</p>
+          <p><strong>Late burst:</strong> Round 10 scores its attack twice, then Reactor and Foundry pairs multiply it again. Leftover resources and all track levels also discharge.</p>
+          <p><strong>Formation:</strong> Three attack dice in one roll earn a bonus. Three different attack-die families earn Spectrum.</p>
+        </section>
+      </div>
+      <button class="primary-button modal-action" data-close-modal type="button"><span>Enter the forge</span><b>→</b></button>
+    </dialog>
+
+    <dialog class="modal scoreboard-modal" id="scoreboard-modal">
+      <button class="modal-close" data-close-modal type="button" aria-label="Close">×</button>
+      <p class="eyebrow">LIVE TRANSMISSION</p>
+      <div class="modal-title-row">
+        <h2>Apogee Top 10</h2>
+        <button class="subtle-button" id="reset-scores-button" type="button">Reset board</button>
+      </div>
+      <div class="scoreboard-list" id="scoreboard-list"><p class="loading-copy">Contacting relay…</p></div>
+      <p class="scoreboard-note" id="scoreboard-note"></p>
+      <form class="reset-panel" id="reset-form" hidden>
+        <label for="reset-token">Administrator token</label>
+        <div>
+          <input id="reset-token" type="password" autocomplete="off" placeholder="ENTER PRIVATE TOKEN" />
+          <button class="subtle-button" id="cancel-reset-button" type="button">Cancel</button>
+          <button class="danger-button" type="submit">Confirm reset</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal forge-modal" id="forge-modal">
+      <button class="modal-close" data-close-modal type="button" aria-label="Close">×</button>
+      <p class="eyebrow">FACE FORGE</p>
+      <h2 id="forge-title">Choose a new face</h2>
+      <p class="modal-lead">The weakest un-forged face is replaced permanently. Better Foundry levels raise its value.</p>
+      <div class="forge-options" id="forge-options"></div>
+    </dialog>
+
+    <dialog class="modal results-modal" id="results-modal">
+      <div class="result-burst" aria-hidden="true"></div>
+      <p class="eyebrow">RUN COMPLETE // APOGEE REACHED</p>
+      <div class="rank-badge" id="rank-badge"><span>S</span></div>
+      <h2 id="result-title">Mythic Forge</h2>
+      <p class="result-score"><strong id="result-score">000</strong><span>FLEET POWER</span></p>
+      <div class="result-stats" id="result-stats"></div>
+      <div class="result-actions">
+        <button class="secondary-button" id="result-scores-button" type="button"><span>View top 10</span></button>
+        <button class="primary-button" id="new-run-button" type="button"><span>Forge another run</span><b>→</b></button>
+      </div>
+    </dialog>
+
+    <script type="module" src="app.js?v=1.0.4"></script>
+  </body>
+</html>
