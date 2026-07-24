@@ -1,5 +1,7 @@
 # Apogee Forge — design notes
 
+> This file preserves the original solo score-attack design. The playable hidden-order battle redesign and future asynchronous team mode are specified in [BATTLE-DESIGN.md](BATTLE-DESIGN.md).
+
 ## The central decision
 
 Every roll asks one question: **How much power do I bank now, and how much do I turn into a better engine?** Attack scores immediately. Energy buys control over luck. Tech, Forge, and Flux do nothing to the current volley, but unlock stronger future rounds.
@@ -29,23 +31,42 @@ The combination is original to this game: custom-faced polyhedral dice grow from
 
 ## Economy safeguards
 
-- A run starts with 1 Tech, 1 Forge, and 1 Flux, so the first workshop offers real choices.
-- Banking rounds 1–9 grants 1 guaranteed Tech salvage. This prevents a run from being locked out of progression by unlucky resource faces.
-- Flux is the gate for die-size growth. The Prism Spindle is the strongest long-term Flux source.
+- A run starts with 1 Credits, 1 Forge, and 1 Size, so the first workshop offers real choices.
+- Banking rounds 1–9 grants 1 guaranteed Credits salvage. This prevents a run from being locked out of progression by unlucky resource faces.
+- Size is the gate for ship upsizing (Ship-4 → Ship-6 → … → Ship-20). The Size Ship is the strongest long-term Size source.
 - The bay starts at 3/6 dice. Reactor mastery can expand it to 8.
 - A forged face starts at value 2 and reaches value 4 with Foundry investment.
 
+## Resonances
+
+Volley synergies keep mid-run rolls exciting without replacing workshop planning:
+
+| Resonance | Trigger | Payout |
+| --- | --- | --- |
+| Formation | 3+ attack dice | `2 + Arsenal` attack |
+| Wing | 4 attack dice | +2 attack; grants one free shaping charge that round |
+| Broadside | 5+ attack dice | +4 attack (replaces Wing); same free shaping grant |
+| Battalion | 2+ attacks from one family | +1 attack per extra match (cap +3) |
+| Spectrum | 3 attack families | +3 attack and +1 tech salvage (rounds 1–9) |
+| Ion Chorus | 3+ energy faces | +2 energy |
+| Loom Sync / Anvil Echo / Prism Wake | 3+ faces of that resource | +1 of the matching resource |
+| Clean Bay | no void faces | +1 attack |
+
+High ceilings are intentional: a stacked Broadside + Battalion + Apogee amplifier should feel absurd in a good way.
+
+Free shaping is an extra reroll action that spends no energy. It is granted at most once per round the first time the bay shows 4+ attacks.
+
 ## Balance targets
 
-The current economy was tested with 15,000 deterministic bot runs across three intentionally different priorities:
+The economy was re-checked after the resonance pass with 2,000 deterministic bot runs per strategy:
 
 | Strategy | Average | Median | 75th percentile | Maximum |
 | --- | ---: | ---: | ---: | ---: |
-| Steady Arsenal | 90.9 | 89 | 103 | 140 |
-| Late Reactor/Foundry engine | 89.0 | 86 | 102 | 135 |
-| Hybrid | 79.3 | 76 | 90 | 146 |
+| Steady Arsenal | 106.6 | 106 | 123 | 163 |
+| Late Reactor/Foundry engine | 104.9 | 100 | 119 | 167 |
+| Hybrid | 88.9 | 84 | 102 | 160 |
 
-The steady and late-engine bots land within two average points, while a hybrid produced the highest exceptional run. The bots are intentionally simple rather than optimal; their purpose is to catch dominant economies and dead progression paths.
+Steady and late-engine stay neck-and-neck. Score inflation from resonances is accepted — big combo Apogee runs are the fantasy. Bots are intentionally simple rather than optimal.
 
 Score tiers are calibrated around those ranges:
 

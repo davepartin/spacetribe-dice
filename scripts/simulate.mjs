@@ -6,8 +6,9 @@ import {
   cycleWild,
   forgeFace,
   nextRound,
+  previewRoll,
   rerollSelected,
-  rerollsAvailable,
+  shapingActionsLeft,
   toggleSelection,
   upgradeDie
 } from "../game-engine.js";
@@ -108,10 +109,15 @@ function play(seed, strategyName) {
       if (roll.symbol === "wild") setWild(state, id, strategy.wild(state.round));
     });
 
-    while (state.rerollsUsed < rerollsAvailable(state) && state.resources.energy > 0) {
+    while (shapingActionsLeft(state) > 0) {
+      const usingFree = (state.freeRerolls || 0) > 0;
+      const energyBudget = usingFree ? 2 : state.resources.energy;
+      if (!usingFree && energyBudget <= 0) break;
+      const preview = previewRoll(state);
+      if (preview.wing > 0 && preview.attackDice === 4 && state.round < 9) break;
       const candidates = Object.entries(state.rolls)
         .filter(([, roll]) => !strategy.keep(resolved(roll), state.round))
-        .slice(0, Math.min(2, state.resources.energy));
+        .slice(0, Math.min(2, Math.max(1, energyBudget)));
       if (!candidates.length) break;
       candidates.forEach(([id]) => toggleSelection(state, id));
       if (!rerollSelected(state).ok) break;

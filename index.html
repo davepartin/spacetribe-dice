@@ -4,12 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#080b13" />
-    <meta name="description" content="Apogee Forge — a ten-round solo dice-forging score attack." />
+    <meta name="description" content="Apogee Forge — forge a fleet, read hidden enemy intent, and resolve ten simultaneous dice battles." />
     <title>Apogee Forge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=1.0.5" />
+    <link rel="stylesheet" href="styles.css?v=1.0.14" />
+    <link rel="stylesheet" href="battle-ui.css?v=2.0.0" />
   </head>
   <body>
     <svg class="svg-sprite" aria-hidden="true">
@@ -27,7 +28,8 @@
         <path d="m7 7.6 2.7 2.5M17 7.6l-2.7 2.5M12 15.2V18" />
       </symbol>
       <symbol id="icon-forge" viewBox="0 0 24 24">
-        <path d="M3 5h11v4.1c0 2.7 2.1 4.9 4.8 5H21v3.1h-7.2V22H8.2v-4.8H3.5v-3.1h3.8A6.7 6.7 0 0 1 3 7.8V5Z" />
+        <!-- Thor hammer: wide head + short thick haft -->
+        <path d="M5.2 2.8h13.6c1 0 1.7.8 1.7 1.7v5.8c0 1-.7 1.7-1.7 1.7h-4.1v8.4c0 1.1-.7 1.8-1.8 1.8h-1.8c-1.1 0-1.8-.7-1.8-1.8v-8.4H5.2c-1 0-1.7-.7-1.7-1.7V4.5c0-.9.7-1.7 1.7-1.7Z" />
       </symbol>
       <symbol id="icon-flux" viewBox="0 0 24 24">
         <path d="M12 1.8 15 9l7.2 3-7.2 3-3 7.2L9 15l-7.2-3L9 9l3-7.2Z" />
@@ -77,7 +79,7 @@
         <div class="launch-copy">
           <p class="eyebrow">A SPACE TRIBES DICE GAME</p>
           <h1>Forge the fleet.<br /><em>Break the sky.</em></h1>
-          <p class="lead">Ten rounds. One final strike. Every die face is a choice between power now and an engine that peaks at Apogee.</p>
+          <p class="lead">Ten hidden-order battles. Read the enemy intent, forge a fleet of living dice, then lock your plan and watch both sides fire at once.</p>
 
           <form class="launch-form" id="launch-form">
             <label for="pilot-name">Pilot call sign</label>
@@ -95,7 +97,7 @@
           </button>
 
           <div class="launch-pills" aria-label="Game features">
-            <span>10 rounds</span><span>Solo strategy</span><span>d4 → d20</span><span>Global scores</span>
+            <span>10 battles</span><span>Hidden enemy dice</span><span>Ship-4 → Ship-20</span><span>Forge every face</span>
           </div>
         </div>
 
@@ -138,7 +140,7 @@
           </div>
           <div class="resource-cell resource-cell--tech">
             <svg><use href="#icon-tech"></use></svg>
-            <span><small>TECH</small><strong id="tech-value">0</strong></span>
+            <span><small>CREDITS</small><strong id="tech-value">0</strong></span>
           </div>
           <div class="resource-cell resource-cell--forge">
             <svg><use href="#icon-forge"></use></svg>
@@ -146,7 +148,7 @@
           </div>
           <div class="resource-cell resource-cell--flux">
             <svg><use href="#icon-flux"></use></svg>
-            <span><small>FLUX</small><strong id="flux-value">0</strong></span>
+            <span><small>SIZE</small><strong id="flux-value">0</strong></span>
           </div>
         </section>
 
@@ -155,7 +157,7 @@
             <div>
               <p class="section-number">01 // ACTIVE BAY</p>
               <h2>Read the roll</h2>
-              <p>Select any dice to reroll. Wild faces can be tapped to cycle their assignment.</p>
+              <p>Select dice to reroll — each costs 1 Energy (unless you have a free shaping charge). Bright chip under each die = what you rolled.</p>
             </div>
             <div class="reroll-gauge" id="reroll-gauge"></div>
           </div>
@@ -163,6 +165,14 @@
           <div class="roll-layout">
             <div class="dice-stage">
               <div class="dice-grid" id="dice-grid"></div>
+              <div class="dice-shaping">
+                <button class="secondary-button reroll-button" id="reroll-button" type="button">
+                  <span>Reroll selected</span><small id="reroll-cost">SELECT DICE</small>
+                </button>
+                <button class="secondary-button overclock-button" id="overclock-button" type="button">
+                  <span>Reroll all</span><small>FREE · ONCE</small>
+                </button>
+              </div>
               <div class="message-ribbon" id="message-ribbon" aria-live="polite"></div>
             </div>
             <aside class="volley-card">
@@ -174,12 +184,6 @@
           </div>
 
           <div class="roll-actions">
-            <button class="secondary-button" id="reroll-button" type="button">
-              <span>Reroll selected</span><small id="reroll-cost">SELECT DICE</small>
-            </button>
-            <button class="secondary-button overclock-button" id="overclock-button" type="button">
-              <span>Overclock all</span><small>ONCE PER RUN</small>
-            </button>
             <button class="primary-button commit-button" id="commit-button" type="button">
               <span>Bank this volley</span><b>→</b>
             </button>
@@ -203,12 +207,12 @@
             </section>
 
             <section class="workshop-section bay-section">
-              <div class="subheading"><span>DICE BAY</span><small id="bay-capacity">3 / 6</small></div>
+              <div class="subheading"><span>SHIP BAY</span><small id="bay-capacity">3 / 6</small></div>
               <div class="bay-list" id="bay-list"></div>
             </section>
 
             <section class="workshop-section market-section">
-              <div class="subheading"><span>ACQUIRE DICE</span><small>SPECIALIZED d4</small></div>
+              <div class="subheading"><span>BUY SHIPS</span><small>NEW SHIP-4</small></div>
               <div class="market-list" id="market-list"></div>
             </section>
           </div>
@@ -232,9 +236,9 @@
       <div class="rules-loop">
         <div><b>1</b><span><strong>Roll</strong><small>Every face makes attack or resources.</small></span></div>
         <i>→</i>
-        <div><b>2</b><span><strong>Shape</strong><small>Spend energy to reroll selected dice.</small></span></div>
+        <div><b>2</b><span><strong>Shape</strong><small>Spend energy to reroll selected dice. Once per run, Reroll all is free.</small></span></div>
         <i>→</i>
-        <div><b>3</b><span><strong>Forge</strong><small>Upgrade dice, faces, and strategy tracks.</small></span></div>
+        <div><b>3</b><span><strong>Drydock</strong><small>Buy ships, upsize, and rewrite faces.</small></span></div>
       </div>
       <div class="rules-columns">
         <section>
@@ -245,7 +249,8 @@
           <h3>Two ways to go big</h3>
           <p><strong>Steady fire:</strong> Arsenal adds reliable base attack to every one of the ten volleys. Banking rounds 1–9 also grants +1 tech salvage.</p>
           <p><strong>Late burst:</strong> Round 10 scores its attack twice, then Reactor and Foundry pairs multiply it again. Leftover resources and all track levels also discharge.</p>
-          <p><strong>Formation:</strong> Three attack dice in one roll earn a bonus. Three different attack-die families earn Spectrum.</p>
+          <p><strong>Attack resonances:</strong> 3 attacks = Formation. 4 = Wing (+2 and free shaping). 5+ = Broadside (+4). Matching attack families build Battalion. 3 families = Spectrum (+1 tech salvage).</p>
+          <p><strong>Resource triples:</strong> Three Energy faces pay +2 Energy. Credits, Forge, or Size triples pay +1 of that commodity. A void-free bay earns Clean Bay (+1 attack).</p>
         </section>
       </div>
       <button class="primary-button modal-action" data-close-modal type="button"><span>Enter the forge</span><b>→</b></button>
@@ -274,7 +279,7 @@
       <button class="modal-close" data-close-modal type="button" aria-label="Close">×</button>
       <p class="eyebrow">FACE FORGE</p>
       <h2 id="forge-title">Choose a new face</h2>
-      <p class="modal-lead">The weakest un-forged face is replaced permanently. Better Foundry levels raise its value.</p>
+      <p class="modal-lead">The weakest un-rewritten face is replaced permanently. Better Foundry levels raise its value.</p>
       <div class="forge-options" id="forge-options"></div>
     </dialog>
 
@@ -291,6 +296,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="app.js?v=1.0.4"></script>
+    <script type="module" src="battle-app.js?v=2.0.0"></script>
   </body>
 </html>

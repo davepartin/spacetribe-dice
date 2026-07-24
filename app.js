@@ -1,4 +1,5 @@
 import {
+  DIE_SIZES,
   MARKET,
   SYMBOLS,
   TRACKS,
@@ -11,6 +12,7 @@ import {
   cycleWild,
   forgeCost,
   forgeFace,
+  listResonances,
   maxDice,
   nextRound,
   overclock,
@@ -19,11 +21,13 @@ import {
   rerollsAvailable,
   scoreRank,
   scrapDie,
+  shapingActionsLeft,
+  shipLabel,
   toggleSelection,
   trackCost,
   upgradeCost,
   upgradeDie
-} from "./game-engine.js?v=1.0.2";
+} from "./game-engine.js?v=1.0.14";
 
 const ACTIVE_RUN_KEY = "apogee-forge-active-run-v1";
 const LOCAL_SCORES_KEY = "apogee-forge-local-scores-v1";
@@ -98,6 +102,21 @@ let forgeTargetId = null;
 let audioContext = null;
 let soundEnabled = localStorage.getItem(SOUND_KEY) !== "off";
 
+function faceMapHtml(die, currentIndex = -1) {
+  return `
+    <div class="die-faces" aria-label="All ${shipLabel(die.sides)} faces">
+      ${die.faces.map((face, index) => {
+        const live = index === currentIndex;
+        const title = `${SYMBOLS[face.symbol].label}${face.value > 0 ? ` ${face.value}` : ""}${face.forged ? " · rewritten" : ""}${live ? " · current" : ""}`;
+        return `
+          <span class="face-chip ${live ? "is-live" : ""} ${face.forged ? "is-forged" : ""} ${face.symbol === "void" ? "is-void" : ""}" style="--face-color:${SYMBOLS[face.symbol].color}" title="${escapeHtml(title)}">
+            ${icon(face.symbol)}
+            ${face.value > 0 ? `<b>${face.value}</b>` : `<b class="face-zero">0</b>`}
+          </span>`;
+      }).join("")}
+    </div>`;
+}
+
 function icon(symbol, className = "") {
   return `<svg class="${className}" aria-hidden="true"><use href="#icon-${symbol}"></use></svg>`;
 }
@@ -129,7 +148,11 @@ function saveState() {
 function readSavedState() {
   try {
     const parsed = JSON.parse(localStorage.getItem(ACTIVE_RUN_KEY));
-    if (parsed?.version === 1 && parsed?.phase !== "complete" && Array.isArray(parsed?.dice)) return parsed;
+    if (parsed?.version === 1 && parsed?.phase !== "complete" && Array.isArray(parsed?.dice)) {
+      parsed.freeRerolls ||= 0;
+      parsed.shapeBonusGranted ||= false;
+      return parsed;
+    }
   } catch {
     localStorage.removeItem(ACTIVE_RUN_KEY);
   }
@@ -240,8 +263,8 @@ function renderRoll() {
       ? `Wild → ${SYMBOLS[resultSymbol].short}`
       : `${SYMBOLS[resultSymbol].label} ${roll.value}`;
     return `
-      <article class="die-card ${selected ? "is-selected" : ""} ${roll.symbol === "wild" ? "is-wild" : ""}" data-die-id="${die.id}" style="--die-color:${die.color};--die-accent:${die.accent};--result-color:${SYMBOLS[resultSymbol].color}" role="button" tabindex="0" aria-label="${escapeHtml(die.name)} d${die.sides}, rolled ${escapeHtml(label)}${selected ? ", selected to reroll" : ""}">
-        <div class="die-meta"><strong>${escapeHtml(die.name)}</strong><span>d${die.sides}</span></div>
+      <article class="die-card ${selected ? "is-selected" : ""} ${roll.symbol === "wild" ? "is-wild" : ""}" data-die-id="${die.id}" style="--die-color:${die.color};--die-accent:${die.accent};--result-color:${SYMBOLS[resultSymbol].color}" role="button" tabindex="0" aria-label="${escapeHtml(die.name)} ${shipLabel(die.sides)}, rolled ${escapeHtml(label)}${selected ? ", selected to reroll" : ""}">
+        <div class="die-meta"><strong>${escapeHtml(die.name)}</strong><span>${shipLabel(die.sides)}</span></div>
         <div class="die-shape" data-sides="${die.sides}">
           ${icon(displaySymbol)}
           ${roll.value > 0 ? `<b>${roll.value}</b>` : ""}
@@ -250,7 +273,8 @@ function renderRoll() {
           <strong>${escapeHtml(label)}</strong>
           ${roll.symbol === "wild" ? `<em data-wild-cycle="${die.id}">TAP TO CHANGE</em>` : ""}
         </div>
-        ${roll.forged ? `<span class="forged-mark">FORGED FACE</span>` : ""}
+        ${faceMapHtml(die, roll.index)}
+        ${roll.forged ? `<span class="forged-mark">REWRITTEN</span>` : ""}
       </article>`;
   }).join("");
 
@@ -260,24 +284,74 @@ function renderRoll() {
   }).join("");
 
   const rerolls = rerollsAvailable(state);
-  dom.rerollGauge.innerHTML = `<small>REROLLS</small>${Array.from({ length: rerolls }, (_, index) => `<span class="${index >= state.rerollsUsed ? "is-live" : ""}"></span>`).join("")}`;
+  const freeRerolls = state.freeRerolls || 0;
+  const normalLeft = Math.max(0, rerolls - (state.rerollsUsed || 0));
+  const totalLeft = normalLeft + freeRerolls;
+  const energyHave = state.resources.energy;
+  dom.rerollGauge.innerHTML = `
+    <div class="reroll-status">
+      <small>REROLLS LEFT</small>
+      <strong class="${totalLeft > 0 ? "is-live" : "is-empty"}">${totalLeft}</strong>
+      ${freeRerolls ? `<em class="free-shape-label">incl. ${freeRerolls} free</em>` : ""}
+    </div>
+    <div class="reroll-energy-hint">
+      ${icon("energy")}
+      <span>${totalLeft <= 0
+        ? "No rerolls left this round"
+        : freeRerolls > 0
+          ? "Next reroll is free (no Energy)"
+          : `Costs 1 Energy per selected die · you have ${energyHave}`}</span>
+    </div>`;
+
   dom.volleyTotal.textContent = preview.totalAttack;
   const rows = [
     ["Base array", preview.base, false],
     ["Attack faces", preview.attack, false],
     ["Formation", preview.formation, preview.formation > 0],
-    ["Spectrum", preview.spectrum, preview.spectrum > 0]
-  ];
-  dom.volleyBreakdown.innerHTML = rows.map(([label, value, bonus]) => `<div class="${bonus ? "bonus-row" : ""}"><dt>${label}</dt><dd>+${value}</dd></div>`).join("");
-  dom.gainPreview.innerHTML = Object.entries(preview.gains).map(([symbol, value]) => `
+    ["Wing", preview.wing, preview.wing > 0],
+    ["Broadside", preview.broadside, preview.broadside > 0],
+    ["Battalion", preview.battalion, preview.battalion > 0],
+    ["Spectrum", preview.spectrum, preview.spectrum > 0],
+    ["Clean Bay", preview.cleanBay, preview.cleanBay > 0]
+  ].filter(([, value, bonus]) => value > 0 || !bonus);
+  dom.volleyBreakdown.innerHTML = rows.map(([label, value, bonus]) =>
+    `<div class="${bonus ? "bonus-row" : ""}"><dt>${label}</dt><dd>+${value}</dd></div>`
+  ).join("");
+
+  const resonances = listResonances(preview);
+  const chipHtml = resonances.length
+    ? `<div class="resonance-chips">${resonances.map((item) =>
+      `<span class="resonance-chip" style="--chip-color:${SYMBOLS[item.type].color}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.detail)}</small></span>`
+    ).join("")}</div>`
+    : `<div class="resonance-chips is-empty"><span class="resonance-chip is-idle"><b>No resonance</b><small>Line up matches</small></span></div>`;
+  let chipsHost = dom.volleyBreakdown.parentElement.querySelector(".resonance-chips");
+  if (chipsHost) chipsHost.outerHTML = chipHtml;
+  else dom.volleyBreakdown.insertAdjacentHTML("afterend", chipHtml);
+
+  const bankGains = { ...preview.gains };
+  Object.entries(preview.resonanceGains || {}).forEach(([key, value]) => {
+    bankGains[key] = (bankGains[key] || 0) + value;
+  });
+  dom.gainPreview.innerHTML = Object.entries(bankGains).map(([symbol, value]) => `
     <span class="gain-chip" style="--gain-color:${SYMBOLS[symbol].color}">${icon(symbol)}<b>+${value}</b><small>${SYMBOLS[symbol].short}</small></span>
   `).join("");
 
   const selectedCost = state.selected.length;
-  dom.rerollCost.textContent = selectedCost ? `${selectedCost} ENERGY` : "SELECT DICE";
-  dom.rerollButton.disabled = !selectedCost || selectedCost > state.resources.energy || state.rerollsUsed >= rerolls;
+  const actionsLeft = shapingActionsLeft(state);
+  const usingFree = freeRerolls > 0;
+  const canAffordEnergy = usingFree || selectedCost <= energyHave;
+  if (!selectedCost) {
+    dom.rerollCost.textContent = totalLeft <= 0 ? "NO REROLLS LEFT" : "SELECT DICE · 1 ENERGY EACH";
+  } else if (usingFree) {
+    dom.rerollCost.textContent = `${selectedCost} DICE · FREE`;
+  } else if (!canAffordEnergy) {
+    dom.rerollCost.textContent = `NEED ${selectedCost} ENERGY · HAVE ${energyHave}`;
+  } else {
+    dom.rerollCost.textContent = `${selectedCost} DICE · ${selectedCost} ENERGY`;
+  }
+  dom.rerollButton.disabled = !selectedCost || actionsLeft <= 0 || !canAffordEnergy;
   dom.overclockButton.disabled = state.overclockUsed;
-  dom.overclockButton.querySelector("small").textContent = state.overclockUsed ? "SPENT" : "ONCE PER RUN";
+  dom.overclockButton.querySelector("small").textContent = state.overclockUsed ? "SPENT THIS RUN" : "FREE · ONCE";
   dom.commitButton.querySelector("span").textContent = state.round === 10 ? "Fire Apogee strike" : "Bank this volley";
 }
 
@@ -306,16 +380,17 @@ function renderWorkshop() {
     const upgrade = upgradeCost(die);
     const forge = forgeCost(state);
     const allForged = die.faces.every((face) => face.forged);
+    const nextSize = DIE_SIZES[DIE_SIZES.indexOf(die.sides) + 1];
     return `
       <article class="bay-die" style="--die-color:${die.color};--die-accent:${die.accent}">
-        <div class="mini-die" data-sides="${die.sides}"><strong>d${die.sides}</strong></div>
+        <div class="mini-die" data-sides="${die.sides}"><strong>${die.sides}</strong></div>
         <div class="bay-info">
-          <div class="bay-title"><strong>${escapeHtml(die.name)}</strong><span>${die.callSign}</span></div>
+          <div class="bay-title"><strong>${escapeHtml(die.name)}</strong><span>${shipLabel(die.sides)}</span></div>
           <div class="face-strip" title="Face distribution">${die.faces.map((face) => `<i class="${face.forged ? "is-forged" : ""}" style="--face-color:${SYMBOLS[face.symbol].color}" title="${SYMBOLS[face.symbol].label} ${face.value}"></i>`).join("")}</div>
           <div class="bay-actions">
-            <button data-upgrade-die="${die.id}" ${!upgrade || !canPay(upgrade) ? "disabled" : ""}>${upgrade ? `Grow · ${costLabel(upgrade)}` : "d20 MAX"}</button>
-            <button data-forge-die="${die.id}" ${allForged || !canPay(forge) ? "disabled" : ""}>Face · ${costLabel(forge)}</button>
-            <button class="scrap-button" data-scrap-die="${die.id}" ${die.family === "core" ? "disabled" : ""} title="Scrap this die">×</button>
+            <button data-upgrade-die="${die.id}" ${!upgrade || !canPay(upgrade) ? "disabled" : ""}>${upgrade ? `Upsize to ${shipLabel(nextSize)} · ${costLabel(upgrade)}` : "Ship-20 MAX"}</button>
+            <button data-forge-die="${die.id}" ${allForged || !canPay(forge) ? "disabled" : ""}>Rewrite face · ${costLabel(forge)}</button>
+            <button class="scrap-button" data-scrap-die="${die.id}" ${die.family === "core" ? "disabled" : ""} title="Scrap this ship">×</button>
           </div>
         </div>
       </article>`;
@@ -330,15 +405,15 @@ function renderWorkshop() {
         <h3>${item.title}</h3>
         <p>${item.detail}</p>
         <button class="buy-button" data-buy-die="${item.family}" ${full || !canPay(item.cost) ? "disabled" : ""}>
-          <span>Acquire d4</span><small>${costLabel(item.cost)}</small>
+          <span>Buy ${shipLabel(4)}</span><small>${costLabel(item.cost)}</small>
         </button>
       </article>`;
   }).join("");
 
   const tips = {
-    1: "Every bank grants +1 command salvage. Flux grows dice; Forge rewrites faces.",
-    4: "A larger die keeps every face you forged and adds stronger new faces.",
-    7: "Only three rounds remain. Start converting the engine into attack.",
+    1: "Every bank grants +1 Credits salvage. Size upsizes ships; Forge rewrites faces.",
+    4: "A larger ship keeps every face you rewrote and adds stronger new faces.",
+    7: "Only three rounds remain. Start converting the fleet into attack.",
     9: "Next round is Apogee: leftover resources convert into bonus fleet power."
   };
   dom.workshopTip.textContent = tips[state.round] || "Unspent resources carry forward and discharge at Apogee.";
@@ -378,7 +453,7 @@ function renderForgeOptions() {
   if (!die) return;
   const cost = forgeCost(state);
   const value = 2 + Math.floor(state.tracks.foundry / 2);
-  dom.forgeTitle.textContent = `Forge ${die.name} d${die.sides}`;
+  dom.forgeTitle.textContent = `Rewrite ${die.name} ${shipLabel(die.sides)}`;
   dom.forgeOptions.innerHTML = ["attack", "energy", "tech", "forge", "flux"].map((symbol) => `
     <button class="forge-choice" data-forge-symbol="${symbol}" style="--symbol-color:${SYMBOLS[symbol].color}" ${!canPay(cost) ? "disabled" : ""}>
       ${icon(symbol)}<strong>${SYMBOLS[symbol].label} ${value}</strong><small>${costLabel(cost)}</small>
@@ -460,7 +535,7 @@ async function openScores() {
 }
 
 dom.symbolLegend.innerHTML = Object.entries(SYMBOLS).filter(([key]) => key !== "void").map(([key, symbol]) => `
-  <div class="legend-row" style="--symbol-color:${symbol.color}">${icon(key)}<span><strong>${symbol.label}</strong> · ${key === "attack" ? "bank power" : key === "energy" ? "fuel rerolls" : key === "tech" ? "buy and advance" : key === "forge" ? "rewrite faces" : key === "flux" ? "grow die size" : "choose any"}</span></div>
+  <div class="legend-row" style="--symbol-color:${symbol.color}">${icon(key)}<span><strong>${symbol.label}</strong> · ${key === "attack" ? "bank power" : key === "energy" ? "fuel rerolls" : key === "tech" ? "buy ships and upgrades" : key === "forge" ? "rewrite faces" : key === "flux" ? "upsize ships" : "choose any"}</span></div>
 `).join("");
 
 dom.form.addEventListener("submit", (event) => {

@@ -1,10 +1,12 @@
 import { createServer } from "node:http";
 import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
-import { dirname, extname, join, normalize } from "node:path";
+import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const dataDir = join(root, ".data");
+const dataDir = process.env.SCOREBOARD_DATA_DIR
+  ? resolve(process.env.SCOREBOARD_DATA_DIR)
+  : join(root, ".data");
 const scoreFile = join(dataDir, "scores.json");
 const port = Number.parseInt(process.env.PORT || "4173", 10);
 const adminToken = process.env.SCOREBOARD_ADMIN_TOKEN || "";
@@ -62,19 +64,38 @@ async function readBody(request) {
   return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
 }
 
-function cleanEntry(input) {
+export function cleanEntry(input) {
   const name = String(input?.name || "").replace(/[<>\u0000-\u001f]/g, "").trim().slice(0, 18);
   const score = Number(input?.score);
+  const scoreVersion = Number.parseInt(input?.scoreVersion ?? 1, 10);
   const runId = String(input?.runId || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80);
-  if (!name || !runId || !Number.isInteger(score) || score < 0 || score > 999999) return null;
+  if (!name || !runId || !Number.isInteger(score) || score < 0 || score > 999999 || !Number.isInteger(scoreVersion) || scoreVersion < 1 || scoreVersion > 99) return null;
   const breakdown = input?.breakdown && typeof input.breakdown === "object"
     ? {
         apogee: Math.max(0, Math.min(999999, Number.parseInt(input.breakdown.apogee, 10) || 0)),
         dice: Math.max(0, Math.min(8, Number.parseInt(input.breakdown.dice, 10) || 0)),
-        bestTrack: Math.max(0, Math.min(5, Number.parseInt(input.breakdown.bestTrack, 10) || 0))
+        ships: Math.max(0, Math.min(6, Number.parseInt(input.breakdown.ships, 10) || 0)),
+        bestTrack: Math.max(0, Math.min(5, Number.parseInt(input.breakdown.bestTrack, 10) || 0)),
+        hits: Math.max(0, Math.min(9999, Number.parseInt(input.breakdown.hits, 10) || 0)),
+        distress: Math.max(0, Math.min(10, Number.parseInt(input.breakdown.distress, 10) || 0))
       }
-    : { apogee: 0, dice: 0, bestTrack: 0 };
-  return { name, score, runId, createdAt: new Date().toISOString(), breakdown };
+    : { apogee: 0, dice: 0, ships: 0, bestTrack: 0, hits: 0, distress: 0 };
+  return { name, score, scoreVersion, runId, createdAt: new Date().toISOString(), breakdown };
+}
+
+export function keepTopScoresByVersion(scores) {
+  const groups = new Map();
+  for (const score of scores) {
+    const version = Number.isInteger(score.scoreVersion) ? score.scoreVersion : 1;
+    const group = groups.get(version) || [];
+    group.push(score);
+    groups.set(version, group);
+  }
+  return [...groups.entries()]
+    .sort(([left], [right]) => left - right)
+    .flatMap(([, group]) => group
+      .sort((left, right) => right.score - left.score || left.createdAt.localeCompare(right.createdAt))
+      .slice(0, 10));
 }
 
 function allowScore(request) {
@@ -107,8 +128,7 @@ async function handleApi(request, response, pathname) {
       const existing = await readScores();
       const scores = existing.filter((score) => score.runId !== entry.runId);
       scores.push(entry);
-      scores.sort((a, b) => b.score - a.score || a.createdAt.localeCompare(b.createdAt));
-      const top = scores.slice(0, 10);
+      const top = keepTopScoresByVersion(scores);
       await persistScores(top);
       return sendJson(response, 201, { scores: top, accepted: top.some((score) => score.runId === entry.runId) });
     } catch (error) {
@@ -171,7 +191,9 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Apogee Forge online at http://localhost:${port}`);
-  if (!adminToken) console.log("Set SCOREBOARD_ADMIN_TOKEN to enable shared scoreboard resets.");
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Apogee Forge online at http://localhost:${port}`);
+    if (!adminToken) console.log("Set SCOREBOARD_ADMIN_TOKEN to enable shared scoreboard resets.");
+  });
+}

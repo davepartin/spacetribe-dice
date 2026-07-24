@@ -4,9 +4,11 @@ import {
   buyDie,
   buyTrack,
   commitRoll,
+  createDie,
   createInitialState,
   cycleWild,
   forgeFace,
+  listResonances,
   nextRound,
   previewRoll,
   rerollSelected,
@@ -85,7 +87,92 @@ test("three attack dice trigger Formation and three families trigger Spectrum", 
   const preview = previewRoll(state);
   assert.equal(preview.formation, 2);
   assert.equal(preview.spectrum, 3);
-  assert.equal(preview.totalAttack, 11);
+  assert.equal(preview.cleanBay, 1);
+  assert.equal(preview.spectrumSalvage, 1);
+  assert.equal(preview.totalAttack, 12); // base2 + faces4 + form2 + spec3 + clean1
+  assert.ok(listResonances(preview).some((item) => item.id === "spectrum"));
+});
+
+test("Battalion rewards matching attack families and Wing grants free shaping", () => {
+  const state = createInitialState("Nova", 56);
+  state.dice.push(createDie("assault", 4, "assault-1"));
+  state.dice.push(createDie("assault", 4, "assault-2"));
+  state.phase = "rolling";
+  state.rolls = {
+    "core-1": { symbol: "energy", value: 1 },
+    "reactor-1": { symbol: "energy", value: 1 },
+    "scout-1": { symbol: "attack", value: 1 },
+    "assault-1": { symbol: "attack", value: 2 },
+    "assault-2": { symbol: "attack", value: 2 }
+  };
+  const preview = previewRoll(state);
+  assert.equal(preview.attackDice, 3);
+  assert.equal(preview.battalion, 1);
+  assert.equal(preview.formation, 2);
+  assert.equal(preview.wing, 0);
+
+  state.rolls = {
+    "core-1": { symbol: "energy", value: 1 },
+    "reactor-1": { symbol: "wild", value: 1, forged: false, wildChoice: "tech" },
+    "scout-1": { symbol: "attack", value: 1 },
+    "assault-1": { symbol: "attack", value: 2 },
+    "assault-2": { symbol: "attack", value: 2 }
+  };
+  state.shapeBonusGranted = false;
+  state.freeRerolls = 0;
+  cycleWild(state, "reactor-1"); // tech -> forge
+  cycleWild(state, "reactor-1"); // forge -> flux
+  cycleWild(state, "reactor-1"); // flux -> attack
+  assert.equal(state.rolls["reactor-1"].wildChoice, "attack");
+  assert.equal(state.freeRerolls, 1);
+  assert.equal(state.shapeBonusGranted, true);
+  const winged = previewRoll(state);
+  assert.equal(winged.attackDice, 4);
+  assert.equal(winged.wing, 2);
+  assert.equal(winged.broadside, 0);
+  assert.equal(winged.battalion, 1);
+
+  state.resources.energy = 0;
+  state.rerollsUsed = rerollsAvailable(state);
+  toggleSelection(state, "scout-1");
+  const freeResult = rerollSelected(state);
+  assert.equal(freeResult.ok, true);
+  assert.equal(freeResult.free, true);
+  assert.equal(state.freeRerolls, 0);
+});
+
+test("Ion Chorus and Clean Bay pay out on bank", () => {
+  const state = createInitialState("Nova", 57);
+  state.dice.push(createDie("reactor", 4, "reactor-2"));
+  state.rolls = {
+    "core-1": { symbol: "energy", value: 1 },
+    "reactor-1": { symbol: "energy", value: 2 },
+    "scout-1": { symbol: "energy", value: 1 },
+    "reactor-2": { symbol: "tech", value: 1 }
+  };
+  const preview = previewRoll(state);
+  assert.equal(preview.cleanBay, 1);
+  assert.equal(preview.resonanceGains.energy, 2); // Ion Chorus
+  const beforeEnergy = state.resources.energy;
+  assert.equal(commitRoll(state).ok, true);
+  assert.equal(state.resources.energy, beforeEnergy + 4 + 2);
+  assert.equal(state.lastRound.totalAttack, preview.totalAttack);
+  assert.ok(preview.totalAttack >= preview.base + preview.cleanBay);
+});
+
+test("Spectrum grants an extra tech salvage before Apogee", () => {
+  const state = createInitialState("Nova", 58);
+  state.round = 3;
+  state.rolls = {
+    "core-1": { symbol: "attack", value: 1 },
+    "reactor-1": { symbol: "attack", value: 1 },
+    "scout-1": { symbol: "attack", value: 1 }
+  };
+  const beforeTech = state.resources.tech;
+  commitRoll(state);
+  // face tech 0 + command salvage 1 + spectrum salvage 1
+  assert.equal(state.resources.tech, beforeTech + 2);
+  assert.equal(state.lastRound.spectrumSalvage, 1);
 });
 
 test("the tenth round adds the Apogee conversion and completes the run", () => {
