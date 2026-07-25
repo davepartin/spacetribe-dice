@@ -855,8 +855,10 @@ function boltsSvg(count, boltY, r){
 // cross, and the hull's glow is a 5px drop-shadow, which bled across whatever
 // space was left. So crosses get a smaller scale, a much wider gap, and a
 // tighter shadow of their own (see .hull path.cr).
+// Gap tuned by eye against the glyph: a space about 60% of a cross's width
+// reads as three symbols without drifting apart. 13r was too airy, 9r too tight.
 function crossesSvg(count, y, r){
-  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.5, 13 * r, "cr");
+  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.52, 10 * r, "cr");
 }
 
 function hullSvg(size, value, kind){
