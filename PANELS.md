@@ -314,3 +314,119 @@ Each returns roughly three times its charge, so firing is usually right and
 skipping is never a disaster. The decision is *is this the round worth it*, which
 is the good kind of question — and it's a decision you make while looking at your
 roll, not while doing arithmetic in the shop.
+
+---
+
+## One-shot panels — the rocket
+
+Your idea, and the measurements say it fills a hole we hadn't named.
+
+**Buy a huge single-use weapon onto a face of your flagship. When it launches,
+that face goes blank.** And the blank is a hardpoint — you can re-arm it later,
+which is exactly the "blank sides you upgrade" you asked for at the very start of
+this project, arrived at from the other direction.
+
+### The hole it fills
+
+A ship is worth wildly different amounts depending on when you buy it, because it
+only pays for the rounds it survives to roll in:
+
+| Bought in round | A free d10 adds | A free d6 adds | A 25-point one-shot adds |
+| --- | ---: | ---: | ---: |
+| 2 | **24.1** | 16.6 | 24.3 |
+| 4 | 12.9 | 8.1 | 23.7 |
+| 6 | 4.9 | 2.3 | 23.3 |
+| 8 | 1.7 | 0.3 | 23.2 |
+| 10 | **0.1** | −0.5 | 23.1 |
+
+*(total damage added across a 10-round match, 60,000 matches per row)*
+
+A ship bought in round 10 adds **one tenth of a point of damage.** The shipyard is
+effectively closed in the back half and we never noticed, because there was
+nothing else to do with the money — an average match ends with **13.5 Energy
+unspent.**
+
+A one-shot is flat. It's worth the same whenever you fire it. So it becomes the
+thing late Energy is *for*, without touching the early game at all.
+
+### The trap, which took some measuring
+
+The obvious version — you choose the round you fire it — is broken, and **price
+cannot fix it:**
+
+| Cost | Best line | Wins | Buying it round 4 | Round 3 |
+| ---: | --- | ---: | ---: | ---: |
+| 15⚡ | buy r8, fire r10 | **66.8%** | 36.3% | 22.4% |
+| 20⚡ | buy r8, fire r10 | **65.0%** | 27.5% | 12.2% |
+
+Raising the price by a third moved the best line by less than two points. Of
+course it did — by round 8 the Energy you're hoarding was worthless anyway, so
+the cost isn't a cost. **Any consumable you can time perfectly is unbalanceable
+by price in this game.**
+
+There is one genuinely good thing in that table, though: the same rocket at the
+same price swings from **22% to 67% purely on when you buy it.** Buy it early and
+you starve the engine that was going to win you the match. That's a real skill
+test, and it's the timing decision DECISIONS.md says the game is missing.
+
+### What actually balances it: not knowing
+
+| Version | Fires | Wins |
+| --- | ---: | ---: |
+| One face, fires when rolled | 56% | 45.4% — a losing buy |
+| **Two faces, fires when rolled** | **84%** | **52.6%** |
+| One face, you pick the round | 100% | 66.8% — dominant |
+
+Mounted across **two** faces and fired the moment the flagship rolls it, the plan
+wins 52.6% — a good play rather than a free one. It's balanced *because* it might
+not go off.
+
+And two faces is the better story anyway. It's a huge rocket; of course it takes
+up two sides of the ship. The theme and the balance turn out to be the same rule.
+
+**Proposed:** costs ~15⚡, pays 25 attack, occupies two faces, fires automatically
+the first round the flagship rolls either of them, and leaves two blank
+hardpoints behind.
+
+**Honest caveat:** these come from a model of the rules with a heuristic bot, not
+from the real client. Treat the percentages as directions, not decimals.
+
+---
+
+## Open question — how much Energy is too much?
+
+Filed unsolved, as you asked.
+
+The worry is right: nothing currently stops a player banking a war chest, and
+DIRECTIONS.md already flagged that fuel is the only thing keeping
+bigger-is-always-better in check.
+
+But a carry cap has a consequence that isn't obvious. **A cap is a price
+ceiling.** Nothing in the game can cost more than the cap, or it can never be
+bought at all. And the numbers leave a narrow window:
+
+| | Value |
+| --- | ---: |
+| Average Energy banked, rounds 4–10 | 13–15 |
+| Price of a d10 | 13 |
+| Proposed price of the rocket | 15 |
+| Energy left unspent at match end | 13.5 |
+
+A cap of 12 quietly deletes the d10 from the game. A cap of 25 never binds, since
+the bank rarely gets there. So the whole live range is roughly **15 to 20**, and
+inside it the cap is doing something subtle rather than dramatic.
+
+Things to try before picking one:
+
+- **A hard cap** (excess evaporates) — simple, but it punishes a bad roll you
+  didn't choose, and it makes the round you're saving for feel bad.
+- **A soft cap** (carry what you like, but anything over N is halved) — gentler,
+  and it still lets you reach a d10 eventually.
+- **No cap, but make Energy spend itself** — which is what the rocket does. If
+  late Energy has somewhere good to go, hoarding stops being the default and the
+  cap may not be needed at all.
+
+That last one is worth noticing: **the rocket and the cap are two answers to the
+same problem.** Build the rocket first and re-measure the end-of-match bank. If
+it drops from 13.5 to near zero, the cap is solving a problem that no longer
+exists.
