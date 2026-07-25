@@ -42,7 +42,42 @@ The two most worth playing with first:
 
 ## Versions
 
-### 05 — no rerolls, buy any size, scrap for room (current)
+### 06 — straights priced by how hard they are (current)
+
+Every straight now pays attack from a table, and the table is built from measured
+probability rather than a formula:
+
+| | d4 | d6 | d8 | d10 |
+| --- | ---: | ---: | ---: | ---: |
+| **3 in a row** | 4 | 5 | 6 | 7 |
+| **4 in a row** | 8 | 10 | 12 | 14 |
+| **5 in a row** | 14 | 18 | 21 | 25 |
+| **6 in a row** | 22 | 28 | 33 | 39 |
+
+Measuring the odds overturned the obvious assumption. **A d10 straight is not
+rarer than a d4 straight — it is far more common.** Once you own big ships they
+join nearly every straight and quietly upgrade its tier, so the small-tier
+straights almost vanish. In a fleet holding all four sizes, a d6 straight of
+three lands under 1% of rounds while a d10 straight of three lands 23%.
+
+What is actually rare is **length**. Three in a row happens most rounds; five is
+roughly one in ten; six about one in twenty. So length sets the size of the
+prize and the biggest ship in the straight lifts it for what you paid to own it.
+
+That is why the table rises steeply down the rows and gently across the columns.
+Straights are worth about a third of your attack early and two thirds late —
+enough that nudging a die into place is usually the best Energy you can spend.
+
+The engine now picks whichever straight **pays most**, not whichever is longest.
+A d10 straight of five pays 25 while a d4 straight of six pays 22, so "longest
+wins" would sometimes have handed you the weaker one.
+
+A reference table appears on the roll screen whenever you have no straight, so
+the payoffs are never a mystery.
+
+---
+
+### 05 — no rerolls, buy any size, scrap for room
 
 **Rerolls are gone.** They were Energy with extra steps, and "roll again and hope"
 isn't a skill. Nudging is now the only way to shape a roll: 1 Energy moves a die
