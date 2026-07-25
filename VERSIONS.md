@@ -42,7 +42,59 @@ The two most worth playing with first:
 
 ## Versions
 
-### 07 — a straight needs four dice (current)
+### 08 — the 1 turns blue, and straights pay three different prizes (current)
+
+**Every odd number is blue and every even number is red, no exceptions.** The 1
+rejoins the shield side and still pays 2 Energy. The visual rule is now perfect,
+which is worth more than the identity it costs.
+
+The cost, stated plainly: with the 1 counted as defence, red averages more than
+blue — 20% on a d10, 50% on a d4 — because the top face of every die is even.
+Pulling the 1 out had made them exactly equal. But the extra point lands on
+shields, which were the weaker side, so the practical effect is a buff to the
+thing that needed one.
+
+**Straights now pay by length, and the prizes are different in kind:**
+
+| Straight | Prize | d4 | d6 | d8 | d10 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| **4 in a row** | Energy | 2⚡ | 3⚡ | 4⚡ | 5⚡ |
+| **5 in a row** | Attack | 10 | 15 | 20 | 25 |
+| **6 in a row** | A free ship | d4 +8 | d6 +12 | d8 +16 | d10 +20 |
+| **7 in a row** | A bigger free ship | d6 +12 | d8 +18 | d10 +24 | d10 +30 |
+
+The ship you earn is the size of the biggest ship that took part, which is both
+thematic and self-balancing.
+
+**You may always cash a straight in at a shorter length.** Rolled five in a row
+but would rather build than fight? Take the Energy. That choice is the best new
+decision in the game and it costs no new rules.
+
+Only ever one straight per round. Two separate straights of four turned out to
+need eight distinct values in two blocks — it happens 0% of the time for a mixed
+fleet and 2% for all-small, so it isn't worth the complexity.
+
+**What this did to the shape of the game:**
+
+| | v07 | v08 |
+| --- | ---: | ---: |
+| Straights as share of attack | 49% | **27%** |
+| Shields per round | 5.6 | **10.0** |
+| Base attack per round | 16.5 | 13.5 |
+
+Straights were half the game and are now a quarter, which leaves room for the
+other paths. Shields nearly doubled and now block about 62% of incoming attack
+rather than 20% — so defence is a real thing for the first time, and your
+straights-pierce-shields idea suddenly has a wall to punch through.
+
+Damage per round drops a long way as a result, from roughly 23 to 6. That is a
+much tighter game, which is what we were aiming at, but it is a big swing and
+wants playtesting before we trust it. If it feels too tight, the fastest dials
+are the straight multiplier and Energy from a 2.
+
+---
+
+### 07 — a straight needs four dice
 
 **Straights now need 4 in a row, not 3.** At three you had a straight in 75% of
 rounds, which meant it wasn't a bonus at all — it was part of your base attack.
