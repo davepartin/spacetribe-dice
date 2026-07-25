@@ -42,7 +42,38 @@ The two most worth playing with first:
 
 ## Versions
 
-### 12 — three rolls a round, hold the dice you want (current)
+### 13 — tap what you want to change, buttons under the dice (current)
+
+Three interface fixes, and they turn out to be one idea: **you always tap the
+dice you want to change**, whether the roll is free or paid.
+
+**The selection flipped.** Tapping a die now marks it **REROLL** rather than HELD.
+That's the right way round for two reasons — it matches how you think about it
+("I want to change these two"), and it makes the paid reroll identical to the
+free one instead of a second, backwards mechanic.
+
+**The buttons moved up under the dice**, so the grid is still on screen when the
+numbers change. They also tumble briefly when they land, so you can see which
+ones moved.
+
+**Energy rerolls are their own button.** While you have free rolls it reads
+*Reroll 2 — 2 rolls left*. Once they're gone it becomes *Reroll 2 for 2⚡* — one
+Energy per die. And when exactly one die is picked, **+1** and **−1** nudge
+buttons appear next to it, so all three ways of changing a die sit in the same row:
+
+| Situation | What you get |
+| --- | --- |
+| Free rolls remaining | Reroll any number of dice, free |
+| Free rolls gone | Reroll for 1⚡ a die |
+| Exactly one die picked | +1 or −1 for 1⚡ |
+
+The distinction that makes both worth having: **a reroll is random, a nudge is
+exact.** Same price, opposite tools. Late in a round when you need a 5 and you're
+holding a 4, the nudge is worth far more than a gamble.
+
+---
+
+### 12 — three rolls a round, hold the dice you want
 
 **Yahtzee structure.** Roll everything, tap the dice you want to **hold**, roll
 the rest. Three rolls a round. Nudging still works after that for 1 Energy, and
