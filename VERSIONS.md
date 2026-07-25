@@ -42,7 +42,39 @@ The two most worth playing with first:
 
 ## Versions
 
-### 18 — the Energy bolts are printed on the face (current)
+### 19 — the bolts are big and yellow (current)
+
+Energy is **yellow** now, and not only on the die — the whole resource changed
+colour, so the bolt on the face and the Energy number in the totals bar and the
+price in the shipyard are all the same `#ffe81f`. One resource, one colour. It
+would have been worse to leave the symbol yellow and the number purple.
+
+And the bolts are roughly **80% taller**:
+
+| Hull | Bolt height was | Now | Number moved up to |
+| --- | ---: | ---: | ---: |
+| d4 triangle | 11.4 | **20.4** | y 50 |
+| d6 square | 12.0 | **20.4** | y 48 |
+| d8 diamond | 10.2 | **18.0** | y 48 |
+| d10 pentagon | 12.0 | **21.6** | y 52 |
+
+At this size the polygon walls become the real constraint, so I checked every
+bolt corner against the actual hull outline rather than eyeballing it. All four
+shapes clear it, with 9–10 units of air between the digit's baseline and the top
+of the bolts.
+
+The diamond is still the awkward one and still runs the smallest bolts — it
+narrows fast, so two full-size bolts would poke through its lower edges.
+
+One thing to watch on your phone: **energy yellow and straight gold are now
+neighbours** (`#ffe81f` against `#ffd75e`). They're doing different jobs in
+different places — bolts inside the shape, gold bar along the card's bottom edge
+— but if it reads muddy to you, the clean fix is to hand straights the violet
+that Energy just vacated. Say the word.
+
+---
+
+### 18 — the Energy bolts are printed on the face
 
 The bolts moved **inside the shape**, sitting below the number the way they'd be
 printed on a real die. The separate row underneath the card is gone.
