@@ -42,7 +42,39 @@ The two most worth playing with first:
 
 ## Versions
 
-### 14 — only the dice you rolled wiggle (current)
+### 15 — white means you tapped it, and straights pay properly (current)
+
+**Gold was doing three jobs at once** — selection, straight membership, and the
+flagship — so on a board where 1-2-3-4 lit up every die you couldn't tell which
+one you'd tapped.
+
+Now the two are different in both colour *and* shape:
+
+| | Looks like | Means |
+| --- | --- | --- |
+| **Selected** | white outline, white REROLL tag | something **you** did |
+| **In your straight** | gold bar along the bottom edge | something the **game** did |
+
+Different hue and different shape, so it reads even at a glance on a phone.
+
+**And a straight of four now pays the biggest ship in it, not half of it:**
+
+| Straight of 4 | d4 | d6 | d8 | d10 |
+| --- | ---: | ---: | ---: | ---: |
+| Was | 2⚡ | 3⚡ | 4⚡ | 5⚡ |
+| **Now** | **4⚡** | **6⚡** | **8⚡** | **10⚡** |
+
+You were right that this was broken. Four in a row on a fleet of d4s paid 2
+Energy — **exactly what a single die showing a 2 pays** — despite being vastly
+harder to achieve. It now pays 4, so a straight is twice a lone Energy face. A
+straight of five pays half again on top: 6 / 9 / 12 / 15.
+
+Total Energy income goes from 3.9 to 4.8 a round early on, which means you can
+buy roughly a ship a round from the start instead of waiting two.
+
+---
+
+### 14 — only the dice you rolled wiggle
 
 A real bug, and an instructive one. `render()` rebuilds every die element from
 scratch, so a CSS animation class attached to a die replayed **every time
