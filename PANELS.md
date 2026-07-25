@@ -209,3 +209,108 @@ makes one.
 Then the store sells the rest, and what you buy says what you're building. Take
 Apex Predator and you've told everyone you're going for d10s. Take Last Stand and
 you've told them you're not.
+
+---
+
+## The six families, and what their levels could be
+
+Keeping it at six panel families for now. Each has three levels, priced so that
+level 2 is worth about twice level 1 and level 3 about three times — otherwise
+upgrading is a trap. Values are measured against a mature eight-ship fleet, where
+a normal starting panel is worth about 3.5.
+
+### 1 · Battery — attack from your red dice
+
+| Level | Effect | Worth | Buy |
+| --- | --- | ---: | ---: |
+| I | Every red die hits for **1** more | 3.5 | starting |
+| II | Every red die hits for **2** more | 7.0 | 7⚡ |
+| III | Every red die hits for **3** more | 10.5 | 11⚡ |
+
+The wide-fleet panel. Scales with ships owned, which is safe, and stops at your
+slot count, which is why it can't run away.
+
+### 2 · Screen — shields from your blue dice
+
+| Level | Effect | Worth | Buy |
+| --- | --- | ---: | ---: |
+| I | Every blue die holds for **1** more | 3.5 | starting |
+| II | Every blue die holds for **2** more | 7.0 | 7⚡ |
+| III | Every blue die holds for **3** more, and surplus pays 1⚡ per 2 | 11 | 11⚡ |
+
+Level III is where the Wall path could start — giving surplus shields somewhere
+to go is the fix we keep circling.
+
+### 3 · Reactor — Energy
+
+| Level | Effect | Worth | Buy |
+| --- | --- | ---: | ---: |
+| I | Gain **2** Energy | 4.0 | starting |
+| II | Gain **5** Energy | 10 | 10⚡ |
+| III | Gain **8** Energy, and your next nudge is free | 17 | 16⚡ |
+
+The Reactor path's engine. Note it pays *Energy*, not attack, so it's worth
+double its face value — Energy buys ships, and ships pay every round after.
+
+### 4 · Lance — flat attack, no conditions
+
+| Level | Effect | Worth | Buy |
+| --- | --- | ---: | ---: |
+| I | Add **4** attack | 4.0 | starting |
+| II | Add **9** attack | 9.0 | 9⚡ |
+| III | Add **15** attack | 15 | 15⚡ |
+
+The honest one. No synergy, no condition, works on turn one and turn ten. Every
+game needs a panel like this so the flagship is never dead weight.
+
+### 5 · Targeting — name a number
+
+This is the family with the most flavour, because the number you name declares
+what fleet you're building. Priced off the rate card: a number appears 1.43 times
+a round at 1–4, 0.68 at 5–6, 0.35 at 7–8 and 0.10 at 9–10.
+
+| Level | Effect | Worth | Buy | Needs |
+| --- | --- | ---: | ---: | --- |
+| I | **+3 attack** for each **4** | 4.3 | starting | anything |
+| II | **+6 attack** for each **6** | 4.1 | 5⚡ | a d6 |
+| III | **+11 attack** for each **8** | 3.9 | 5⚡ | a d8 |
+| — | **+40 attack** for each **9** | 4.0 | 6⚡ | a d10 |
+
+All four are worth about the same on paper and feel *completely* different to
+play. Level I fires most rounds for a little. The d10 version fires once every
+ten rounds and wins that round outright. Same expected value, opposite
+experience — and you cannot take the last one without the ship.
+
+### 6 · Beacon — help your straights
+
+The flagship's faces are panels, not numbers, so it can't join a straight. This
+family buys that back, which is the most thematic upgrade in the game.
+
+| Level | Effect | Worth | Buy |
+| --- | --- | ---: | ---: |
+| I | Your straight pays as though it were **one longer** | ~5 | starting |
+| II | Your flagship **joins your straight** as any number it needs | ~9 | 10⚡ |
+| III | Joins, **and** you pick which end it extends | ~13 | 15⚡ |
+
+Level II is the one to build first. It helps you *reach* a straight rather than
+inflating one you already rolled, which is why it doesn't compound the way a
+multiplier would.
+
+---
+
+## Charged versions — Energy as a choice, not a bill
+
+Now that upkeep is gone, charged panels are what gives Energy an ongoing job.
+These are level-III alternates: they pay big if you spend, small if you don't.
+
+| Panel | Fire it | Free | Buy |
+| --- | --- | --- | ---: |
+| **Overload** | 3⚡ → +20 attack | +5 | 11⚡ |
+| **Bulwark** | 3⚡ → +20 shields | +5 | 11⚡ |
+| **Full Spread** | 2⚡ → every red die +4 | +1 each | 12⚡ |
+| **Refit Bay** | 4⚡ → a free d6 joins your fleet | +2 Energy | 11⚡ |
+
+Each returns roughly three times its charge, so firing is usually right and
+skipping is never a disaster. The decision is *is this the round worth it*, which
+is the good kind of question — and it's a decision you make while looking at your
+roll, not while doing arithmetic in the shop.
