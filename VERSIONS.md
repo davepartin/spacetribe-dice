@@ -42,7 +42,59 @@ The two most worth playing with first:
 
 ## Versions
 
-### 11 — upkeep removed, and charged flagship panels (current)
+### 12 — three rolls a round, hold the dice you want (current)
+
+**Yahtzee structure.** Roll everything, tap the dice you want to **hold**, roll
+the rest. Three rolls a round. Nudging still works after that for 1 Energy, and
+does a different job — rolling is random, nudging is exact.
+
+This is a different mechanic to the paid rerolls removed in v05, and better for a
+specific reason. Paid rerolls were a soft decision you made over and over: *is
+one more worth an Energy.* Three rolls is finite and free, so the decision moves
+to **which dice to keep** — and that turns out to have real teeth, because the
+dice you send back to chase a longer straight are dice whose **attack you're
+gambling.** Reroll an 8 and a 10 hunting one more number and you've staked 18
+attack on it.
+
+**Three rolls makes a straight about two lengths easier**, measured on a full
+eight-ship fleet:
+
+| | 1 roll | 2 rolls | 3 rolls |
+| --- | ---: | ---: | ---: |
+| 4 in a row | 47% | 76% | **88%** |
+| 5 in a row | 19% | 46% | **64%** |
+| 6 in a row | 6% | 24% | **40%** |
+| 7 in a row | 1% | 6% | **16%** |
+| 8 in a row | — | — | **3.7%** |
+
+So rather than raise the minimum, the **prize tiers step up two lengths.** The
+odds at 6, 7 and 8 in a row are now almost exactly what 4, 5 and 6 used to be —
+same feel, bigger numbers, and the whole top of the ladder finally gets used:
+
+| Straight | Prize | d4 | d6 | d8 | d10 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| **4 in a row** | Energy | 2⚡ | 3⚡ | 4⚡ | 5⚡ |
+| **5 in a row** | Energy | 4⚡ | 6⚡ | 8⚡ | 10⚡ |
+| **6 in a row** | Attack | 8 | 12 | 16 | 20 |
+| **7 in a row** | Attack | 12 | 18 | 24 | 30 |
+| **8 in a row** | A free ship + attack | d4 +8 | d6 +12 | d8 +16 | d10 +20 |
+
+A straight of four is now just your income rather than a prize, which is the right
+job for something that lands 88% of the time.
+
+**On when the Energy arrives — it has to be at lock, spendable next round.**
+
+If this round's Energy were spendable this round, there'd be a loop: nudge a die
+down to a 2, collect 2 Energy, spend 1 nudging another die down to a 2, collect 2
+more. A nudge costs 1 and a 2 pays 2, so it's net positive forever. So what you
+spend during a round is what you banked before it, and what you earn lands when
+you lock. Clean, and no arithmetic trap.
+
+The opponent gets the same three rolls and holds toward its own best straight.
+
+---
+
+### 11 — upkeep removed, and charged flagship panels
 
 **The upkeep is gone.** You were right to be confused by it — it was a second
 concept doing almost no work. Measured across whole matches:
