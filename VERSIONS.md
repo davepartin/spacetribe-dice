@@ -42,7 +42,48 @@ The two most worth playing with first:
 
 ## Versions
 
-### 19 — the bolts are big and yellow (current)
+### 20 — the Rocket (current)
+
+A one-shot panel you bolt onto the flagship. **It fills two faces. The first
+round either one comes up it launches for 25 attack, and both faces are left
+blank** — and a blank is a hardpoint you can arm again with anything.
+
+Costs 20⚡, and both numbers are in the Tune panel.
+
+Two faces rather than one is the whole design, and it isn't cosmetic:
+
+| Version | Fires | Best line wins |
+| --- | ---: | ---: |
+| One face, fires when rolled | 56% | 45.4% — a losing buy |
+| **Two faces, fires when rolled** | **84%** | **54.7%** |
+| One face, you choose the round | 100% | 66.8% — dominant |
+
+Letting you pick the round breaks it, and **price can't fix that** — raising the
+cost from 15 to 20 moved the best line by less than two points, because by round
+eight the Energy you're hoarding was worthless anyway. What balances a consumable
+in this game is not knowing when it goes off. It's a huge rocket, so it takes up
+two sides of the ship: the theme and the balance are the same rule.
+
+What makes it worth having at all is that **the shipyard is nearly dead in the
+back half.** A d10 bought in round two adds 24 damage across the match; the same
+d10 bought in round ten adds 0.1. A one-shot is worth the same whenever you fire
+it, so it's the natural late buy — and the timing is a real test:
+
+| You buy it in | Best line wins |
+| ---: | ---: |
+| Round 3 | 13.5% |
+| Round 5 | 48.5% |
+| Round 8 | 54.7% |
+
+Buy it early and you starve the engine that was going to win you the match.
+
+It did **not** fix the Energy problem, though — end-of-match banked Energy went
+from 13.5 to 13.6. You spend 20 once and then carry on accumulating. The carry
+cap stays an open question.
+
+---
+
+### 19 — the bolts are big and yellow
 
 Energy is **yellow** now, and not only on the die — the whole resource changed
 colour, so the bolt on the face and the Energy number in the totals bar and the
