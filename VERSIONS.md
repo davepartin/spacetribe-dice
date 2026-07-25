@@ -30,9 +30,11 @@ Eleven settings, all live. Change one, hit **Start a fresh match**, and feel it.
 
 The two most worth playing with first:
 
-- **Run bonus multiplier** — currently 1, so a run of 3 topping at 6 adds 6 attack.
-  Set it to 2 and runs become the whole game. Set it to 0 and see whether the game
-  still holds up without them.
+- **Straight bonus multiplier** — currently 1, so a d6 straight of three adds 6.
+  Set it to 2 and straights become the whole game. Set it to 0 and see whether the
+  game still holds up without them.
+- **Energy from rolling a 2** — currently 1. Set it to 0 to feel version 01 again,
+  or 2 if Energy feels too tight.
 - **How fast they grow** — 1 is an even match. Drop it to 0.5 if the opponent is
   running away from you while we're still tuning other things.
 
@@ -40,7 +42,28 @@ The two most worth playing with first:
 
 ## Versions
 
-### 01 — the simple core (current)
+### 02 — straights named after ships, Energy on the 2 (current)
+
+What changed from 01:
+
+- **The 1 keeps its number**, shown in white with two lightning bolts under it.
+  It still doesn't fight, but it reads as a die face rather than a symbol.
+- **The 2 now pays 1 Energy and still attacks.** That is the roll that used to be
+  a dud and now isn't. It adds 50% to Energy income at every die size, and it
+  makes a 2 worth about the same as a 4 once you value Energy at roughly 2 attack
+  — so keeping a low die became a real decision instead of an obvious no.
+- **Straights are named after the biggest ship in them**, not the highest number.
+  Three d4s rolling 2-3-4 is a **d4 straight** worth 4. Swap one for a d10 and the
+  same numbers become a **d10 straight** worth 10. Your big ships now lift a low
+  straight just by joining it, which is the ships-working-together idea.
+- Bonus is now `biggest ship × (length − 2) × multiplier`.
+
+When we name the fleet, these become Scout straights, Cruiser straights and so on
+— the mechanic is already shaped for it.
+
+---
+
+### 01 — the simple core
 
 The game reduced to something you can read at a glance.
 
