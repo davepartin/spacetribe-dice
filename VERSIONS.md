@@ -42,7 +42,51 @@ The two most worth playing with first:
 
 ## Versions
 
-### 04 — the flagship you design (current)
+### 05 — no rerolls, buy any size, scrap for room (current)
+
+**Rerolls are gone.** They were Energy with extra steps, and "roll again and hope"
+isn't a skill. Nudging is now the only way to shape a roll: 1 Energy moves a die
+up or down by one. What you roll is what you have, and Energy is how you change
+it. (Still a Tune setting if you want them back.)
+
+**Panels lost the clever names and the clever effects.** Four types now, and
+they say what they do:
+
+| Starting | Store |
+| --- | --- |
+| Attack +1 each | Attack +2 each — 9⚡ |
+| Shield +2 each | Shield +4 each — 9⚡ |
+| Energy +2 | Energy +5 — 9⚡ |
+| Attack +4 | Attack +9 — 8⚡ |
+
+The straight and reroll panels are cut. Straights belong to the fleet, not the
+flagship.
+
+**Growing a die is replaced by buying any size outright, and scrapping to make
+room.** Prices are 4 / 6 / 9 / 13, and scrapping returns half — you lose on the
+deal, so you scrap to free a slot, not to raise cash.
+
+The prices took work. At the obvious ones (4 / 8 / 14 / 22) two d4s beat one d6
+for the same money, so saving up was *mathematically wrong* and buying the
+cheapest thing always won:
+
+| Strategy | Old prices | Value prices |
+| --- | ---: | ---: |
+| Buy the biggest you can afford | 176 | **187** |
+| Buy d4s forever | 170 | 169 |
+| Only buy d6+ | 135 | 154 |
+| Only buy d8+ | 122 | 134 |
+
+Pricing dice by what they're worth rather than by how many sides they have gives
+"buy bigger when you can" a real 11% edge. Note that pure hoarding still loses,
+which is correct — sitting on Energy shouldn't be rewarded, and the decision is
+"can I afford better this round" rather than "should I skip a turn."
+
+Eight fleet slots now, since the flagship holds the ninth cell of the grid.
+
+---
+
+### 04 — the flagship you design
 
 Your fleet now sits in a 3×3 grid with a **flagship in the centre**. It has six
 faces, and unlike every other ship those faces are **panels you choose** rather
