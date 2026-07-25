@@ -835,20 +835,24 @@ var CROSS = "M-2,-6 L2,-6 L2,-2 L6,-2 L6,2 L2,2 L2,6 L-2,6 L-2,2 L-6,2 L-6,-2 L-
 
 // One row of symbols, centred, drawn inside the hull below the number. Bolts on
 // a 1 or a 2, crosses on a 3 - never both, so they can share the same slot.
-function marksSvg(count, glyph, colour, y, r){
+function marksSvg(count, glyph, colour, y, r, gap){
   if (!count) return "";
-  var out = "", gap = 9 * r, start = -(gap * (count - 1)) / 2, i;
+  var out = "", start = -(gap * (count - 1)) / 2, i;
   for (i = 0; i < count; i++){
     out += '<path d="' + glyph + '" fill="' + colour + '" ' +
       'transform="translate(' + (50 + start + i * gap) + ',' + y + ') scale(' + r + ')"/>';
   }
   return out;
 }
-function boltsSvg(count, boltY, r){ return marksSvg(count, BOLT, "var(--nrg)", boltY, r); }
-// Crosses are wider than bolts (12 units across, against the bolt's 7), so they
-// need a smaller scale and a wider gap or they collide inside the narrow hulls.
+function boltsSvg(count, boltY, r){
+  return marksSvg(count, BOLT, "var(--nrg)", boltY, r, 9 * r);
+}
+// The cross is 12 units across where the bolt is only 7, so spacing them on the
+// bolt's gap ran them together into a solid bar. They get their own scale AND
+// their own gap: drawn at 0.55 they are 6.6r wide, and a gap of 9r leaves a
+// clear 2.4r of space between each one.
 function crossesSvg(count, y, r){
-  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.62);
+  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.55, 9 * r);
 }
 
 function hullSvg(size, value, kind){
