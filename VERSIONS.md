@@ -42,7 +42,47 @@ The two most worth playing with first:
 
 ## Versions
 
-### 02 — straights named after ships, Energy on the 2 (current)
+### 03 — big ships burn fuel (current)
+
+The dice-building spine. Before this, there was no reason to ever keep a small
+ship — a d10 was simply a better d4, so the shop had no tension and the right
+play was always "buy the biggest thing you can."
+
+The Dominion comparison shows why. Copper actively hurts you: it clogs your
+draw. A d4 didn't hurt, it was just weaker. No dilution, no decision.
+
+I tested four ways to fix it. Making only small ships generate Energy barely
+moved the needle — the difference is too small to matter. What works is
+**upkeep**: big ships burn Energy every round just to launch.
+
+Nine-slot fleets, with Energy recycled into nudges:
+
+| Fleet | Attack |
+| --- | ---: |
+| 9 × d4 | 30.8 |
+| 4 d4 + 3 d6 + 2 d8 | 57.7 |
+| **3 d4 + 3 d6 + 2 d8 + 1 d10** | **63.3** |
+| 2 d4 + 2 d6 + 2 d8 + 3 d10 | 49.2 |
+| 9 × d10 | **0** — never launches |
+
+The best fleet is a flagship inside a screen of small ships, which is both a real
+decision and the right picture. Your capital ship count is limited by how many
+little ones are feeding it.
+
+Changes:
+
+- **Nine slots**, a 3×3 fleet.
+- **A d10 burns 1 Energy every round.** d4, d6 and d8 are free. Unfuelled ships
+  are greyed out and sit the round out entirely — they don't attack, don't
+  shield, and can't join a straight.
+- Fuel is paid before you roll, biggest ships first.
+- The dock shows your fuel burn; the shop warns you before a growth raises it.
+
+Both upkeep numbers are Tune settings. Set the d10 cost to 0 to feel version 02.
+
+---
+
+### 02 — straights named after ships, Energy on the 2
 
 What changed from 01:
 
