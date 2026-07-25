@@ -42,7 +42,41 @@ The two most worth playing with first:
 
 ## Versions
 
-### 06 — straights priced by how hard they are (current)
+### 07 — a straight needs four dice (current)
+
+**Straights now need 4 in a row, not 3.** At three you had a straight in 75% of
+rounds, which meant it wasn't a bonus at all — it was part of your base attack.
+Four lands it in 47%, so it's something you achieve about half the time.
+
+| Minimum | Rounds with a straight |
+| --- | ---: |
+| 3 in a row | 75.5% — too common to feel earned |
+| **4 in a row** | **46.9%** |
+| 5 in a row | 19.3% — a genuine event |
+| 6 in a row | 6.2% — too rare |
+
+Also tested paying **2 × the number of dice** (4 in a row = 8, 7 in a row = 14)
+and it doesn't work, though the reason is interesting. Every extension pays
+exactly +2 whatever the difficulty:
+
+| Extend | Linear 2×N | The table |
+| --- | ---: | ---: |
+| 3 → 4 | +2 | +4 |
+| 4 → 5 | +2 | +6 |
+| 5 → 6 | +2 | +8 |
+| 6 → 7 | +2 | +10 |
+
+Going 6 → 7 is **20× harder** than 3 → 4 — one round in 112 against one in three
+— but linear pays the same for both, so you'd never chase it. Total value per
+round comes out almost identical (6.0 against 6.7), so linear isn't weaker, it's
+flat. The escalation is the whole point: each extra die is worth more than the
+last, which is what makes a long straight worth spending Energy on.
+
+Try minimum 5 in the Tune panel if you want straights to be rare and huge.
+
+---
+
+### 06 — straights priced by how hard they are
 
 Every straight now pays attack from a table, and the table is built from measured
 probability rather than a formula:
