@@ -42,7 +42,36 @@ The two most worth playing with first:
 
 ## Versions
 
-### 17 — the hull is the shape (current)
+### 18 — the Energy bolts are printed on the face (current)
+
+The bolts moved **inside the shape**, sitting below the number the way they'd be
+printed on a real die. The separate row underneath the card is gone.
+
+They're drawn as a path rather than typed as ⚡, which matters for two reasons:
+the glyph turns into a colour emoji on some phones, and a drawn bolt scales with
+the hull instead of fighting the text baseline.
+
+Each hull needed its own placement, because a polygon's usable space isn't where
+you'd guess:
+
+| Hull | Number sits | Bolts sit | Bolt size |
+| --- | ---: | ---: | ---: |
+| d4 triangle | y 60 | y 78 | 95% |
+| d6 square | y 54 | y 74 | 100% |
+| d8 diamond | y 56 | y 76 | 85% |
+| d10 pentagon | y 58 | y 80 | 100% |
+
+The diamond was the awkward one. It narrows fast toward the bottom — at y 76 it's
+only about 34 units wide — so its bolts are shrunk to 85% and its number rides
+higher to leave them room. The triangle is the opposite: widest exactly where the
+bolts want to be, so they tuck in comfortably low.
+
+A 1 shows two bolts and a 2 shows one, which is the rule made visible: **the lower
+face pays more.**
+
+---
+
+### 17 — the hull is the shape
 
 Ships are drawn as their dice now:
 
