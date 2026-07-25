@@ -42,7 +42,29 @@ The two most worth playing with first:
 
 ## Versions
 
-### 13 — tap what you want to change, buttons under the dice (current)
+### 14 — only the dice you rolled wiggle (current)
+
+A real bug, and an instructive one. `render()` rebuilds every die element from
+scratch, so a CSS animation class attached to a die replayed **every time
+anything re-rendered** — including tapping a die to select it. The whole board
+shook whenever you touched one.
+
+The fix is that the animation flag lives in a **one-shot set consumed by the next
+render**, not on the dice themselves:
+
+- Reroll → only the dice that actually changed are flagged
+- Nudge → only that one die
+- A fresh round → all of them, once
+- Tapping, buying, cashing a straight → nothing, because the set was already
+  emptied at the end of the previous render
+
+So the wiggle now means exactly one thing: *this die just changed.* Which makes
+it useful information rather than decoration — with three rolls a round you can
+glance at the board and see what moved.
+
+---
+
+### 13 — tap what you want to change, buttons under the dice
 
 Three interface fixes, and they turn out to be one idea: **you always tap the
 dice you want to change**, whether the roll is free or paid.
