@@ -42,7 +42,48 @@ The two most worth playing with first:
 
 ## Versions
 
-### 08 — the 1 turns blue, and straights pay three different prizes (current)
+### 09 — shield panels halved, store priced flat (current)
+
+**The 1 stays blue.** It doesn't need to be white for the flagship's sake — the
+flagship has its own six panels and never touches the numbered dice, so nothing
+is being kept from it. Blue keeps the visual rule perfect and the extra point
+lands where it's useful.
+
+**Shield panels halved: +2 each becomes +1 each, and the store's +4 becomes +2.**
+
+Your instinct was right and a bug was making it worse. `applyPanel` was still
+skipping the 1 when it counted blue dice, left over from when the 1 wasn't blue.
+Once fixed, the shield panel measured **exactly double** its red counterpart —
+7.0 against 3.5. Halving it lands both on 3.5.
+
+The reason a point of shield is now worth about a point of attack: damage is
+`attack − their shields`, so adding one shield lowers their number by the same
+amount that adding one attack raises yours. Both move the gap by one. That was
+only untrue while shields were routinely wasted, and at 10 against 16 they rarely
+are any more.
+
+| Starting panel | Value |
+| --- | ---: |
+| Attack +1 each | 3.5 |
+| Shield +1 each | 3.5 |
+| Energy +2 | 4.0 |
+| Attack +4 | 4.0 |
+
+Spread 1.15× — the tightest the panels have ever been.
+
+**Store repriced so every panel returns exactly 1.00 value per Energy:** Attack
++2 each and Shield +2 each at 7⚡, Attack +9 at 9⚡, Energy +5 at 10⚡. Nothing in
+the store is a trap and nothing is an auto-buy; you're choosing what your fleet
+needs, not what's underpriced.
+
+Worth noting why this tuning is even possible: **both sides start with identical
+ships.** There's no faction to balance against, only the internal question of
+whether the four things you can spend on are worth the same. That's a much
+easier problem and it's why the numbers are converging.
+
+---
+
+### 08 — the 1 turns blue, and straights pay three different prizes
 
 **Every odd number is blue and every even number is red, no exceptions.** The 1
 rejoins the shield side and still pays 2 Energy. The visual rule is now perfect,
