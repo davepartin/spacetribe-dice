@@ -82,6 +82,9 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .die.r .kind{color:var(--red)}
 .die.b .kind{color:var(--blue)}
 .hull path{filter:drop-shadow(0 0 5px var(--nrg))}
+/* A 5px glow is wider than the space between three crosses, so it welded them
+   into one bar. Theirs is tight enough to leave the gap visible. */
+.hull path.cr{filter:drop-shadow(0 0 1px var(--hp))}
 .die.inrun{border-color:#4a3d14}
 .die.inrun::before{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;
   border-radius:3px 3px 0 0;background:var(--gold);box-shadow:0 0 10px -1px var(--gold)}
@@ -835,24 +838,25 @@ var CROSS = "M-2,-6 L2,-6 L2,-2 L6,-2 L6,2 L2,2 L2,6 L-2,6 L-2,2 L-6,2 L-6,-2 L-
 
 // One row of symbols, centred, drawn inside the hull below the number. Bolts on
 // a 1 or a 2, crosses on a 3 - never both, so they can share the same slot.
-function marksSvg(count, glyph, colour, y, r, gap){
+function marksSvg(count, glyph, colour, y, r, gap, cls){
   if (!count) return "";
   var out = "", start = -(gap * (count - 1)) / 2, i;
   for (i = 0; i < count; i++){
-    out += '<path d="' + glyph + '" fill="' + colour + '" ' +
+    out += '<path class="' + cls + '" d="' + glyph + '" fill="' + colour + '" ' +
       'transform="translate(' + (50 + start + i * gap) + ',' + y + ') scale(' + r + ')"/>';
   }
   return out;
 }
 function boltsSvg(count, boltY, r){
-  return marksSvg(count, BOLT, "var(--nrg)", boltY, r, 9 * r);
+  return marksSvg(count, BOLT, "var(--nrg)", boltY, r, 9 * r, "mk");
 }
-// The cross is 12 units across where the bolt is only 7, so spacing them on the
-// bolt's gap ran them together into a solid bar. They get their own scale AND
-// their own gap: drawn at 0.55 they are 6.6r wide, and a gap of 9r leaves a
-// clear 2.4r of space between each one.
+// The cross is 12 units across where the bolt is only 7. Two things ran the
+// three of them together into a solid bar: the bolt's gap was narrower than a
+// cross, and the hull's glow is a 5px drop-shadow, which bled across whatever
+// space was left. So crosses get a smaller scale, a much wider gap, and a
+// tighter shadow of their own (see .hull path.cr).
 function crossesSvg(count, y, r){
-  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.55, 9 * r);
+  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.5, 13 * r, "cr");
 }
 
 function hullSvg(size, value, kind){
