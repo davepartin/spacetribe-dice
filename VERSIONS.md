@@ -42,7 +42,55 @@ The two most worth playing with first:
 
 ## Versions
 
-### 09 — shield panels halved, store priced flat (current)
+### 10 — the 1 and 2 are pure fuel (current)
+
+**The whole face rule now fits in one line: 1 and 2 are fuel and pay their own
+number, everything above fights — odd blocks, even hits.**
+
+This does three good things at once.
+
+It's cleaner. A face is either fuel or a weapon, never both, and the number tells
+you how much of whichever it is.
+
+It narrows the red/blue imbalance, because the low faces were where the problem
+lived. Red's edge over blue drops from 20–50% to **17–33%**.
+
+And it makes "small ships are tankers, big ships are warships" **structurally**
+true instead of merely statistical. A d4 has two fuel faces and two combat faces.
+A d10 has two and eight.
+
+| Per roll | d4 | d6 | d8 | d10 |
+| --- | ---: | ---: | ---: | ---: |
+| Combat value | 1.75 | 3.00 | 4.13 | 5.20 |
+| Fuel | 0.75 | 0.50 | 0.38 | 0.30 |
+
+A d10 is now 2.97× a d4 in combat, up from 2.20×. That's a real shift toward
+bigger-is-better, so the thing worth checking was whether the fuel economy still
+holds the line. It does — **the best fleet is unchanged:**
+
+| Fleet | Attack, before | Attack, now |
+| --- | ---: | ---: |
+| 8 × d4 | 22.7 | 16.2 |
+| 4d4 2d6 2d8 | 35.4 | 30.0 |
+| **3d4 2d6 2d8 1d10** | **36.0** | **35.7** |
+| 2d4 2d6 2d8 2d10 | 34.0 | 33.8 |
+| 8 × d10 | 27.6 | 25.5 |
+
+A flagship inside a screen still wins. What changed is that the all-small fleet
+lost 29% of its punch, so the curve is steeper and a fleet of nothing but scouts
+is now clearly a fuel operation rather than a fighting force.
+
+**1 and 2 still count as numbers for straights**, which matters — it keeps the
+best decision in the game and actually sharpens it. A 2 on a d8 now pays you fuel
+*and* can bridge a straight, while a 4 on the same die just hits. Choosing between
+them got harder.
+
+The Tune panel setting is "Faces that are pure fuel" — set it to 0 to play v09,
+or 3 if you want scouts to be almost purely tankers.
+
+---
+
+### 09 — shield panels halved, store priced flat
 
 **The 1 stays blue.** It doesn't need to be white for the flagship's sake — the
 flagship has its own six panels and never touches the numbered dice, so nothing
