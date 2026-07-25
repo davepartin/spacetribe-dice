@@ -42,7 +42,43 @@ The two most worth playing with first:
 
 ## Versions
 
-### 15 — white means you tapped it, and straights pay properly (current)
+### 16 — the 1 and 2 rejoin the fight (current)
+
+You were right that there was no reason to sit them out. **Every face fights now:
+odd blocks, even hits, and the two lowest also pay Energy on top.**
+
+| Face | Does |
+| --- | --- |
+| **1** | blocks for 1, pays 2⚡ |
+| **2** | hits for 2, pays 1⚡ |
+| 3 and up | blocks or hits as normal |
+
+The nice consequence is the shape it gives a die. Valuing an Energy at about two
+attack, the faces of a d6 come out worth **5, 4, 3, 4, 5, 6** — so the **1 is your
+best low roll**, the middle is a dead zone, and the top is the top. Both ends of
+the die are good for opposite reasons, and the reroll decision lives in the
+middle where it belongs.
+
+What it changes elsewhere:
+
+| | v15 pure Energy | v16 they fight |
+| --- | ---: | ---: |
+| d4 combat value | 1.75 | **2.50** |
+| d10 combat value | 5.20 | **5.50** |
+| d10 ÷ d4 | 2.97× | **2.20×** |
+
+Small ships gained the most, so the gap between a scout and a capital ship
+narrowed back from 2.97× to 2.20×. A fleet of d4s is a real fighting force again
+rather than only a fuel operation.
+
+The trade, stated plainly: with the 1 counted as a shield, red averages more than
+blue again — 20% on a d10, 50% on a d4, because the top face of every die is even.
+That gap is the price of the clean rule, and it lands on shields, which have been
+the weaker side all along.
+
+---
+
+### 15 — white means you tapped it, and straights pay properly
 
 **Gold was doing three jobs at once** — selection, straight membership, and the
 flagship — so on a board where 1-2-3-4 lit up every die you couldn't tell which
