@@ -335,3 +335,81 @@ statement about the game — on a cheap ship your *middle* face is the jackpot �
 but it isn't a balance problem, and it's flattered by the arithmetic anyway:
 surplus shields are still wasted while health never is, so the 3's true worth
 sits somewhere between 3 and 6 depending on what's incoming.
+
+---
+
+## 10 · Buy order, and whether a cheap wide fleet can ever win
+
+Two questions, and the answers turned out to be linked.
+
+### Is it best to fill all eight slots with d4s first?
+
+**It makes no difference.** Four buy orders, measured head to head against each
+other in the real build:
+
+| | vs rush d4s | vs biggest affordable | vs never buy small | vs only d10s |
+| --- | ---: | ---: | ---: | ---: |
+| **Rush eight d4s, then upgrade** | — | 50.1% | 60.4% | 93.0% |
+| **Buy the biggest you can afford** | 48.2% | — | 59.4% | 92.6% |
+| **Never buy small ships** | 39.3% | 40.6% | — | 88.2% |
+| **Save for d10s only** | 7.5% | 8.0% | 12.0% | — |
+
+Rushing cheap hulls and buying the best you can afford are **within noise of each
+other** — 50.1 against 48.2. Both are correct. What's wrong is *refusing* to buy
+small: holding out for quality loses 60/40, and saving for d10s loses 92/8.
+
+So the shipyard has one trap and two right answers, which is a healthy shape.
+**Fill your slots. How you fill them is taste.**
+
+### But you must diversify sizes — and here's why
+
+A cheap wide fleet is not a viable path, and the reason is structural rather
+than a matter of tuning:
+
+> **A d4 only carries the numbers 1, 2, 3 and 4. Eight of them cover four
+> values, so the longest straight they can physically make is four — which pays
+> Energy only.**
+
+| Fleet | Longest straight possible | Straight income per round |
+| --- | ---: | ---: |
+| Eight d4s | **4** | 6.71 |
+| 4d4 2d6 2d8 | 8 | **16.32** |
+| 2d4 2d6 2d8 2d10 | 8 | **18.47** |
+
+The swarm earns a third of what a mixed fleet earns from straights, and straights
+are the engine of the game. Worse, it's penalised twice: the reward also scales
+with the biggest ship in the straight, so even a *long* d4 straight pays 4× its
+length rather than 10×.
+
+### Three attempted fixes, all of which failed
+
+| Fix | Swarm wins | Why it failed |
+| --- | ---: | --- |
+| Medical Bay (+2 health per 3) | 2.1% → **1.7%** | Healing lengthens matches, and long matches favour whoever is growing |
+| All Hands (+N attack per ship) | 36% at N=2 | But it lifted the *upgrading* fleet to 75% — both fleets fill eight slots, so ship count doesn't distinguish them |
+| Wolfpack (straight scores as 3 longer) | **11.4%** | A d4 straight still pays 4× its tier, not 10× |
+
+**So Fleet Dice currently has one path — grow your ships — with two equally good
+ways to walk it.** That isn't a bug; it falls directly out of "a straight's
+strength comes from the biggest ship taking part," which is a rule we like.
+
+The honest conclusion is that **fleet composition is the wrong place to look for
+alternate paths.** Targeting is the right place, because choosing whether to
+shoot a flagship, an economy or a heavy adds decisions that don't fight the
+core scaling rule. Sections 1–3 above.
+
+### Should health be 2 instead of 3?
+
+It costs about **one round of match length per point of healing**, and nothing
+else:
+
+| Heal per 3 | Match length | Ends in a kill | Swarm wins |
+| ---: | ---: | ---: | ---: |
+| 1 | 9.3 rounds | 100% | 4.4% |
+| 2 | 10.2 rounds | 100% | 2.8% |
+| **3** | **11.1 rounds** | 100% | 1.8% |
+| 4 | 12.0 rounds | 100% | 1.2% |
+
+Every setting still ends in a destroyed flagship, so it isn't a safety question.
+**Keep 3** unless matches start to feel long — and if they do, 2 is a one-round
+saving, not a rebalance.
