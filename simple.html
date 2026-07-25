@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#080c18">
+<title>Fleet Dice</title>
+<style>
+:root{
+  --bg:#080c18; --panel:#111a2e; --panel2:#16223c; --line:#26334f;
+  --ink:#eaf0ff; --dim:#93a3c4; --faint:#61729a;
+  --red:#ff5566; --blue:#45b6ff; --gold:#ffd75e; --nrg:#c58bff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;min-height:100vh;padding-bottom:96px;color:var(--ink);
+  background:radial-gradient(900px 600px at 25% -8%,#1a2a5533,transparent 65%),
+             radial-gradient(700px 500px at 85% 8%,#3a1f5a33,transparent 60%),var(--bg);
+  font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+.wrap{max-width:540px;margin:0 auto;padding:16px 16px 0}
+header{display:flex;align-items:baseline;justify-content:space-between;padding:4px 2px 14px}
+h1{margin:0;font-size:21px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;
+   background:linear-gradient(90deg,var(--blue),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tiny{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:transparent}
+.ver{font-size:11px;letter-spacing:.1em;-webkit-text-fill-color:var(--faint);color:var(--faint);font-weight:600}
+.pill{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+
+.board{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;background:linear-gradient(180deg,var(--panel),#0d1425);
+  border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:16px}
+.board .who{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.board .val{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05}
+.board .mid{align-self:center;font-size:11px;letter-spacing:.1em;color:var(--faint);text-align:center}
+.board .r{text-align:right}
+
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 2px 9px;font-weight:700}
+.say{font-size:15px;color:var(--dim);margin:0 2px 12px}
+.say b{color:var(--ink)}
+.say .red{color:var(--red);font-weight:700}
+.say .blue{color:var(--blue);font-weight:700}
+.say .nrg{color:var(--nrg);font-weight:700}
+
+.dice{display:flex;flex-wrap:wrap;gap:11px;justify-content:center;margin-bottom:14px}
+.die{width:78px;border:1px solid var(--line);border-radius:15px;padding:8px 6px 7px;cursor:pointer;
+  background:linear-gradient(180deg,var(--panel),#0d1425);transition:transform .1s,border-color .1s,box-shadow .1s;user-select:none}
+.die:active{transform:scale(.96)}
+.die.sel{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 26px -8px var(--gold)}
+.die .lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-align:center;margin-bottom:2px}
+.die .num{font-size:34px;font-weight:800;text-align:center;line-height:1.15;font-variant-numeric:tabular-nums}
+.die .kind{font-size:10px;letter-spacing:.09em;text-transform:uppercase;text-align:center;font-weight:700}
+.die.r .num,.die.r .kind{color:var(--red)}
+.die.b .num,.die.b .kind{color:var(--blue)}
+.die.e .num,.die.e .kind{color:var(--nrg)}
+.die.inrun{border-color:var(--gold)}
+
+.tot{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.tot > div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 6px;text-align:center}
+.tot .n{font-size:27px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.tot .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.tot .a .n{color:var(--red)} .tot .d .n{color:var(--blue)} .tot .e .n{color:var(--nrg)}
+
+.run{display:flex;align-items:center;gap:11px;background:#1a1608;border:1px solid var(--gold);
+  border-radius:12px;padding:10px 13px;margin-bottom:14px}
+.run .tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--gold);color:#151005;
+  border-radius:5px;padding:3px 8px;font-weight:800;white-space:nowrap}
+.run .t{font-size:14px} .run .t small{display:block;color:var(--dim);font-size:12px}
+
+button{font:inherit;cursor:pointer;border-radius:12px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--ink);padding:11px 16px;transition:filter .1s,transform .07s}
+button:hover:not(:disabled){filter:brightness(1.28)}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{opacity:.32;cursor:not-allowed}
+button.go{background:linear-gradient(180deg,#3573ff,#1c46c6);border-color:#5182ff;font-weight:700}
+.row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+
+.card{background:linear-gradient(180deg,var(--panel),#0d1425);border:1px solid var(--line);
+  border-radius:15px;padding:14px;margin-bottom:11px}
+.card h3{margin:0 0 3px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}
+.card p{margin:0 0 11px;font-size:14px;color:var(--dim)}
+.buy{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;
+  border:1px solid var(--line);border-radius:11px;background:#0b1322;margin-bottom:8px}
+.buy:last-child{margin-bottom:0}
+.buy .i b{display:block;font-size:14px}
+.buy .i small{color:var(--faint);font-size:12px}
+.cost{font-weight:800;color:var(--nrg);white-space:nowrap}
+
+.rep{font-size:15px;line-height:1.7}
+.rep .line{padding:9px 0;border-bottom:1px solid #1a2440}
+.rep .line:last-child{border-bottom:0}
+.rep b{color:var(--ink)}
+.rep .red{color:var(--red)} .rep .blue{color:var(--blue)} .rep .nrg{color:var(--nrg)}
+.hit{font-size:34px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+.blk{font-size:34px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(10,15,28,.88),rgba(8,12,24,.99));backdrop-filter:blur(14px);
+  padding:11px 16px calc(11px + env(safe-area-inset-bottom))}
+.dockin{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.met{display:flex;gap:16px;flex:1}
+.met .n{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.met .n.p{color:var(--nrg)}
+.met .l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--panel2);
+  border:1px solid var(--gold);padding:10px 16px;border-radius:999px;font-size:14px;z-index:40;
+  box-shadow:0 10px 34px -10px #000}
+.tune{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid #1a2440}
+.tune:last-child{border-bottom:0}
+.tune .i b{display:block;font-size:14px}
+.tune .i small{color:var(--faint);font-size:12px}
+.tune input{width:78px;font:inherit;text-align:center;padding:7px;border-radius:9px;
+  border:1px solid var(--line);background:#0b1322;color:var(--ink)}
+.hint{font-size:13px;color:var(--faint);margin:0 2px 14px}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+
+var VERSION = "01";   // bump this when saving a new simpleNN.html
+
+// ── rules ────────────────────────────────────────────────────────────────
+// Every die: EVEN faces are red (attack), ODD faces 3+ are blue (defense),
+// and the 1 is worth two Energy and no combat value. Pulling the 1 out is
+// what makes red and blue exactly equal on average, on every die size.
+
+// Every number worth arguing about lives here, and the Tune panel edits it
+// live. Nothing about the rules is buried in the code below.
+var C = {
+  rounds:       { v:10, min:3,  max:20, label:"Rounds in a match" },
+  startDice:    { v:4,  min:2,  max:8,  label:"Dice you start with" },
+  maxDice:      { v:8,  min:4,  max:12, label:"Most dice you can own" },
+  freeRerolls:  { v:2,  min:0,  max:5,  label:"Free rerolls each round" },
+  nudgeCost:    { v:1,  min:1,  max:4,  label:"Energy per nudge" },
+  oneEnergy:    { v:2,  min:1,  max:5,  label:"Energy from rolling a 1" },
+  runMin:       { v:3,  min:3,  max:5,  label:"Dice needed for a run" },
+  runMult:      { v:1,  min:0,  max:4,  label:"Run bonus multiplier", step:0.5,
+                  note:"Bonus = highest die x (length - 2) x this" },
+  buyBase:      { v:4,  min:1,  max:10, label:"Cost of your next die" },
+  buyStep:      { v:1,  min:0,  max:4,  label:"Extra cost per die owned" },
+  botPace:      { v:1,  min:0,  max:3,  label:"How fast they grow", step:0.5,
+                  note:"1 = even match. Lower is easier." }
+};
+function K(name){ return C[name].v; }
+
+var DEFAULTS = {};
+Object.keys(C).forEach(function(k){ DEFAULTS[k] = C[k].v; });
+
+var GROW_COST = {6:3, 8:5, 10:8};
+
+function buyCost(owned){
+  return K("buyBase") + Math.max(0, owned - K("startDice")) * K("buyStep");
+}
+
+function kindOf(n){ return n === 1 ? "energy" : (n % 2 === 0 ? "attack" : "defense"); }
+function roll(sides){ return 1 + Math.floor(Math.random() * sides); }
+
+// Best run of 3+ consecutive values. Tier is the highest number in it.
+function bestRun(values){
+  var have = {}, i;
+  for (i = 0; i < values.length; i++) have[values[i]] = true;
+  var best = null;
+  for (var start = 1; start <= 10; start++){
+    var len = 0;
+    while (have[start + len]) len++;
+    if (len >= K("runMin")){
+      var top = start + len - 1;
+      if (!best || len > best.length || (len === best.length && top > best.top)){
+        best = { start: start, top: top, length: len };
+      }
+    }
+  }
+  if (best) best.bonus = Math.round(best.top * (best.length - 2) * K("runMult"));
+  return best;
+}
+
+function tally(dice){
+  var t = { attack: 0, defense: 0, energy: 0 };
+  for (var i = 0; i < dice.length; i++){
+    var n = dice[i].value;
+    if (n === 1) t.energy += K("oneEnergy");
+    else if (n % 2 === 0) t.attack += n;
+    else t.defense += n;
+  }
+  var r = bestRun(dice.map(function(d){ return d.value; }));
+  if (r) t.attack += r.bonus;
+  t.run = r;
+  return t;
+}
+
+function startingDice(){
+  var a = [], i;
+  for (i = 0; i < K("startDice"); i++) a.push(4);
+  return a;
+}
+
+// ── state ────────────────────────────────────────────────────────────────
+var G, sel;
+
+function newGame(){
+  G = {
+    round: 1,
+    phase: "roll",
+    you:  { dice: startingDice(), values: [], energy: 0, damage: 0, rerolls: 0 },
+    them: { dice: startingDice(), values: [], energy: 0, damage: 0 },
+    report: null
+  };
+  sel = {};
+  rollAll(G.you);
+  render();
+}
+
+function rollAll(side){
+  side.values = side.dice.map(function(s){ return { sides: s, value: roll(s) }; });
+}
+
+function doReroll(){
+  var ids = Object.keys(sel).filter(function(k){ return sel[k]; });
+  if (!ids.length) return toast("Tap the dice you want to reroll first");
+  if (G.you.rerolls >= K("freeRerolls")) return toast("No rerolls left this round");
+  G.you.rerolls++;
+  ids.forEach(function(k){
+    var i = +k;
+    G.you.values[i].value = roll(G.you.values[i].sides);
+  });
+  sel = {};
+  render();
+}
+
+// The opponent keeps its high dice and rerolls its low ones, twice.
+function playThem(){
+  rollAll(G.them);
+  for (var r = 0; r < K("freeRerolls"); r++){
+    for (var i = 0; i < G.them.values.length; i++){
+      var d = G.them.values[i];
+      if (d.value !== 1 && d.value <= d.sides / 2) d.value = roll(d.sides);
+    }
+  }
+}
+
+function submit(){
+  playThem();
+  var you = tally(G.you.values);
+  var them = tally(G.them.values);
+
+  var youDealt  = Math.max(0, you.attack  - them.defense);
+  var themDealt = Math.max(0, them.attack - you.defense);
+
+  G.you.damage  += youDealt;
+  G.them.damage += themDealt;
+  G.you.energy  += you.energy;
+  G.them.energy += them.energy;
+
+  G.report = { you: you, them: them, youDealt: youDealt, themDealt: themDealt,
+               themDice: G.them.values.slice() };
+  G.phase = "report";
+  render();
+}
+
+function nextRound(){
+  if (G.round >= K("rounds")){ G.phase = "over"; return render(); }
+  G.round++;
+  G.phase = "shop";
+  render();
+}
+
+function startRound(){
+  G.you.rerolls = 0;
+  sel = {};
+  rollAll(G.you);
+  G.phase = "roll";
+  render();
+}
+
+// Spending Energy mid-round: move one die by one. A reroll is a gamble that
+// only helps this round, so paying for extra rerolls was always the wrong
+// call; a nudge is precise, and it is usually what completes a run.
+function doNudge(delta){
+  var ids = Object.keys(sel).filter(function(k){ return sel[k]; });
+  if (ids.length !== 1) return toast("Select exactly one die to nudge");
+  if (G.you.energy < K("nudgeCost")) return toast("Not enough Energy");
+  var d = G.you.values[+ids[0]];
+  var next = d.value + delta;
+  if (next < 1 || next > d.sides) return toast("That die can't go past " + (next < 1 ? 1 : d.sides));
+  G.you.energy -= K("nudgeCost");
+  d.value = next;
+  render();
+}
+
+// ── shop ─────────────────────────────────────────────────────────────────
+function buyDie(){
+  var cost = buyCost(G.you.dice.length);
+  if (G.you.dice.length >= K("maxDice") || G.you.energy < cost) return;
+  G.you.energy -= cost;
+  G.you.dice.push(4);
+  toast("New die added to your fleet");
+  render();
+}
+function growDie(i){
+  var next = { 4:6, 6:8, 8:10 }[G.you.dice[i]];
+  if (!next) return;
+  var cost = GROW_COST[next];
+  if (G.you.energy < cost) return;
+  G.you.energy -= cost;
+  G.you.dice[i] = next;
+  toast("Die grown to a d" + next);
+  render();
+}
+
+// The opponent grows on a fixed schedule so it keeps pace.
+// They grow on a schedule rather than thinking. botPace scales how much they
+// get: 1 is an even match, lower makes them easier to beat.
+function themGrow(){
+  var t = G.them, pace = K("botPace"), i, nx;
+  var buyOn = [3, 6], growOn = [4, 7, 9];
+  if (buyOn.indexOf(G.round) >= 0 && Math.random() < pace) t.dice.push(4);
+  if (growOn.indexOf(G.round) >= 0 && Math.random() < pace){
+    for (i = 0; i < t.dice.length; i++){
+      nx = { 4:6, 6:8, 8:10 }[t.dice[i]];
+      if (nx){ t.dice[i] = nx; break; }
+    }
+  }
+}
+
+// ── views ────────────────────────────────────────────────────────────────
+function dieHtml(d, i, clickable){
+  var k = kindOf(d.value);
+  var cls = k === "attack" ? "r" : k === "defense" ? "b" : "e";
+  var label = k === "attack" ? "Attack" : k === "defense" ? "Shield" : "Energy";
+  var shown = k === "energy" ? "⚡⚡" : d.value;
+  var inrun = d.inrun ? " inrun" : "";
+  return '<div class="die ' + cls + (sel[i] ? " sel" : "") + inrun + '"' +
+    (clickable ? ' data-die="' + i + '"' : '') + '>' +
+    '<div class="lbl">d' + d.sides + '</div>' +
+    '<div class="num">' + shown + '</div>' +
+    '<div class="kind">' + label + '</div></div>';
+}
+
+function rollView(){
+  var t = tally(G.you.values);
+  var vals = G.you.values.map(function(d){ return d.value; });
+  if (t.run){
+    for (var v = t.run.start; v <= t.run.top; v++){
+      var ix = vals.indexOf(v);
+      if (ix >= 0) G.you.values[ix].inrun = true;
+    }
+  }
+  var free = Math.max(0, K("freeRerolls") - G.you.rerolls);
+  var picked = Object.keys(sel).filter(function(k){ return sel[k]; }).length;
+
+  var h = '<h2>Your roll</h2>' +
+    '<p class="say">Red dice are your <span class="red">attack</span>. Blue are your <span class="blue">shields</span>. ' +
+    'A <span class="nrg">1</span> gives you two Energy instead of fighting.</p>' +
+    '<div class="dice">' + G.you.values.map(function(d,i){ return dieHtml(d,i,true); }).join("") + '</div>' +
+    '<p class="hint">Tap any dice you want to change, then Reroll. ' +
+    (free ? free + " reroll" + (free===1?"":"s") + " left this round." : "No rerolls left \u2014 but you can still nudge.") + '</p>';
+
+  if (t.run){
+    h += '<div class="run"><span class="tag">Run of ' + t.run.length + '</span>' +
+      '<span class="t"><b>' + t.run.start + ' through ' + t.run.top + '</b>' +
+      '<small>Highest die is ' + t.run.top + ', so this adds <b>' + t.run.bonus + '</b> to your attack.</small></span></div>';
+  } else {
+    h += '<p class="hint">Three or more numbers in a row makes a <b>Run</b> and adds bonus attack. ' +
+         'The higher the run, the bigger the bonus.</p>';
+  }
+
+  h += '<div class="tot">' +
+    '<div class="a"><div class="n">' + t.attack + '</div><div class="l">Attack</div></div>' +
+    '<div class="d"><div class="n">' + t.defense + '</div><div class="l">Shields</div></div>' +
+    '<div class="e"><div class="n">' + t.energy + '</div><div class="l">Energy</div></div></div>' +
+    '<div class="row">' +
+    '<button id="reroll"' + (free ? '' : ' disabled') + '>Reroll selected</button>' +
+    '<button id="up"' + (picked === 1 && G.you.energy >= K("nudgeCost") ? '' : ' disabled') + '>Nudge +1 (1⚡)</button>' +
+    '<button id="down"' + (picked === 1 && G.you.energy >= K("nudgeCost") ? '' : ' disabled') + '>Nudge −1 (1⚡)</button>' +
+    '</div>' +
+    '<p class="hint">A nudge moves one die up or down by one for 1 Energy. It is how you finish a run.</p>';
+  return h;
+}
+
+function reportView(){
+  var r = G.report;
+  var blocked = Math.min(r.you.attack, r.them.defense);
+  var wasted = Math.max(0, r.them.defense - r.you.attack);
+  return '<h2>Round ' + G.round + ' result</h2>' +
+    '<div class="card center"><div class="hit">' + r.youDealt + '</div>' +
+    '<p style="margin:4px 0 0">damage you dealt this round</p></div>' +
+    '<div class="card"><div class="rep">' +
+    '<div class="line">You attacked with <b class="red">' + r.you.attack + '</b>' +
+      (r.you.run ? ' (including <b>' + r.you.run.bonus + '</b> from your run of ' + r.you.run.length + ')' : '') + '.</div>' +
+    '<div class="line">Their shields blocked <b class="blue">' + blocked + '</b>' +
+      (wasted ? ', and ' + wasted + ' of their shields went to waste' : '') + '.</div>' +
+    '<div class="line">So <b>' + r.youDealt + '</b> got through.</div>' +
+    '<div class="line">They attacked with <b class="red">' + r.them.attack + '</b>' +
+      (r.them.run ? ' (including <b>' + r.them.run.bonus + '</b> from their run of ' + r.them.run.length + ')' : '') +
+      ', your shields stopped <b class="blue">' + Math.min(r.them.attack, r.you.defense) +
+      '</b>, so you took <b>' + r.themDealt + '</b>.</div>' +
+    '<div class="line">Their dice: ' + r.themDice.map(function(d){
+        var k = kindOf(d.value);
+        var c = k === "attack" ? "red" : k === "defense" ? "blue" : "nrg";
+        return '<b class="' + c + '">' + (k === "energy" ? "1" : d.value) + '</b>';
+      }).join(" · ") + '</div>' +
+    '<div class="line">You banked <b class="nrg">' + r.you.energy + ' Energy</b> from dice showing 1.</div>' +
+    '</div></div>' +
+    '<p class="say">Running totals — you have dealt <b>' + G.you.damage + '</b>, they have dealt <b>' + G.them.damage + '</b>.</p>';
+}
+
+function shopView(){
+  themGrow();
+  var cost = buyCost(G.you.dice.length);
+  var canBuy = G.you.dice.length < K("maxDice") && G.you.energy >= cost;
+  var grows = G.you.dice.map(function(s,i){
+    var next = { 4:6, 6:8, 8:10 }[s];
+    if (!next) return '<div class="buy"><div class="i"><b>d' + s + '</b><small>as big as it gets</small></div></div>';
+    var c = GROW_COST[next];
+    return '<div class="buy"><div class="i"><b>d' + s + ' → d' + next + '</b>' +
+      '<small>bigger numbers on both sides</small></div>' +
+      '<button data-grow="' + i + '"' + (G.you.energy >= c ? '' : ' disabled') + '>' + c + '⚡</button></div>';
+  }).join("");
+
+  return '<h2>Between rounds</h2>' +
+    '<p class="say">You have <span class="nrg">' + G.you.energy + ' Energy</span>. ' +
+    'Spend it now on your fleet, or save it to nudge dice during a round.</p>' +
+    '<div class="card"><h3>Add a die</h3>' +
+    '<p>More dice means more attack, more shields, and a better chance at a run.</p>' +
+    '<div class="buy"><div class="i"><b>New d4</b><small>you have ' + G.you.dice.length + ' of a possible ' + K("maxDice") + '</small></div>' +
+    '<button id="buy"' + (canBuy ? '' : ' disabled') + '>' + cost + '⚡</button></div></div>' +
+    '<div class="card"><h3>Grow a die</h3>' +
+    '<p>A bigger die rolls bigger numbers, and only bigger dice can reach the high runs.</p>' + grows + '</div>' +
+    '<p class="hint">Their fleet: ' + G.them.dice.length + ' dice, largest d' + Math.max.apply(null, G.them.dice) + '.</p>';
+}
+
+function tuneView(){
+  var rows = Object.keys(C).map(function(k){
+    var c = C[k];
+    return '<div class="tune">' +
+      '<div class="i"><b>' + c.label + '</b>' +
+      (c.note ? '<small>' + c.note + '</small>' : '') + '</div>' +
+      '<input type="number" data-set="' + k + '" value="' + c.v + '" ' +
+      'min="' + c.min + '" max="' + c.max + '" step="' + (c.step || 1) + '"></div>';
+  }).join("");
+  return '<h2>Tune the game</h2>' +
+    '<p class="say">Change anything, then start a fresh match to feel it. ' +
+    'These are the numbers worth arguing about \u2014 nothing here is settled.</p>' +
+    '<div class="card">' + rows + '</div>' +
+    '<div class="row"><button class="go" id="restart">Start a fresh match</button>' +
+    '<button id="back">Back to the game</button>' +
+    '<button id="reset">Reset to defaults</button></div>';
+}
+
+function overView(){
+  var won = G.you.damage > G.them.damage;
+  return '<div class="card center">' +
+    '<h3>' + (won ? "You win" : G.you.damage === G.them.damage ? "Dead heat" : "You lose") + '</h3>' +
+    '<div style="font-size:46px;font-weight:800;margin:10px 0">' + G.you.damage + ' – ' + G.them.damage + '</div>' +
+    '<p>Total damage dealt over ' + K("rounds") + ' rounds.</p>' +
+    '<button class="go" id="again">Play again</button></div>';
+}
+
+function render(){
+  var body = G.phase === "tune" ? tuneView()
+           : G.phase === "roll" ? rollView()
+           : G.phase === "report" ? reportView()
+           : G.phase === "shop" ? shopView() : overView();
+  var label = G.phase === "roll" ? "Submit round"
+            : G.phase === "report" ? (G.round >= K("rounds") ? "See result" : "Continue")
+            : G.phase === "shop" ? "Roll round " + G.round : "";
+
+  document.getElementById("app").innerHTML =
+    '<div class="wrap"><header><h1>Fleet Dice <span class="ver">v' + VERSION + '</span></h1>' +
+    '<span><button class="tiny" id="tune">Tune</button> ' +
+    '<span class="pill">' + (G.phase === "over" ? "Finished" : "Round " + G.round + " of " + K("rounds")) + '</span></span></header>' +
+    '<div class="board"><div><div class="who">You</div><div class="val">' + G.you.damage + '</div></div>' +
+    '<div class="mid">DAMAGE<br>DEALT</div>' +
+    '<div class="r"><div class="who">Them</div><div class="val">' + G.them.damage + '</div></div></div>' +
+    body + '</div>' +
+    (G.phase === "over" || G.phase === "tune" ? "" :
+      '<div class="dock"><div class="dockin"><div class="met">' +
+      '<div><div class="n p">' + G.you.energy + '</div><div class="l">Energy</div></div>' +
+      '<div><div class="n">' + G.you.dice.length + '</div><div class="l">Dice</div></div>' +
+      '</div><button class="go" id="next">' + label + '</button></div></div>');
+
+  wire();
+}
+
+function wire(){
+  var n = document.getElementById("next");
+  if (n) n.onclick = function(){
+    if (G.phase === "roll") submit();
+    else if (G.phase === "report") nextRound();
+    else if (G.phase === "shop") startRound();
+  };
+  var rr = document.getElementById("reroll");
+  if (rr) rr.onclick = doReroll;
+  var up = document.getElementById("up");
+  if (up) up.onclick = function(){ doNudge(1); };
+  var dn = document.getElementById("down");
+  if (dn) dn.onclick = function(){ doNudge(-1); };
+  var ag = document.getElementById("again");
+  if (ag) ag.onclick = newGame;
+  var b = document.getElementById("buy");
+  if (b) b.onclick = buyDie;
+
+  var tn = document.getElementById("tune");
+  if (tn) tn.onclick = function(){
+    if (G.phase === "tune"){ G.phase = G.resume || "roll"; }
+    else { G.resume = G.phase; G.phase = "tune"; }
+    render();
+  };
+  var bk = document.getElementById("back");
+  if (bk) bk.onclick = function(){ G.phase = G.resume || "roll"; render(); };
+  var rs = document.getElementById("restart");
+  if (rs) rs.onclick = newGame;
+  var rd = document.getElementById("reset");
+  if (rd) rd.onclick = function(){ Object.keys(C).forEach(function(k){ C[k].v = DEFAULTS[k]; }); newGame(); };
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-set]"), function(el){
+    el.onchange = function(){
+      var k = el.getAttribute("data-set"), c = C[k];
+      var v = parseFloat(el.value);
+      if (isNaN(v)) v = c.v;
+      C[k].v = Math.max(c.min, Math.min(c.max, v));
+      render();
+    };
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-die]"), function(el){
+    el.onclick = function(){
+      var i = el.getAttribute("data-die");
+      sel[i] = !sel[i];
+      render();
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-grow]"), function(el){
+    el.onclick = function(){ growDie(+el.getAttribute("data-grow")); };
+  });
+}
+
+function toast(msg){
+  var old = document.querySelector(".toast");
+  if (old) old.remove();
+  var el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2200);
+}
+
+newGame();
+</script>
+</body>
+</html>
