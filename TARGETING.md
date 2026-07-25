@@ -206,3 +206,68 @@ aimed at a base with hit points.**
 - **A second commodity.** You asked whether we'd need one. I don't think so any
   more: Health *is* the second commodity, and it arrived attached to a face we
   already had.
+
+---
+
+## 8 · Dropping the round limit
+
+*"What if we didn't end in rounds — most of these card games ramp up until
+someone finally wins."*
+
+**It works, and the main worry doesn't happen.** I ran matches with no cap at
+all, at every healing value from 0 to 5 and starting HP from 60 to 150:
+
+> **Not one match in 54,000 failed to end.** Zero stalemates, everywhere.
+
+The reason is built into the dice. Attack scales with fleet quality — a d10 hits
+for 3 a round against a d4's 1.5 — while **healing per die shrinks as your ships
+get bigger**, because a d4 shows a 3 a quarter of the time and a d10 only a
+tenth. So the longer a match runs, the more the fleets out-grow the healing. The
+ramp you wanted is already in the maths; we don't have to add anything.
+
+### How long a match runs (health 3 on every 3)
+
+| Starting HP | Fastest 10% | Median | Slowest 10% | Longest seen |
+| ---: | ---: | ---: | ---: | ---: |
+| 30 | 6 | 8 | 12 | 21 |
+| 40 | 7 | **10** | 14 | 24 |
+| 50 | 8 | **11** | 15 | 24 |
+| 60 | 9 | 12 | 16 | 23 |
+| 100 | 12 | 16 | 20 | 30 |
+
+**Starting HP is now the length dial.** 40–50 gives a median of 10 or 11 rounds,
+which is almost exactly the game we already have — so nothing about the pacing
+has to change, we just stop counting.
+
+### The one real risk: the tail
+
+A median of 11 is fine. The slowest tenth running 15 rounds is fine. But six
+friends playing a round a day means **the longest matches are three and a half
+weeks**, and that's where someone stops answering.
+
+A small escalation rule fixes the tail without touching a normal game:
+
+| Rule | Median | Slowest 10% | Longest |
+| --- | ---: | ---: | ---: |
+| None | 12 | 16 | 23 |
+| +1 damage a round after round 8 | 12 | 14 | 20 |
+| **+2 damage a round after round 8** | 11 | **13** | **18** |
+| +3 damage a round after round 10 | 12 | 14 | 17 |
+
++2 after round eight moves the median by one round and cuts the worst case from
+23 to 18. Thematically it's the war escalating — both sides stop holding back.
+
+### What we'd give up
+
+**The deadline.** Right now "it's round eight, I have to swing *now*" is real
+pressure, and it's exactly what makes the Rocket's timing a test worth failing.
+With no fixed end, every purchase might still have five rounds to pay off, so the
+sharp late-game reckoning softens. That's a loss as well as a gain.
+
+**And a correction to something I said earlier.** I expected dropping the round
+limit to revive the dead late-game shipyard. It doesn't — Energy left over at the
+end went 13.4 to 14.1, essentially unchanged. Looking closer, that 13.5 was never
+a war chest: **it's float, the remainder that's never quite enough for the next
+thing you want.** Which means an Energy carry cap around 15–20 would sit right on
+top of normal pocket change and mostly create noise. The cap is probably solving
+a problem we don't have.
