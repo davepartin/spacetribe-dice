@@ -42,7 +42,54 @@ The two most worth playing with first:
 
 ## Versions
 
-### 03 — big ships burn fuel (current)
+### 04 — the flagship you design (current)
+
+Your fleet now sits in a 3×3 grid with a **flagship in the centre**. It has six
+faces, and unlike every other ship those faces are **panels you choose** rather
+than numbers. One fires each round.
+
+This is where all the interesting choices now live, and that is the point: the
+other eight ships stay plain numbered dice, so the board is still readable at a
+glance while the game gained a whole layer.
+
+**The six starting panels all help the rest of the fleet**, so building ships and
+building your flagship pull in the same direction instead of competing:
+
+| Panel | Effect |
+| --- | --- |
+| Signal | every red die hits for 1 more |
+| Screen | every blue die holds for 2 more |
+| Tender | gain 2 Energy |
+| Relay | one extra reroll this round |
+| Vanguard | your straight pays its biggest ship again |
+| Salvo | a straight 4 attack, no strings |
+
+Later, a **panel store** sells stronger versions for Energy — Signal Array,
+Aegis Net, Reactor Core, Overhaul, Battle Line, Broadside.
+
+Two rules keep it honest:
+
+- **No more than 2 of any panel.** With one face showing per roll, your expected
+  value is just the average of your six, and the average is always maximised by
+  six copies of the best one. Testing confirmed it: all-Battery beat a balanced
+  mix at the same cost. A cap forces a real combination.
+- **Nothing multiplies.** A ×2 attack panel tested 40% ahead of a flat one early
+  and 69% ahead by mid-game, because multipliers grow with everything you build.
+  Per-die support panels grow too, but they stop at your slot count.
+
+The flagship burns fuel like any capital ship, and its faces are panels rather
+than numbers — **so it cannot join a straight.** That is the price of the most
+powerful ship on the board.
+
+Balance after tuning: the six starters sit within 1.47× of each other, the store
+within 1.67×.
+
+Also fixes a v03 bug where the roll screen still counted unfuelled ships in your
+totals. The battle maths was always right; the preview was not.
+
+---
+
+### 03 — big ships burn fuel
 
 The dice-building spine. Before this, there was no reason to ever keep a small
 ship — a d10 was simply a better d4, so the shop had no tension and the right
