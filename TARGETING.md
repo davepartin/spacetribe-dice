@@ -413,3 +413,40 @@ else:
 Every setting still ends in a destroyed flagship, so it isn't a safety question.
 **Keep 3** unless matches start to feel long — and if they do, 2 is a one-round
 saving, not a rebalance.
+
+---
+
+## 11 · When both flagships die in the same volley
+
+You were right that this needed solving, and it's much more common than it
+sounds. Everyone fires at once across the galaxy, so nobody knows they've won
+until the salvos land — and **18.9% of matches end with both flagships
+destroyed.** Near enough one in five. That's not an edge case.
+
+| Starting HP | Both flagships die |
+| ---: | ---: |
+| 40 | 18.9% |
+| **60** | **18.9%** |
+| 80 | 19.6% |
+
+Interestingly it barely moves with hit points, because it's really a property of
+how evenly matched the two damage curves are, not of how much health is on the
+table.
+
+### The cascade
+
+1. **The heavier final volley wins.** Decided by the round you both just
+   watched, which makes it legible and dramatic — and it means someone who was
+   losing can steal the whole match with one enormous last salvo. That's the
+   screenshot.
+2. **Then damage across the whole match.** The final volleys come out level only
+   4.7% of the time, so this almost always settles it, and it rewards the player
+   who was ahead all along.
+3. **Then a genuine mutual destruction.** Both flagships gone, volleys level,
+   and not a point between them across the whole match. That lands in roughly
+   **1 match in 5,000** — rare enough to be a story in itself.
+
+I chose the volley over total damage as the first tiebreak because it's decided
+by what's on screen in front of you rather than by a running total, and because
+"he was dead anyway and still hit me for 33" is a better sentence than "he had
+more cumulative damage."
