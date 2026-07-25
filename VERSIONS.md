@@ -42,7 +42,39 @@ The two most worth playing with first:
 
 ## Versions
 
-### 16 — the 1 and 2 rejoin the fight (current)
+### 17 — the hull is the shape (current)
+
+Ships are drawn as their dice now:
+
+| Ship | Shape |
+| --- | --- |
+| **d4** | triangle |
+| **d6** | square |
+| **d8** | diamond |
+| **d10** | pentagon |
+
+Each is an SVG outline in the face's colour — red for a hit, blue for a block —
+with the number sitting inside it and a soft fill so it reads as a hull rather
+than a wireframe.
+
+**The "d4" caption is gone**, which was the point. Once the silhouette carries the
+size you read the ship at a glance instead of reading a label, and the card gets
+its vertical space back.
+
+One detail worth noting: the numbers sit at each shape's **visual** centre, not
+its geometric one. A triangle's mass is low so the digit drops; a pentagon's is
+slightly high so it lifts. Centring them all the same way looks subtly wrong even
+though it's mathematically correct.
+
+The d6 and d8 use the same four corners — the diamond is just the square turned
+45° — which keeps them clearly distinct while making the family feel related.
+
+White selection outline and the gold straight bar both still sit on the card
+rather than the shape, so all three signals stay readable at once.
+
+---
+
+### 16 — the 1 and 2 rejoin the fight
 
 You were right that there was no reason to sit them out. **Every face fights now:
 odd blocks, even hits, and the two lowest also pay Energy on top.**
