@@ -42,7 +42,49 @@ The two most worth playing with first:
 
 ## Versions
 
-### 10 — the 1 and 2 are pure fuel (current)
+### 11 — upkeep removed, and charged flagship panels (current)
+
+**The upkeep is gone.** You were right to be confused by it — it was a second
+concept doing almost no work. Measured across whole matches:
+
+| | End fleet | d8+ ships | Total attack |
+| --- | --- | ---: | ---: |
+| Upkeep on | 7.9 ships, avg d5.2 | 1.0 | 127 |
+| Upkeep off | 7.9 ships, avg d5.3 | 1.2 | 149 |
+
+Almost identical, because **price was already the limiter.** Eight d10s cost
+104 Energy to assemble and you only earn 60–80 across a match, so the tax was
+guarding against a fleet nobody could afford. Removing it makes both sides about
+17% stronger and changes nothing strategically. The setting survives in the Tune
+panel as a safety valve, defaulted to 0.
+
+So Energy now has **one job: it is what you spend.** Rerolls, nudges, ships,
+panels — never a bill you owe.
+
+**And your idea for the fourth thing to spend it on is in: charged panels.**
+
+| Panel | Fire it | Free |
+| --- | --- | --- |
+| **Overload** | 3⚡ → add 20 attack | add 5 |
+| **Bulwark** | 3⚡ → add 20 shields | add 5 |
+| **Full Spread** | 2⚡ → every red die hits for 4 more | 1 more |
+| **Refit Bay** | 4⚡ → a free d6 joins your fleet | gain 2 Energy |
+
+When one of these comes up on your flagship, a **Fire** button appears and the
+flagship lights up if you pay. Each is worth roughly three times its charge, so
+firing is usually right and skipping is never a disaster — the decision is
+whether this round is the one worth spending on, which is the good kind of
+question.
+
+This is a much better use of Energy than upkeep was. A bill you owe every round
+is arithmetic; a button you choose to press is a decision.
+
+The 1 and 2 are now called **Energy faces** rather than fuel, and the word fuel
+is gone from the game entirely.
+
+---
+
+### 10 — the 1 and 2 are pure Energy
 
 **The whole face rule now fits in one line: 1 and 2 are fuel and pay their own
 number, everything above fights — odd blocks, even hits.**
