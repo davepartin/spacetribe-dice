@@ -271,3 +271,67 @@ a war chest: **it's float, the remainder that's never quite enough for the next
 thing you want.** Which means an Energy carry cap around 15–20 would sit right on
 top of normal pocket change and mostly create noise. The cap is probably solving
 a problem we don't have.
+
+---
+
+## 9 · Settling the swarm question
+
+Section 5 left this unproven because my swarm bot was weak. Re-run against the
+**real v21 build** — real dice, real straights, three rolls a round, both sides
+buying, healing and escalation on:
+
+| Match | Swarm wins |
+| --- | ---: |
+| Eight d4s, never upgrading, vs a fleet that upgrades | **1.6%** |
+| Same match with the sides swapped | **2.0%** |
+| Upgrade vs upgrade (control) | 50.3% |
+| Swarm vs swarm (control) | 49.7% |
+
+**You cannot win with eight d4s.** Both orderings agree and both controls sit on
+50%, so it isn't a bug in the harness.
+
+The reason is that **slots are the limit, not money.** Per Energy spent a d4 is
+easily the best buy — 1.19 a round against a d10's 0.49 — but you only have eight
+slots, and once they're full the only number that matters is value *per slot*:
+
+| Ship | Attack | Shields | Energy | Health | Worth per round |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| d4 | 1.50 | 1.00 | 0.75 | 0.75 | 4.75 |
+| d6 | 2.00 | 1.50 | 0.50 | 0.50 | 5.00 |
+| d8 | 2.50 | 2.00 | 0.38 | 0.38 | 5.63 |
+| d10 | 3.00 | 2.50 | 0.30 | 0.30 | **6.40** |
+
+### The surprise: healing *hurts* the swarm
+
+I expected health on the 3 to help small ships, since a d4 shows a 3 a quarter of
+the time and a d10 only a tenth. It does the opposite:
+
+| Heal per 3 | Swarm wins | Average match |
+| ---: | ---: | ---: |
+| 0 | **9.2%** | 8.7 rounds |
+| **3 (current)** | **1.7%** | 12.4 rounds |
+| 6 | 3.3% | 17.2 rounds |
+| 10 | 37.8% | 24.8 rounds |
+| 15 | 94.9% | 31.2 rounds |
+
+Healing makes matches longer — 8.7 rounds to 12.4 — and **long matches favour the
+fleet that upgrades**, because the upgrade curve compounds while the swarm's
+advantage was only ever early tempo. Health takes away the fast kill that was the
+swarm's single best path. It would take a heal of about 10 before small ships
+came back, which is more than three times what we're running.
+
+### What *is* true about the 3
+
+It's now the best face on a small die:
+
+| Die | Face values (1 Energy = 2, 1 Health = 1) |
+| --- | --- |
+| d4 | 1 = 5, 2 = 4, **3 = 6**, 4 = 4 |
+| d6 | 1 = 5, 2 = 4, **3 = 6**, 4 = 4, 5 = 5, **6 = 6** |
+| d10 | 3 = 6, and every face from 7 up beats it |
+
+On a d4 the 3 is outright best; on a d6 it ties the top face. That's a real
+statement about the game — on a cheap ship your *middle* face is the jackpot —
+but it isn't a balance problem, and it's flattered by the arithmetic anyway:
+surplus shields are still wasted while health never is, so the 3's true worth
+sits somewhere between 3 and 6 depending on what's incoming.
