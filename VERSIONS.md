@@ -42,7 +42,58 @@ The two most worth playing with first:
 
 ## Versions
 
-### 20 — the Rocket (current)
+### 21 — health, hit points, and no more rounds (current)
+
+The biggest change since the game was rebuilt. **The scoreboard is gone.** Your
+flagship has hit points, and the match ends when one of them is destroyed.
+
+**Three green crosses ride on the 3**, on every die, the way Energy rides on the
+1 and the 2. They heal your flagship.
+
+| Face | Does |
+| --- | --- |
+| **1** | blocks for 1, pays 2⚡ |
+| **2** | hits for 2, pays 1⚡ |
+| **3** | blocks for 3, heals **3** |
+| 4 and up | blocks or hits as normal |
+
+The 3 is a *blue* face, so it blocks and heals at once — which is what finally
+makes a defensive round pay for itself. That has been the game's biggest hole
+since v07: shields evaporated while damage compounded, so nobody built defence.
+Now a quiet round is a round you gained something in, and it needed one symbol
+rather than a whole subsystem.
+
+It's also a real reroll ache. You're looking at a 3 — take 3 shields plus 3
+health, or push it to a 4 and hit? That's the same shape as the choice between a
+1 and a 2, which is what the whole face model was built around.
+
+**Flagships start on 60 and there is no round limit.** The worry was stalemates,
+and they don't happen: across 54,000 uncapped matches in the model, **not one
+failed to end**, and in the real build it's 100% with nothing reaching the safety
+net. The reason is already in the dice — attack scales with fleet quality while
+healing per die *shrinks* as your ships get bigger, because a d4 shows a 3 a
+quarter of the time and a d10 only a tenth. The ramp is built in.
+
+Starting HP is now the length dial:
+
+| Starting HP | Median match | Slowest 10% | Longest seen |
+| ---: | ---: | ---: | ---: |
+| 40 | 8 rounds | 13 | 17 |
+| 50 | 10 rounds | 14 | 17 |
+| **60** | **11 rounds** | 15 | 18 |
+
+**And the war escalates.** From round 8, every attack gains 2 more each round.
+Without it a stubborn pair of walls can drag a match past 20 rounds, which in a
+game played once a day is nearly a month — long enough that someone stops
+answering. It moves a typical match by about one round and cuts the worst case
+from 23 to 18.
+
+All four numbers — hit points, health per 3, when the war escalates and by how
+much — are in the Tune panel.
+
+---
+
+### 20 — the Rocket
 
 A one-shot panel you bolt onto the flagship. **It fills two faces. The first
 round either one comes up it launches for 25 attack, and both faces are left
