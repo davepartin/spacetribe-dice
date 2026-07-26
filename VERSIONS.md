@@ -42,7 +42,56 @@ The two most worth playing with first:
 
 ## Versions
 
-### 72 — the old panel game is deleted (current)
+### 73 — two reference pages, and Tune gets out of the way (current)
+
+You asked whether **Tune** matters and whether that space could tell people what
+Energy is for — because they will sit on a pile of it without knowing why.
+
+**Tune matters to you, not to a player.** It is how every number in this game
+gets balanced without a rebuild, and it has earned its place. So it is not
+deleted — it moved to **the version number**. Tap `v73` next to the title and the
+Tune panel opens exactly as before. A player will never press it; you always
+know where it is.
+
+**The top button is now `Energy ⚡`.** It opens a page that answers the question
+the board never did: *what is this number for?*
+
+- **During a round** — a **nudge** is 1⚡ and moves one die up or down by one.
+  That is the cheapest thing in the game and usually the best: one point turns
+  four in a row into five. An extra reroll past your three is 1⚡ a die.
+- **Between rounds** — every hull price, what it averages, and which straight
+  tier it lifts you to. Both flagship levels with their cost.
+- **Where it comes from** — every 1 pays 2, every 2 pays 1, your standing income
+  and what raises it, and the straight tier that pays Energy.
+
+It ends with the part that actually answers your worry:
+
+> **Why hold on to it.** A single 1⚡ nudge at the right moment completes a
+> straight, and saving three rounds for a d10 beats spending the same Energy on
+> two d4s — small hulls fill your berths and then you have to pay to scrap them.
+
+**How to play** sits at the bottom left, right beside Submit round: the round in
+four steps, how to read a die, what the flagship does and why those rings appear,
+straights with the payout table, taking damage and why Direct ignores all of it,
+and how the match ends. On a narrow phone the Ships counter in the bar hides so
+the button always has room.
+
+Neither page shows the bottom bar — they are places you read, not places you act,
+and both return to exactly the phase you left.
+
+Measured: both pages opened and returned cleanly from **roll, report and shop** —
+right phase, Back present, dock correctly hidden, and the phase restored on the
+way out. Every earlier suite still passes.
+
+**A note on how this nearly went wrong.** Moving Tune onto the version number
+silently did nothing the first time: my find-and-replace string had a stray
+quote, matched no text, and reported success. That is the exact failure written
+down in `HANDOFF.md` from v45. The fix was to assert the match before writing the
+file, which is now how these edits get made.
+
+---
+
+### 72 — the old panel game is deleted
 
 You looked at what I was doing and said: *this is all old game mechanics, only
 use the mechanics of the flagship dice we have made and the different dice
