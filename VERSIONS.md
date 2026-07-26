@@ -42,7 +42,46 @@ The two most worth playing with first:
 
 ## Versions
 
-### 78 — Direct moves to the 2, Energy to the 4 (current)
+### 79 — the difficulty dial was a coin flip (current)
+
+v78 left the player winning **81%**, so the first job was to strengthen the
+opponent. There was no way to do it: **`botPace` did nothing above 1.**
+
+Every line of the opponent's growth was gated on `Math.random() < pace`. At a pace
+of 1 that test always passes, so 1, 1.5, 2 and 3 were the same opponent. The Tune
+panel offered a dial to 3 and two thirds of it was decoration — which is why my
+first three measurements came back 81%, 50% and 83% and looked like noise. They
+*were* noise; I was measuring the same thing three times.
+
+It is a **rate** now. `timesPerRound(0.25 × pace)` buys a ship, `timesPerRound(0.33
+× pace)` grows a hull, and the flagship levels arrive at `round 4/pace` and
+`8/pace`. The rates are chosen so **pace 1 reproduces the old schedule exactly** —
+a ship on rounds 2, 4 and 6, a hull grown on 3, 5, 7 and 9 — because that is the
+schedule every measurement in this file was taken against.
+
+Now it moves, and monotonically. Opponent's fleet after 12 rounds, 400 runs each:
+
+| Pace | Ships | Biggest | Total sides | Flagship |
+| --- | --- | --- | --- | --- |
+| 0.5 | 5.5 | d7.6 | 26.0 | 2.0 |
+| 1 | 6.8 | d9.5 | 35.1 | 3.0 |
+| 1.5 | 7.5 | d9.9 | 41.8 | 3.0 |
+| 2 | 7.9 | d10.0 | 47.4 | 3.0 |
+| 3 | 8.0 | d10.0 | 55.7 | 3.0 |
+
+And the win rate finally responds: **pace 1 → 81%, 1.5 → 63%, 1.75 → 46% over 46
+matches, 2 → 21%.**
+
+**The default is now 1.75.** Worth knowing why that is the right side of even: the
+simulated player is deliberately plain — it buys the biggest hull it can afford,
+always braces, holds by the opponent's own logic, and **never chooses a straight
+tier**. A person who reads the straight banner and picks their prize is playing
+better than that, so 46% for the simulation should land a thoughtful human a bit
+above half. That is the feel this game wants. If it is wrong, the dial works now.
+
+---
+
+### 78 — Direct moves to the 2, Energy to the 4
 
 Your read: on a d4 the **4** is the top face, so it was collecting the biggest
 attack *and* the unblockable damage at once — the best face on the smallest die.
