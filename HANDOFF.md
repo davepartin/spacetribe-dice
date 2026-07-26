@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v32)
+## The rules as they stand (v35)
 
 ### Every ship die
 
@@ -76,7 +76,7 @@ One rule covers every face on every ship:
 | **1** | blocks for 1 | **two yellow bolts** — 2 Energy |
 | **2** | hits for 2 | **one yellow bolt** — 1 Energy |
 | **3** | blocks for 3 | **three green crosses** — 3 Health |
-| **4** | hits for 4 | **two violet chevrons** — 2 Direct, when your flagship is firing Direct |
+| **4** | hits for 4 | **two violet chevrons** — the face's picture; Direct lands when your flagship is firing Direct |
 | **5 and up** | odd blocks, even hits | nothing — a big face is just its number |
 
 **Even hits, odd blocks.** All the texture lives in the low faces, which is why

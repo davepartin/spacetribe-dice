@@ -42,7 +42,46 @@ The two most worth playing with first:
 
 ## Versions
 
-### 30–32 — the flagship faces, re-measured (current)
+### 35 — the number is the die (current)
+
+The flagship had become a white card with panel text as the hero. Wrong way
+round. **The number belongs on the front of a real d6**, same weight as the
+ships, because it joins your straight. Panel name and description sit under
+the cube, not on top of it.
+
+The flagship is drawn as a white cube — front face with the number, a sliver of
+top and side so it reads in three dimensions, the way a dice-rolling app does
+it. Ship hulls get the same slight CSS tilt. A 6 gets the little underline so
+it can't be a 9.
+
+---
+
+### 34 — the flagship is a real white die
+
+The flagship used to be a dark gold card with a number in the label. It now
+looks like what it is: a **big white d6**, with classic pips under the face and
+the panel name sitting cleanly on top.
+
+The pips are quiet on purpose — just enough that the board reads as a dice game
+— and a soft frost in the middle keeps them from cutting through the text. The
+thin gold ring is what says *this is the flagship*, not a paint job over the
+die. Your ships stay coloured hulls; the centre of the board is a real cube.
+
+---
+
+### 33 — the chevrons stay on the 4
+
+The purple chevrons on a **4** are the face's picture — same idea as the yellow
+bolts on a 1 and the green crosses on a 3. They had been hidden unless the
+flagship was showing Direct that round, so most of the time a 4 looked like a
+plain red attack face. That was wrong: the mark belongs on the die.
+
+They're back on every 4, always. Direct damage itself still only lands while
+your flagship is firing Direct — the violet edge on the card lights when it is.
+
+---
+
+### 30–32 — the flagship faces, re-measured
 
 Dave asked a simple question — *tell me the six sides of the flagship and why
 they're balanced* — and answering it honestly meant admitting they weren't.

@@ -47,15 +47,71 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
 .grid .die{width:auto}
 .slot{border:1px dashed var(--line);border-radius:15px;min-height:128px;opacity:.35}
-.die.flag{border-color:var(--gold);background:linear-gradient(180deg,#1c1708,#12100a);
-  box-shadow:0 0 26px -10px var(--gold);display:flex;flex-direction:column;justify-content:center}
-.die.flag .lbl{color:var(--gold)}
-.die.flag .pname{font-size:14px;font-weight:800;text-align:center;color:var(--gold);line-height:1.2;margin:4px 0 3px}
-.die.flag .pdesc{font-size:10px;text-align:center;color:var(--dim);line-height:1.25;padding:0 2px}
-.die.flag .chg{font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;
-  color:var(--nrg);font-weight:800;margin-top:4px}
-.die.flag.lit{box-shadow:0 0 30px -6px var(--nrg);border-color:var(--nrg)}
-.die.flag.lit .chg{color:#fff}
+/* The flagship is a real white d6 — pips underneath, panel text on top.
+   Soft gold ring so it reads as the centrepiece without painting over the die. */
+.die.flag{
+  border:none;padding:0;background:transparent;overflow:visible;
+  box-shadow:none;min-height:148px;
+  display:flex;align-items:stretch;justify-content:stretch;
+  transform:scale(1.06);transform-origin:center center;z-index:2}
+.die.flag .flagdie{
+  position:relative;flex:1;border-radius:20px;overflow:hidden;
+  background:
+    linear-gradient(155deg,#ffffff 0%,#f4f5f9 38%,#e4e7f0 100%);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:
+    0 0 0 2px #c9a227,
+    0 0 28px -4px rgba(255,215,94,.65),
+    0 14px 28px -14px rgba(0,0,0,.75),
+    inset 0 1px 0 rgba(255,255,255,.98),
+    inset 0 -12px 20px -12px rgba(40,48,70,.2);
+}
+.die.flag .pips{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.die.flag .flagface{
+  position:relative;z-index:1;height:100%;min-height:148px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:14px 11px 12px;text-align:center;
+  /* Soft frost over the middle so pips stay visible at the edges but never
+     cut through the panel name. */
+  background:radial-gradient(ellipse 78% 58% at 50% 48%,
+    rgba(255,255,255,.94) 0%,rgba(255,255,255,.78) 42%,rgba(255,255,255,0) 70%);
+}
+.die.flag .flbl{
+  font-size:8px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;
+  color:#8a7340;margin-bottom:5px}
+.die.flag .pname{
+  font-size:15px;font-weight:800;color:#141820;line-height:1.15;margin:0 0 4px;
+  letter-spacing:.01em;
+  text-shadow:0 0 10px #fff,0 0 4px #fff}
+.die.flag .pdesc{
+  font-size:10px;color:#3a4558;line-height:1.3;padding:0 1px;font-weight:600;
+  text-shadow:0 0 8px #fff,0 0 3px #fff}
+.die.flag .chg{
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;
+  color:#7a5a00;font-weight:800;margin-top:6px;
+  background:rgba(255,232,31,.28);border:1px solid rgba(201,162,39,.45);
+  border-radius:999px;padding:3px 8px}
+.die.flag.lit .flagdie{
+  box-shadow:
+    0 0 0 1.5px var(--nrg),
+    0 0 28px -4px rgba(255,232,31,.75),
+    0 10px 22px -12px rgba(0,0,0,.65),
+    inset 0 1px 0 rgba(255,255,255,.95)}
+.die.flag.lit .chg{color:#1a1400;background:rgba(255,232,31,.55);border-color:var(--nrg)}
+.die.flag.sel .flagdie{
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px #c9a227,
+    0 0 26px -6px rgba(255,255,255,.55),
+    0 10px 22px -12px rgba(0,0,0,.65)}
+.die.flag.sel::after{color:#141820;top:8px;right:8px;
+  background:rgba(255,255,255,.85);border-radius:4px;padding:1px 4px}
+.die.flag.inrun .flagdie{
+  box-shadow:
+    0 0 0 1.5px var(--orange),
+    0 0 22px -6px rgba(255,148,56,.55),
+    0 10px 22px -12px rgba(0,0,0,.65)}
+.die.flag.inrun::before{left:14px;right:14px;bottom:0;z-index:2}
 .die{width:78px;border:1px solid var(--line);border-radius:15px;padding:6px 5px 5px;cursor:pointer;
   background:linear-gradient(180deg,var(--panel),#0d1425);transition:transform .1s,border-color .1s,box-shadow .1s;user-select:none}
 /* The hull silhouette carries the ship's size, so no caption is needed. */
@@ -196,7 +252,7 @@ button.go{background:linear-gradient(180deg,#3573ff,#1c46c6);border-color:#5182f
 <script>
 "use strict";
 
-var VERSION = "36";   // bump this when saving a new simpleNN.html
+var VERSION = "34";   // bump this when saving a new simpleNN.html
 
 // ── IDEAS NOT BUILT YET ──────────────────────────────────────────────────
 // Kept here rather than in a doc so they stay next to the numbers they touch.
@@ -1044,10 +1100,14 @@ function crossesSvg(count, y, r){
 function chevronsSvg(count, y, r){
   return marksSvg(count, CHEV, "var(--direct)", y, r * 0.9, 9 * r, "ch");
 }
-// A 4 only carries Direct while the flagship is actually firing it, so the mark
-// never promises damage that is not happening.
+// Two purple chevrons are printed on every 4 — the face's picture, same as
+// bolts on a 1 and crosses on a 3. Direct damage itself still only lands while
+// your flagship is firing Direct; the violet card edge lights when it is.
 function directLive(){
   return G && G.you && flagPanel(G.you) === "direct" ? K("panelDirect") : 0;
+}
+function chevronsOf(value, kind){
+  return value === 4 && kind !== "dry" ? 2 : 0;
 }
 
 function hullSvg(size, value, kind){
@@ -1061,7 +1121,7 @@ function hullSvg(size, value, kind){
       'style="font-variant-numeric:tabular-nums">' + value + '</text>' +
     boltsSvg(energyOf(value), h.boltY, h.boltR) +
     crossesSvg(healOf(value) ? Math.min(healOf(value), 4) : 0, h.boltY, h.boltR) +
-    chevronsSvg(value === 4 && kind !== "dry" ? Math.min(directLive(), 4) : 0, h.boltY, h.boltR) +
+    chevronsSvg(chevronsOf(value, kind), h.boltY, h.boltR) +
     '</svg>';
 }
 
@@ -1088,16 +1148,46 @@ function gridHtml(){
   return '<div class="grid">' + cells.join("") + '</div>';
 }
 
+// Classic d6 pip layouts on a 3×3. The white die is the object; the panel text
+// sits on top. Pips stay quiet so the face never fights the words.
+var PIP_FACE = {
+  1: [5],
+  2: [1, 9],
+  3: [1, 5, 9],
+  4: [1, 3, 7, 9],
+  5: [1, 3, 5, 7, 9],
+  6: [1, 3, 4, 6, 7, 9]
+};
+var PIP_XY = {
+  1: [26, 26], 2: [50, 26], 3: [74, 26],
+  4: [26, 50], 5: [50, 50], 6: [74, 50],
+  7: [26, 74], 8: [50, 74], 9: [74, 74]
+};
+function flagPipsSvg(n){
+  var spots = PIP_FACE[n] || PIP_FACE[1], out = "", i, xy;
+  for (i = 0; i < spots.length; i++){
+    xy = PIP_XY[spots[i]];
+    out += '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r="8" fill="#1a2030" fill-opacity="0.22"/>' +
+      '<circle cx="' + (xy[0] - 1.6) + '" cy="' + (xy[1] - 1.8) + '" r="2.4" fill="#fff" fill-opacity="0.28"/>';
+  }
+  return '<svg class="pips" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
+    out + '</svg>';
+}
+
 function flagHtml(){
-  var id = flagPanel(G.you), p = PANELS[id], c = chargeOf(id);
+  var id = flagPanel(G.you), p = PANELS[id], c = chargeOf(id), n = flagNumber(G.you);
   return '<div class="die flag' + (sel.flag ? ' sel' : '') + (charged ? ' lit' : '') +
     (flagInLine ? ' inrun' : '') +
     (animate.flag ? ' rolled' : '') + '" data-flag="1">' +
-    '<div class="lbl">Flagship \u00b7 ' + flagNumber(G.you) + '</div>' +
-    '<div class="pname">' + p.name + '</div>' +
-    '<div class="pdesc">' + p.desc + '</div>' +
-    (c ? '<div class="chg">' + (charged ? "FIRING" : c + "\u26a1 to fire") + '</div>' : '') +
-    '</div>';
+    '<div class="flagdie">' +
+      flagPipsSvg(n) +
+      '<div class="flagface">' +
+        '<div class="flbl">Flagship</div>' +
+        '<div class="pname">' + p.name + '</div>' +
+        '<div class="pdesc">' + p.desc + '</div>' +
+        (c ? '<div class="chg">' + (charged ? "FIRING" : c + "\u26a1 to fire") + '</div>' : '') +
+      '</div>' +
+    '</div></div>';
 }
 
 // A small reference so the payoffs are never a mystery.

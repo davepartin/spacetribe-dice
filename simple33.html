@@ -196,7 +196,7 @@ button.go{background:linear-gradient(180deg,#3573ff,#1c46c6);border-color:#5182f
 <script>
 "use strict";
 
-var VERSION = "36";   // bump this when saving a new simpleNN.html
+var VERSION = "33";   // bump this when saving a new simpleNN.html
 
 // ── IDEAS NOT BUILT YET ──────────────────────────────────────────────────
 // Kept here rather than in a doc so they stay next to the numbers they touch.
@@ -1044,10 +1044,14 @@ function crossesSvg(count, y, r){
 function chevronsSvg(count, y, r){
   return marksSvg(count, CHEV, "var(--direct)", y, r * 0.9, 9 * r, "ch");
 }
-// A 4 only carries Direct while the flagship is actually firing it, so the mark
-// never promises damage that is not happening.
+// Two purple chevrons are printed on every 4 — the face's picture, same as
+// bolts on a 1 and crosses on a 3. Direct damage itself still only lands while
+// your flagship is firing Direct; the violet card edge lights when it is.
 function directLive(){
   return G && G.you && flagPanel(G.you) === "direct" ? K("panelDirect") : 0;
+}
+function chevronsOf(value, kind){
+  return value === 4 && kind !== "dry" ? 2 : 0;
 }
 
 function hullSvg(size, value, kind){
@@ -1061,7 +1065,7 @@ function hullSvg(size, value, kind){
       'style="font-variant-numeric:tabular-nums">' + value + '</text>' +
     boltsSvg(energyOf(value), h.boltY, h.boltR) +
     crossesSvg(healOf(value) ? Math.min(healOf(value), 4) : 0, h.boltY, h.boltR) +
-    chevronsSvg(value === 4 && kind !== "dry" ? Math.min(directLive(), 4) : 0, h.boltY, h.boltR) +
+    chevronsSvg(chevronsOf(value, kind), h.boltY, h.boltR) +
     '</svg>';
 }
 
