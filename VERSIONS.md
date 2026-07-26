@@ -42,7 +42,51 @@ The two most worth playing with first:
 
 ## Versions
 
-### 66 — the brace screen says what it does (current)
+### 67 — the result screen adds up (current)
+
+You said the score screen could be better and that the **+3 repair was red when
+it should be green**. The colour was a one-line fix — `.hit` set red and `.hp`
+never won the tiebreak — but pulling on it found something worse.
+
+**The arithmetic on screen was wrong.** The screen said *"You attacked with 12.
+Their shields blocked 7. So 9 got through."* Twelve minus seven is five. The
+missing four was the **Direct**, which the total quietly folded in but the
+sentences never mentioned. Every round with a Direct in it had been showing a
+sum that does not work, and a player checking our maths would have concluded the
+game was cheating.
+
+So the round result is now a **ledger** rather than a paragraph. Two of them —
+your shot and their shot — each running top to bottom:
+
+    Your fleet attacked                6
+    Their shields                     −6
+    They put a d10 in the way         −4
+    ─────────────────────────────────────
+    Through to their flagship          0
+    Direct — no shield stops it       +2
+    ═════════════════════════════════════
+    Damage to their flagship           2
+
+Direct is a **row**, so you can see it skip the shield line. Fodder is a row, so
+you can see what the ship bought you. The subtotal is where the shot stops and
+the total is what lands.
+
+Above the ledgers, three counters: **You dealt · You took · Repaired**, the
+repair in green. Below them, the things that are not arithmetic — the straight,
+the free ship, wasted shielding, which panel each flagship fired, their dice,
+Energy banked.
+
+Two big stacked hero cards used to eat the whole phone screen to show two
+numbers. Those numbers are now one strip, and the space goes to the ledgers.
+
+Measured: 198 result screens across 25 full matches, with a machine checking
+every ledger — that the rows above the rule sum to the total, and that the
+subtotal equals everything before it. **All 198 add up.** That check now runs on
+every future change, so this class of error cannot come back silently.
+
+---
+
+### 66 — the brace screen says what it does
 
 Three complaints, all about the screen where you decide whether to put a ship in
 front of an incoming shot. All three were the same complaint underneath: **the
