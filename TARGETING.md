@@ -672,3 +672,86 @@ kind of fleet do you want and how do you want the damage taken.* The Rocket was
 fun but it was a number you buy. This is a decision you make with the pieces
 already on the table — and it turns the moment you open the app, which is
 currently passive ("you took 22"), into the most interesting choice of the round.
+
+---
+
+## 14 · Cannon fodder — the numbers behind it
+
+You asked what the maths and the fun say. Here's both.
+
+### First: how much damage actually arrives?
+
+This turns out to be the number everything else hangs on, and it isn't what the
+averages suggest — **the distribution is wildly skewed.**
+
+| Round | 10th %ile | Median | 90th %ile | 99th %ile | Rounds where nothing gets through |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 0 | **2** | 7 | 11 | 36% |
+| 4 | 0 | **3** | 12 | 23 | 35% |
+| 7 | 0 | **7** | 25 | 38 | 27% |
+| 10 | 0 | **15** | 34 | 47 | 14% |
+| 12 | 2 | **20** | 39 | 54 | 8% |
+
+Two things to take from that. **Most rounds barely hurt** — a third of early
+rounds land nothing at all, because shields eat the lot. And **the damage that
+matters arrives in spikes**: a round-ten hit is typically 15 but one in ten is 34
+and one in a hundred is 47.
+
+That's the shape that makes fodder interesting. If damage were a steady 15 every
+round, sacrificing a ship would be routine bookkeeping. Because it's 2, 2, 0, 31,
+4, 0, 44, you're deciding *is this the spike?*
+
+### Your half-and-half idea, measured
+
+**It breaks the game, and badly:**
+
+| Each ship eats | Max ships | Always-sacrifice beats never |
+| --- | ---: | ---: |
+| 50% of the hit | 2 | **99.8%** |
+| 50% of the hit | 1 | 92.3% |
+| 25% of the hit | 2 | 76.2% |
+| **Half the ship's own faces** | **1** | **39.7%** |
+
+The reason is in the table above. Half of a 34-point spike is 17 absorbed by one
+ship — more than three times what that ship produces over the four rounds it
+spends crippled. **A proportional soak pays you most exactly when you need it
+most**, which is the definition of a broken defensive rule: it removes the spikes
+that are supposed to be the danger.
+
+So the principle is: **the hull decides what it can eat, not the shot.** A d10
+soaks 5 whether the incoming is 6 or 46. Against a median round-ten hit of 15
+that's a third of it blunted; against a 40-point spike it's a rounding error.
+Fodder softens ordinary rounds and cannot save you from a real one — which is
+what keeps the flagship in danger and the match ending.
+
+### How many ships per round?
+
+| Max per round | Always-soak beats never | Restraint beats always-soak | Ships given up per match |
+| ---: | ---: | ---: | ---: |
+| **1** | 40.3% | 63.1% | **10.4** |
+| 2 | 33.3% | 70.7% | 20.8 |
+| 3 | 31.2% | 73.6% | 23.0 |
+| Any | 31.3% | 74.2% | 23.9 |
+
+Raising the cap doesn't make sacrificing stronger — it makes it *easier to
+overuse*, so reflexive soaking gets worse and restraint gets more valuable.
+Tempting, but look at the last column: **two ships a round means 21 sacrifices a
+match**, which is a lot of taps and a lot of half-dark dice on a phone.
+
+**One ship a round.** One decision, one animation, one thing to explain, and the
+discipline test is already there at 40.3%.
+
+### Where it lands
+
+| | |
+| --- | --- |
+| Who chooses | The defender, always |
+| How many ships | **One a round** |
+| What it soaks | **Half its faces** — d4 soaks 2, d6 3, d8 4, d10 5 |
+| What it costs | That half of the die goes blank for **4 rounds** |
+| Which half | **You choose** — red-damaged loses the evens, blue-damaged the odds |
+
+And the decision you're actually making, which is the good bit: *this hit is 22.
+I can eat 5 of it with my d10 and lose its guns for four rounds, or take all 22
+on the flagship and keep shooting.* That question has a different answer at 55
+health than at 12, and a different answer again in round three than in round ten.
