@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v62)
+## The rules as they stand (v63)
 
 ### Every ship die
 
@@ -94,7 +94,7 @@ the shipyard, not one face at a time.
 
 | Face | At level 1 |
 | ---: | --- |
-| **1** | **Reactor** — your base Energy rises by **1** (by 2 at level 2, 3 at level 3) |
+| **1** | **Reactor** — your base Energy rises by **2**, for the rest of the match |
 | **2** | Every **2** pays **2** more Energy |
 | **3** | Every **3** repairs **2** more |
 | **4** | Every **4** hits for **2** Direct |
