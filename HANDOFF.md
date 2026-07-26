@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v59)
+## The rules as they stand (v62)
 
 ### Every ship die
 
@@ -88,12 +88,16 @@ Its faces mean what those numbers mean everywhere else, so there's nothing extra
 to learn. **Each face does one thing, automatically. No menus on a die** — the
 choosing in this game lives in which dice you reroll.
 
-| Face | Does |
+**The flagship has a level, and the level is the number on every face.** Level 1
+pays **2**, level 2 pays **3**, level 3 pays **4**. You upgrade the whole ship in
+the shipyard, not one face at a time.
+
+| Face | At level 1 |
 | ---: | --- |
-| **1** | **Reactor** — your base Energy rises by 1, for the rest of the match |
-| **2** | Every **2** pays 2 more Energy |
-| **3** | Every **3** repairs 3 more |
-| **4** | Every **4** hits for 3 Direct |
+| **1** | **Reactor** — your base Energy rises by **1** (by 2 at level 2, 3 at level 3) |
+| **2** | Every **2** pays **2** more Energy |
+| **3** | Every **3** repairs **2** more |
+| **4** | Every **4** hits for **2** Direct |
 | **5** | Every blue die blocks **2** more |
 | **6** | Every red die hits **2** more |
 
@@ -115,12 +119,14 @@ so if a total looks high, check this first.
    bigger, and the biggest *ship* in the line sets the size of the prize. A long
    straight can always be cashed as a shorter one, so it's a real choice —
    **Refuel**, **Strike** or **Build**.
-4. **Submit.** Damage is `your attack − their shields`, plus any **Direct**,
-   which goes past shields entirely.
-5. **Brace.** If damage got through, *you* decide where it lands: take it on the
-   flagship, or **feed it one ship**. That ship blocks its own size — a d10 blocks
-   10 — and is **Damaged** for the next round: greyed in its berth, not rolling,
-   not rerollable, not scrappable. It's back the round after.
+4. **Submit.** Your **volley** is `your attack − their shields`. **Direct** is
+   tracked separately and **nothing stops it** — not shields, not a ship thrown in
+   front of it. It always reaches the flagship.
+5. **Brace.** If the **volley** got through, *you* decide: take it on the flagship,
+   or **feed it one ship**. That ship blocks its own size — a d10 blocks 10 — and is
+   **Damaged** for the next round: greyed in its berth, not rolling, not
+   rerollable, not scrappable. It's back the round after. **A fed ship cannot
+   touch Direct.**
 6. **Repair, then take the hit.** Your 3s repair your flagship first.
 
 ### Winning
@@ -152,7 +158,8 @@ All of these are live in the **Tune** panel, top right.
 | Rolls a round | 3 | then 1 Energy a die |
 | A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
 | Ships you may feed a round | **1** | at 2, careless play loses far too hard |
-| Flagship faces | 1 Reactor · 2 +2 Energy per #2 · 3 +3 repair per #3 · 4 +3 Direct per #4 · 5 +2 per shield · 6 +2 per attack | every face is a plain multiplier, and they are deliberately not equal |
+| Flagship level | **1** of 3 | the level is the number on every face: 2, 3, then 4 |
+| Flagship upgrades | 16⚡ then 26⚡ | one purchase lifts all six faces |
 | War escalates after round | 8, by 2 a round | |
 | Rocket | 20⚡, pays 25, fills two faces | |
 
