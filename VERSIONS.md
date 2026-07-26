@@ -42,7 +42,49 @@ The two most worth playing with first:
 
 ## Versions
 
-### 35 — the number is the die (current)
+### 66 — the brace screen says what it does (current)
+
+Three complaints, all about the screen where you decide whether to put a ship in
+front of an incoming shot. All three were the same complaint underneath: **the
+screen was describing itself in game-designer shorthand instead of telling a
+player what will happen.**
+
+**All eight berths now show.** It was drawing one card per ship you own, so a
+four-ship fleet showed four cards in a row and the board changed shape between
+the roll screen and this one. It now draws the same 3×3 you've been looking at
+all round — flagship in the middle, eight numbered berths around it, empty ones
+drawn as empty. *Slot 5 is empty* is information; you should be able to see it.
+
+**The instruction was stale and wrong.** It read *"Feed it a ship? — each blocks
+half its faces and sits out one round."* Half its faces stopped being the rule
+in v57 — a ship blocks its own size now — so the screen had been lying for nine
+versions. It now says: tap a ship to take the hit there; it blocks damage equal
+to its size, then it is damaged for the next round, will not roll, and cannot be
+scrapped; it is back the round after.
+
+**The button read like a choice it isn't.** *"Take 4 on the flagship"* sits next
+to a row of ships you can tap, so it looks like the fourth option on a menu. It
+is not an option — it is what happens when you stop choosing. Now:
+**"Continue — flagship takes 4"**, and when nothing landed, **"Continue —
+nothing gets through."**
+
+Two things fixed on the way past: the hulls were drawing a **0** on every ship,
+because the screen passed a value of zero to a die that isn't rolling. They now
+show no number at all, just the hull and `d6 · blocks 6`. And the counter strip
+is hard-coded to five columns, so a three-item strip was bunching to the left —
+it takes a `three` variant now.
+
+Measured: 40 full matches driven through the real screen, feeding a ship on half
+the brace prompts. 40/40 reached a finish, 252 brace screens drawn, every one of
+them 9 cells, 1,008 empty berths rendered, no console errors.
+
+**A note on this file.** Versions 36 through 65 were never written up here — the
+detail for those lives in `HANDOFF.md` and in the git log. Worth backfilling
+before the next big rule change.
+
+---
+
+### 35 — the number is the die
 
 The flagship had become a white card with panel text as the hero. Wrong way
 round. **The number belongs on the front of a real d6**, same weight as the
