@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v45)
+## The rules as they stand (v58)
 
 ### Every ship die
 
@@ -90,8 +90,8 @@ choosing in this game lives in which dice you reroll.
 
 | Face | Does |
 | ---: | --- |
-| **1** | Gain 2 Energy |
-| **2** | **Reactor** — your base Energy rises by 1, for the rest of the match |
+| **1** | **Reactor** — your base Energy rises by 1, for the rest of the match |
+| **2** | Every **2** pays 2 more Energy |
 | **3** | Every 3 repairs 4 more |
 | **4** | Every 4 hits for 3 Direct |
 | **5** | Every blue die blocks 1 more, and +3 shields |
@@ -113,11 +113,9 @@ roll.
 4. **Submit.** Damage is `your attack − their shields`, plus any **Direct**,
    which goes past shields entirely.
 5. **Brace.** If damage got through, *you* decide where it lands: take it on the
-   flagship, or **put one ship in front of it**. That ship soaks a flat 2 and
-   loses half its faces for 4 rounds — you pick which half. **Red-damaged** loses
-   its evens and can still block and heal; **blue-damaged** loses its odds and can
-   still shoot. A ship already crippled can be thrown in again, which destroys it
-   and frees the slot.
+   flagship, or **feed it one ship**. That ship blocks its own size — a d10 blocks
+   10 — and is **Damaged** for the next round: greyed in its berth, not rolling,
+   not rerollable, not scrappable. It's back the round after.
 6. **Repair, then take the hit.** Your 3s repair your flagship first.
 
 ### Winning
@@ -147,9 +145,9 @@ All of these are live in the **Tune** panel, top right.
 | Scrap value | 50% | |
 | Fleet slots | 8 | plus the flagship |
 | Rolls a round | 3 | then 1 Energy a die |
-| Damage a ship soaks | **2** | flat, any hull |
-| Rounds a crippled ship stays dark | 4 | |
-| Flagship panels | Energy 2 · Repair 4 a three · Direct 3 a four · Shields +1 each +3 · Attack +1 each +2 | |
+| A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
+| Ships you may feed a round | **1** | at 2, careless play loses far too hard |
+| Flagship faces | 1 Reactor · 2 Energy per 2 · 3 Repair 4 a three · 4 Direct 3 a four · 5 Shields +1 each +3 · 6 Attack +1 each +2 | |
 | War escalates after round | 8, by 2 a round | |
 | Rocket | 20⚡, pays 25, fills two faces | |
 
