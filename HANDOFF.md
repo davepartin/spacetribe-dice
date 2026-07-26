@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v58)
+## The rules as they stand (v59)
 
 ### Every ship die
 
@@ -92,10 +92,10 @@ choosing in this game lives in which dice you reroll.
 | ---: | --- |
 | **1** | **Reactor** — your base Energy rises by 1, for the rest of the match |
 | **2** | Every **2** pays 2 more Energy |
-| **3** | Every 3 repairs 4 more |
-| **4** | Every 4 hits for 3 Direct |
-| **5** | Every blue die blocks 1 more, and +3 shields |
-| **6** | Every red die hits 1 more, and +2 attack |
+| **3** | Every **3** repairs 3 more |
+| **4** | Every **4** hits for 3 Direct |
+| **5** | Every blue die blocks **2** more |
+| **6** | Every red die hits **2** more |
 
 The flagship **also lends its number to your straight**, and its boost still
 fires. It never scores as attack or shields — that would be three jobs from one
@@ -147,7 +147,7 @@ All of these are live in the **Tune** panel, top right.
 | Rolls a round | 3 | then 1 Energy a die |
 | A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
 | Ships you may feed a round | **1** | at 2, careless play loses far too hard |
-| Flagship faces | 1 Reactor · 2 Energy per 2 · 3 Repair 4 a three · 4 Direct 3 a four · 5 Shields +1 each +3 · 6 Attack +1 each +2 | |
+| Flagship faces | 1 Reactor · 2 +2 Energy per #2 · 3 +3 repair per #3 · 4 +3 Direct per #4 · 5 +2 per shield · 6 +2 per attack | every face is a plain multiplier, and they are deliberately not equal |
 | War escalates after round | 8, by 2 a round | |
 | Rocket | 20⚡, pays 25, fills two faces | |
 
