@@ -450,3 +450,83 @@ I chose the volley over total damage as the first tiebreak because it's decided
 by what's on screen in front of you rather than by a running total, and because
 "he was dead anyway and still hit me for 33" is a better sentence than "he had
 more cumulative damage."
+
+---
+
+## 12 · Balancing the four level-1 flagship panels
+
+One panel per thing the game is made of — **attack, shields, health, Energy** —
+and each round you find out which of the four your flagship is enhancing.
+
+Balanced by playing each panel on all six faces against each of the others,
+15,000 matches a pairing, in the real build:
+
+| | Attack | Shields | Repair | Energy |
+| --- | ---: | ---: | ---: | ---: |
+| **Attack** | — | 50% | 51% | 46% |
+| **Shields** | 51% | — | 48% | 56% |
+| **Repair** | 49% | 53% | — | 57% |
+| **Energy** | 54% | 44% | 44% | — |
+
+Every pair lands between 44% and 57%, which is about as level as whole numbers
+allow.
+
+### The four
+
+| Panel | Level 1 |
+| --- | --- |
+| **Attack** | Every red die hits for **1 more**, and **+2 attack** |
+| **Shields** | Every blue die holds for **1 more**, and **+3 shields** |
+| **Repair** | Every **3** heals **4 more** |
+| **Energy** | **+3 Energy** |
+
+### Two things the numbers insisted on
+
+**Shields need more than attack, even though they fire equally often.** Red and
+blue faces come up almost exactly as much — 4.09 against 3.91 on a mid fleet — so
+"+1 a die" ought to be even money. It isn't: at equal rates attack beat shields
+**57/43**, because surplus attack still counts and surplus shields are thrown
+away. That's why the shield panel carries +3 flat against attack's +2. It's the
+same asymmetry that has been dogging defence since v07, and here it's paid for
+explicitly instead of being ignored.
+
+**Healing fades as your fleet grows, exactly as you predicted.** Threes per round:
+
+| Fleet | 3s a round | What Repair pays |
+| --- | ---: | ---: |
+| Starting four d4s | 1.21 | 4.9 |
+| Mid — 4d4 2d6 2d8 | 1.53 | **6.1** |
+| Late — 2d4 2d6 2d8 2d10 | 1.08 | 4.3 |
+| Capital — eight d10s | 0.69 | 2.8 |
+
+So Repair peaks at mid-game and quietly becomes the weakest of the four once
+you're flying d10s. I'd keep that rather than fix it: **the panel you want in
+round two isn't the one you want in round nine**, which gives the flagship shop
+a reason to exist beyond raw upgrades.
+
+Here's the same thing for all four, which is the clearest picture of the set:
+
+| Fleet | Attack | Shields | Repair | Energy |
+| --- | ---: | ---: | ---: | ---: |
+| Start — 4× d4 | 4.0 | 5.0 | 4.9 | 6.0 |
+| Mid — 4d4 2d6 2d8 | 6.1 | 6.9 | 6.1 | 6.0 |
+| Late — 2d4 2d6 2d8 2d10 | 6.2 | 6.8 | 4.3 | 6.0 |
+
+*(Energy valued at 2 a point, which is what it converts to in ships over a match.)*
+
+Energy is flat by nature, so it's the strongest of the four on turn one and the
+most ordinary later — the mirror image of Repair. Attack and Shields both grow
+with the fleet, which is why they're the two that get doubled on the starting
+flagship.
+
+### Still to do
+
+**Level 2.** The shipyard panels haven't been re-balanced against the new level
+1, only checked that each is still an upgrade. Medical Bay had to go from "+2 a
+three" to "+6" or it would have been *worse* than the starter it upgrades.
+
+**An idea worth considering:** six faces don't divide evenly into four areas, so
+two get doubled. If the flagship were a **d4** at level 1 — four faces, one per
+area — it would divide perfectly, and the flagship could then grow d4 → d6 → d8
+the same way your ships do. That would make the flagship's *shape* an upgrade
+path rather than only its faces.
