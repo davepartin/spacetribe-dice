@@ -42,7 +42,16 @@ The two most worth playing with first:
 
 ## Versions
 
-### 75 — "pays" becomes "adds", everywhere (current)
+### 76 — the top button says "Upgrade costs" (current)
+
+Renamed as you asked. Two things went with it, because a button that disagrees
+with the page it opens is its own small confusion: the page heading changed from
+**Prices** to **Upgrade costs**, and the shop's pointer to it — which still said
+"on the Energy page at the top" — now names the button a player can actually see.
+
+---
+
+### 75 — "pays" becomes "adds", everywhere
 
 You pointed at *"every face pays 3"* and said it should be **adds** — that what
 really happens is **each matching face gets a bonus**. You are right, and the old
