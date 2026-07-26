@@ -42,7 +42,74 @@ The two most worth playing with first:
 
 ## Versions
 
-### 29 — the flagship fires *and* joins the line (current)
+### 30–32 — the flagship faces, re-measured (current)
+
+Dave asked a simple question — *tell me the six sides of the flagship and why
+they're balanced* — and answering it honestly meant admitting they weren't.
+
+**What went wrong.** The four original panels were balanced back at v24, all
+landing between 44% and 57% against each other. But that was measured under the
+old straight rules, and **Direct and the Reactor had never been through the test
+at all.** Running the full six:
+
+| Face | Average against the other five |
+| --- | ---: |
+| 1 Energy | 63.9% |
+| 2 Reactor | **67.5%** |
+| 3 Repair | 58.3% |
+| 4 Direct | **27.1%** |
+| 5 Shields | 42.7% |
+| 6 Attack | 40.3% |
+
+Raising the straight minimum from four to five had quietly shifted the ground
+under the original tuning. **Any change to a core rule means the flagship needs
+re-checking** — that's the lesson worth keeping.
+
+**v30 — three numbers.** Energy **3 → 2**, Direct **2 → 3**, Reactor cash
+**4 → 3**.
+
+**v31 — face 1 had no reason to exist.** Face 2 paid *more* cash than face 1 and
+offered the engine on top: strictly better on both axes. Its cash dropped to 2 to
+match. And testing the cap turned up something useful — **+1, +3 and uncapped all
+measure the same**, because you rarely roll the 2 twice and a +1 arriving in round
+nine has no time to pay for itself.
+
+**v32 — no menus on a die.** Dave's call, and it's now a rule we keep: *a face
+does one thing, automatically. The choosing lives in which dice you reroll.* Face
+2 is simply **your base Energy rises by 1**. It's also why the whole game still
+works with real dice on a table.
+
+The cash-or-engine menu was never the reason face 2 was strong, either. With the
+cash set to **zero** it still beat a second Energy face 53.7% of the time. **A
+permanent gain beats a one-off and no number fixes that** — +1 base picked up in
+round three pays about 8 Energy before the match ends, against a flat 2.
+
+**Where the six landed.** Each face measured in place — the real flagship against
+one with that face swapped for a second Attack:
+
+| Face | Worth |
+| --- | ---: |
+| 1 Energy | 50.2% |
+| **2 Reactor** | **56.0%** |
+| 3 Repair | 52.4% |
+| 4 Direct | 50.1% |
+| 5 Shields | 49.0% |
+| 6 Attack | 49.9% |
+
+Five of six within a point and a half. The Reactor stays the strongest by about 6
+points, and that's inherent rather than a tuning error. It doesn't unbalance
+anything today because both players start with the identical flagship — **but it
+will matter the moment flagship faces become buyable**, because nobody would ever
+sell their Reactor. Price it accordingly.
+
+One methodology note for next time: putting a panel on **all six faces** to
+measure it *overstates anything permanent*, because the Reactor reaches its cap in
+three rounds and then collects forever. For a face with a lasting effect, test it
+in place instead.
+
+---
+
+### 29 — the flagship fires *and* joins the line
 
 You were right and I was wrong. Making you choose between the flagship's boost
 and its number was a false economy: **the moment worth building toward is your
