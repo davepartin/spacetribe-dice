@@ -755,3 +755,128 @@ And the decision you're actually making, which is the good bit: *this hit is 22.
 I can eat 5 of it with my d10 and lose its guns for four rounds, or take all 22
 on the flagship and keep shooting.* That question has a different answer at 55
 health than at 12, and a different answer again in round three than in round ten.
+
+---
+
+## 15 · The flagship is a normal d6
+
+Your idea, and it's the cleanest thing we've done. **The flagship's faces mean
+what the same numbers mean on every other ship**, so there is nothing new to
+learn:
+
+| Face | Boosts | Because on a ship… |
+| ---: | --- | --- |
+| **1** | Energy | a 1 pays Energy |
+| **2** | *held open* | — |
+| **3** | Health | a 3 heals |
+| **4** | Direct | a 4 is the Direct face |
+| **5** | Shields | 5 is odd, and odd blocks |
+| **6** | Attack | 6 is even, and even hits |
+
+You're right that this is the tell we haven't over-built it. **Every piece of
+this game is now a real object you could put on a table** — four ship dice, one
+flagship d6, a health track, and a pile of Energy tokens. Nothing needs an app to
+adjudicate it. That's worth protecting as we add the rest.
+
+---
+
+## 16 · How much should a ship absorb?
+
+You asked whether it should be a flat 5 for everyone, and worried that scaling by
+size means you'd always feed the small ones in first. The maths says something
+sharper than either.
+
+### Flat is right, and the reason is counter-intuitive
+
+**Half of a big ship is barely worth more than half of a small one.**
+
+| Ship | Half of it is worth, per round | Cost of 4 rounds crippled |
+| --- | ---: | ---: |
+| d4 | 2.38 | 9.5 |
+| d6 | 2.50 | 10.0 |
+| d8 | 2.81 | 11.3 |
+| d10 | 3.20 | 12.8 |
+
+A d10 is 2.5× the price of a d4 but sacrificing half of it only costs you 35%
+more. So if the soak scaled with size, you'd get this:
+
+| Ship | Soak per point of value lost — flat 5 | — soak = half its faces |
+| --- | ---: | ---: |
+| d4 | **0.53** | 0.21 |
+| d6 | 0.50 | 0.30 |
+| d8 | 0.44 | 0.36 |
+| d10 | 0.39 | **0.39** |
+
+**Scaled soak makes your d10 the best fodder in the fleet** — twice as efficient
+as a d4 — which is exactly backwards. You'd feed your capital ship to the guns
+and keep the scouts safe.
+
+**Flat soak puts it the right way round.** Small ships become 36% more efficient
+as shields, so cheap hulls are cannon fodder, which is both the fantasy and the
+first real job d4s have had since we priced them.
+
+### But 5 is too much
+
+| Soak | Always-soak beats never | Restraint beats always-soak |
+| --- | ---: | ---: |
+| Half its faces (2/3/4/5) | 42.4% | 59.7% |
+| **Flat 3** | **51.3%** | **52.3%** |
+| Flat 4 | 59.8% | 46.5% |
+| Flat 5 | **67.2%** | 42.1% |
+| Flat 8 | 82.4% | 31.3% |
+
+At a flat 5, sacrificing becomes automatic — 67% says you should always do it,
+and a mechanic you always use isn't a decision. **At a flat 3 both policies sit
+within two points of even**, which is what a live choice looks like.
+
+### Finishing off a crippled ship
+
+Letting an already-damaged ship soak again and die is a strong option, so it
+needs paying for:
+
+| Flat soak, with finish-it-off allowed | Always-soak beats never |
+| ---: | ---: |
+| 1 | 38.8% |
+| **2** | **49.6%** |
+| 3 | 61.0% |
+| 4 | 70.4% |
+
+**So: 3 if a crippled ship is spent, 2 if it can be finished off.** I'd take the
+second — the extra rule earns its place, because "my d4 was already half dead so
+I threw the rest of it in front of the shot" is a better moment than "that ship
+is unavailable."
+
+And it closes a loop: destroying your own ship **frees the slot**, so a d4 you
+finished off costs 4 Energy to replace while a d10 costs 13. Cheap ships are
+cheap to lose *and* cheap to rebuild, which stacks the fodder role onto them
+twice over.
+
+### All the reasons you'd pick a different ship
+
+With a flat soak, "use the smallest" is the default — but it's a default, not a
+rule, and here's everything that overrides it:
+
+1. **Your small ships are already crippled.** The obvious one, and it arrives
+   fast: nine or ten ships get spent in a typical match.
+2. **You need this round's Energy.** The d4s are your fuel — 38% of a d4's value
+   is Energy against a d10's 10%. Crippling the blue half of a d4 costs you the
+   1s and the 3s, which is the fuel and the healing at once.
+3. **Straights need low numbers.** Only d4s and d6s cover 1 through 4 reliably.
+   Cripple two d4s and your straight of six may be gone.
+4. **Which half is worth more depends on the round.** If you're playing a
+   defensive round anyway, taking the *red* half off a d10 costs you almost
+   nothing right now — you weren't going to use those five attack faces.
+5. **You're about to be finished.** At 8 health, efficiency is irrelevant; you
+   take the soak from whatever is still whole.
+6. **Replacement cost.** A destroyed d4 is 4 Energy to replace, a d10 is 13 — so
+   the *finish-it-off* option is far more attractive on a small hull.
+
+### Where it lands
+
+| | |
+| --- | --- |
+| Who chooses | The defender |
+| Ships per round | One |
+| Soak | **A flat 2, any hull** |
+| Cost | Half that die goes blank for 4 rounds — **you choose red or blue** |
+| Already crippled? | It may soak again, and is **destroyed** — the slot frees up |
