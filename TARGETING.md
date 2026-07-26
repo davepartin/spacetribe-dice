@@ -1026,3 +1026,81 @@ have.
 
 It also gives the flagship a fifth thing to be, and it's the only face that
 changes your future rather than your round.
+
+---
+
+## 19 · Damaged, not dark — the simpler fodder rule
+
+Your rewrite: **a ship you throw in front of a shot is *damaged*. It sits out the
+next round entirely, then comes back.** No odd/even halves, no four-round
+sentence. You still own it, it's greyed out and marked DAMAGED, and you can still
+sell it.
+
+It's better, and for a reason beyond simplicity: **the cost is immediate and
+visible.** You see the hole in your fleet next round, not spread thinly over four.
+
+### What a ship is worth for one round
+
+Measured on a fleet of two of each size — remove one ship and see what the fleet
+loses:
+
+| Ship | Costs the fleet, for that round |
+| --- | ---: |
+| d4 | 8.63 |
+| d6 | 9.30 |
+| d8 | 9.23 |
+| **d10** | **10.37** |
+
+**Almost flat.** A d10 costs only 20% more to lose than a d4. Which kills the
+"mid dice soak more" idea stone dead — if they all cost the same to lose, they
+should all soak the same, or the bigger one is simply better fodder again.
+
+The reason is that the fleet covers for a missing ship: three rolls and seven
+other dice absorb most of the gap, and a d4's Energy and Repair are worth about
+as much as a d10's bigger numbers.
+
+### The cap is the whole design
+
+Your instinct — *you could block everything but have a terrible round* — turns out
+to be the danger rather than the feature:
+
+| Soak | Ships per round | Using fodder beats never | Playing it smart beats spamming it |
+| ---: | ---: | ---: | ---: |
+| 3 | any | 1.6% | 97.9% |
+| 5 | any | 35.9% | 81.0% |
+| **6** | **any** | **80.0%** | 47.5% |
+| **4** | **2** | **47.3%** | **58.1%** |
+| 5 | 2 | 61.4% | 46.5% |
+| 5 | 1 | 63.3% | 44.0% |
+
+**Uncapped, there is no middle.** At a soak of 5 fodder is useless; at 6 it's
+dominant. Nothing sits between, because "block the whole hit" is either
+achievable or it isn't — and the moment it is, you do it every round and never
+take damage again.
+
+**A cap of two creates the middle.** At two ships and 4 each, using fodder is
+roughly break-even against never using it (47.3%), and playing it with judgement
+still beats spamming it (58.1%). That's a live decision instead of a solved one.
+
+### Where it lands
+
+| | |
+| --- | --- |
+| Who chooses | The defender |
+| Ships per round | **Two** |
+| Each soaks | **4**, any hull |
+| Cost | That ship is **damaged** — out for the next round, then back |
+| Most you can block | **8** in a round |
+
+Eight is about half a typical round-ten hit and a fifth of a bad one, so fodder
+blunts and never negates. And the price is steep and legible: two ships out next
+round costs about **19** of your roughly 60 points of production. You'd only pay
+that when the alternative is worse — which is the definition of a desperation
+move worth having.
+
+### Is it fun?
+
+I think so, and more than the version it replaces. The trade is one sentence —
+*two ships for eight damage* — you watch the hole appear in your own fleet the
+following round, and the answer genuinely changes with your health. At 55 you
+take the hit. At 12 you feed it two ships and hope. That's the moment.
