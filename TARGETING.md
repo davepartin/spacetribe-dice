@@ -530,3 +530,105 @@ two get doubled. If the flagship were a **d4** at level 1 — four faces, one pe
 area — it would divide perfectly, and the flagship could then grow d4 → d6 → d8
 the same way your ships do. That would make the flagship's *shape* an upgrade
 path rather than only its faces.
+
+---
+
+## 13 · The defender chooses — and it fixes what targeting couldn't
+
+This is the best structural idea in the project so far, and the reason is that it
+**inverts the exact thing that broke attacker-chosen targeting.**
+
+Back in section 2, letting the attacker pick a target won 84% of matches and left
+the loser with less than one ship, because the attacker always picks the most
+painful thing to lose. Hand that choice to the **defender** and the spiral cannot
+start: nobody ever chooses a trade that's worse for them than the alternative.
+The victim controls their own decline. That's self-limiting by construction, not
+by tuning.
+
+### The rule
+
+Damage arrives as one number. Before it lands, the defender decides:
+
+- take it on the flagship, **or**
+- **cripple one of your own ships to soak part of it**
+
+A crippled ship is **red-damaged** (its even faces go blank — guns wrecked, it can
+still block and heal) or **blue-damaged** (odd faces blank — shields wrecked, it
+can still shoot). You choose which half you're giving up, and that alone is a
+good decision: *do I keep my guns or my screen?*
+
+### The numbers
+
+I sweated this one, because my first guess was badly wrong. Valuing half a ship
+by what it produces per round says a fair soak is about *sides + 2* — and at that
+rate, a player who always sacrifices beats one who never does **100% to nothing.**
+
+The mistake was treating a point of production as equal to a point of flagship
+health. It isn't, and not by a little. **Health is life; production is only a
+claim on the future.** Soaking damage buys survival directly.
+
+Sweeping it properly:
+
+| Soak | Rounds dark | Ships per round | Always-sacrifice beats never |
+| --- | ---: | ---: | ---: |
+| Sides | 3 | any | 96.9% |
+| Sides | 3 | one | 83.2% |
+| Half the faces | 3 | one | 57.2% |
+| **Half the faces** | **4** | **one** | **45.4%** |
+| Half the faces | 5 | one | 35.1% |
+| Sides | rest of match | one | 29.3% |
+
+**The one-ship-a-round cap is doing real work** — it alone took 96.9% down to
+83.2%, and it keeps the moment to a single decision instead of a dozen.
+
+And the reason to land on four rounds rather than three is the shape of the
+decision, not the win rate:
+
+| Rounds dark | Sacrifice freely, vs never | Sacrifice freely, vs only-when-desperate |
+| ---: | ---: | ---: |
+| 3 | 57.2% | 51.2% |
+| **4** | **45.4%** | **39.9%** |
+
+At three rounds, sacrificing constantly is simply correct, so there's no
+decision. **At four rounds, reflexive sacrificing is a losing habit and saving it
+for the round that would kill you is the winning line** — which is exactly the
+question you want the player asking.
+
+**Proposed:** a ship soaks **half its faces** — d4 soaks 2, d6 soaks 3, d8 soaks
+4, d10 soaks 5 — one ship a round, dark for four rounds. Legible, too: *you give
+up half the die, it soaks half its number.*
+
+### Pierce, the counter
+
+Once ships can eat damage, a wall of hulls becomes the dominant defence — and
+that's precisely when your pierce idea earns its place. Back in DIRECTIONS.md we
+parked it because there was no wall to punch through. Now there is.
+
+**Pierce turns your 4s into undefendable damage — past shields, and past the
+hulls.** A purple symbol on the 4, sitting alongside yellow bolts on the 1 and 2
+and green crosses on the 3, so every low face carries a meaning and the die reads
+as a complete vocabulary:
+
+| Face | Carries |
+| --- | --- |
+| 1 | two Energy bolts |
+| 2 | one Energy bolt |
+| 3 | three health crosses |
+| **4** | **a pierce mark, with the right panel** |
+
+Fours come up about 1.53 times a round on a mid fleet, so **+2 a four is roughly
+3 undefendable damage a round.** That's modest against an open flagship and
+devastating against a player hiding behind their fleet, which is the right shape
+for a counter — it should be a bad buy until someone forces you into it.
+
+I'd gate it behind a flagship panel rather than making it a base rule. As a base
+rule it just hands everyone 3 more damage a round and shortens the game; as a
+panel it's an answer you reach for when your opponent starts turtling.
+
+### Why this direction is the right one
+
+You put it well: *no more bolting a super-weapon onto the flagship, more what
+kind of fleet do you want and how do you want the damage taken.* The Rocket was
+fun but it was a number you buy. This is a decision you make with the pieces
+already on the table — and it turns the moment you open the app, which is
+currently passive ("you took 22"), into the most interesting choice of the round.
