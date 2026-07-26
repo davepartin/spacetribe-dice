@@ -42,7 +42,37 @@ The two most worth playing with first:
 
 ## Versions
 
-### 28 — you choose how to take the hit (current)
+### 29 — the flagship fires *and* joins the line (current)
+
+You were right and I was wrong. Making you choose between the flagship's boost
+and its number was a false economy: **the moment worth building toward is your
+whole fleet lining up, flagship included**, and charging you for it took the joy
+out of the thing the game is about.
+
+**It does both now.** The boost fires, and its number joins your straight. It
+still never scores as attack or shields — that would be three jobs off one roll —
+and the flagship card lights with the orange bar when it's part of the line.
+
+Giving it away costs nothing, because **raising the minimum to five already paid
+for the ninth die**:
+
+| Fleet | Old — min 4, no flagship | v29 — min 5, flagship always in |
+| --- | ---: | ---: |
+| Mid — 4d4 2d6 2d8 | 82% | **60%** |
+| Late — 2d4 2d6 2d8 2d10 | 75% | **56%** |
+
+Straights are *less* frequent than they were in v27, not more — and 60% is inside
+the band where a bonus still feels like an event rather than base attack with
+extra steps.
+
+The flagship turns a nothing into a straight in **8% of rounds**, and in the
+opening it's the only way in at all: four d4s make 1-2-3-4 and the flagship's 5
+completes the line. Your first straight of the match will almost always be that
+exact moment.
+
+---
+
+### 28 — you choose how to take the hit
 
 Four things at once, and they lean on each other.
 
