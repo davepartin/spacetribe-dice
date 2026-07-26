@@ -4,8 +4,8 @@ A dice-building battle game. Every die is a ship — a **d4**, **d6**, **d8** or
 **d10** — and in the middle of your fleet sits your **flagship**, a normal d6 with
 hit points. The match ends when someone's flagship is destroyed.
 
-**Even hits, odd blocks.** The low faces carry everything else: a **1** and a **2**
-pay Energy, a **3** heals your flagship, a **4** can punch straight through
+**Even hits, odd blocks.** The low faces carry everything else: a **1** and a **4**
+pay Energy, a **3** repairs your flagship, and a **2** punches straight through
 shields. Five or more numbers in a row is a **straight**, and your flagship's
 number can complete the line.
 

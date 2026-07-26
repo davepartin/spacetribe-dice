@@ -42,7 +42,65 @@ The two most worth playing with first:
 
 ## Versions
 
-### 77 — full review: the missing straight screen, and a solved game (current)
+### 78 — Direct moves to the 2, Energy to the 4 (current)
+
+Your read: on a d4 the **4** is the top face, so it was collecting the biggest
+attack *and* the unblockable damage at once — the best face on the smallest die.
+So Direct moves to the **2** and Energy moves to the **4**.
+
+| Face | Was | Now |
+| --- | --- | --- |
+| **1** | blocks 1 · 2 Energy | blocks 1 · **2 Energy** |
+| **2** | hits 2 · 1 Energy | hits 2 · **2 Direct** |
+| **3** | blocks 3 · 3 repair | blocks 3 · **3 repair** |
+| **4** | hits 4 · **2 Direct** | hits 4 · **1 Energy** |
+
+The flagship followed, because its whole trick is that a face means what the same
+number means on a ship: **#2 now boosts Direct** and **#4 now boosts Energy**.
+
+**I expected this to change nothing and I was wrong.** On paper the 2 and the 4
+are equally likely on any die, so moving Direct between them should not touch the
+d4's advantage. It halved it — d4 Direct fell from **6.57 to 2.77** a round.
+
+The reason is what players *hold*. Everyone keeps their high numbers. On a d4 the
+4 **is** the high number, so "keep your best attack" was quietly farming Direct
+every single round. Now the unblockable damage sits on a face nobody wants to
+keep, so you have to choose between attack and Direct. That is a real decision
+where there was none, and it is the kind of thing only a playtest finds — the
+paper odds said this change was a no-op.
+
+**What it did to the strategy table** (same plans as v77, same harness):
+
+| Plan | v77 | v78 |
+| --- | --- | --- |
+| Fill all 8 slots with d4s, then trade up | 100% | 100% |
+| Flagship levels first | 43% | **83%** |
+| Buy the biggest hull affordable | **21%** | **75%** |
+| Hoard for d10s only | **7%** | **58%** |
+| Only ever buy d4s | 57% | **43%** |
+
+The order **inverted**: d4-forever went from second-best to worst, and buying big
+went from worst to strong. The spread narrowed from 93 points to 57.
+
+**Two things this did not fix, stated plainly.** *Fill all eight slots then trade
+up* still wins 100% — that is the slot economy, not the faces, and no change to a
+die face can touch it. And everything got easier: the baseline win rate went from
+about 56–61% to **81%**, so the opponent now needs strengthening. `botPace` in the
+Tune panel is the lever.
+
+**A refactor that closes a bug class.** Every flagship face now declares what it
+matches (`match:3`, `even:true`, `odd:true`) and both the payout and the ring on
+the board read that one field. They used to be two hand-written lists that had to
+agree, and twice they did not. Swapping Direct and Energy was then a two-line data
+change instead of an edit in five places.
+
+The legend on the How to play page is also generated from the settings now, so if
+you move a number in the Tune panel the key moves with it. It used to hard-code
+"2 Energy" and "3 crosses", which is how it drifted before.
+
+---
+
+### 77 — full review: the missing straight screen, and a solved game
 
 A slow pass over every screen and every process, the dead code out, and playtests.
 The housekeeping is below; the finding is first, because it changes what to build
