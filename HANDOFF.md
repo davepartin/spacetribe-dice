@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v35)
+## The rules as they stand (v45)
 
 ### Every ship die
 
@@ -75,7 +75,7 @@ One rule covers every face on every ship:
 | ---: | --- | --- |
 | **1** | blocks for 1 | **two yellow bolts** — 2 Energy |
 | **2** | hits for 2 | **one yellow bolt** — 1 Energy |
-| **3** | blocks for 3 | **three green crosses** — 3 Health |
+| **3** | blocks for 3 | **three green crosses** — 3 Repair |
 | **4** | hits for 4 | **two violet chevrons** — the face's picture; Direct lands when your flagship is firing Direct |
 | **5 and up** | odd blocks, even hits | nothing — a big face is just its number |
 
@@ -92,7 +92,7 @@ choosing in this game lives in which dice you reroll.
 | ---: | --- |
 | **1** | Gain 2 Energy |
 | **2** | **Reactor** — your base Energy rises by 1, for the rest of the match |
-| **3** | Every 3 heals 4 more |
+| **3** | Every 3 repairs 4 more |
 | **4** | Every 4 hits for 3 Direct |
 | **5** | Every blue die blocks 1 more, and +3 shields |
 | **6** | Every red die hits 1 more, and +2 attack |
@@ -118,7 +118,7 @@ roll.
    its evens and can still block and heal; **blue-damaged** loses its odds and can
    still shoot. A ship already crippled can be thrown in again, which destroys it
    and frees the slot.
-6. **Heal, then take the hit.** Your 3s heal your flagship first.
+6. **Repair, then take the hit.** Your 3s repair your flagship first.
 
 ### Winning
 
@@ -139,7 +139,7 @@ All of these are live in the **Tune** panel, top right.
 | Setting | Value | |
 | --- | ---: | --- |
 | Flagship hit points | **60** | the length dial — 40 gives an 8-round match, 60 gives 11 |
-| Health a 3 heals | 3 | each point adds about one round to a match |
+| Repair a 3 gives | 3 | each point adds about one round to a match |
 | Dice needed for a straight | **5** | at 4, straights fired in 82% of rounds — too often to feel special |
 | Straight multiplier | 1 | scales the whole prize table |
 | Energy: a 1 pays / a 2 pays | 2 / 1 | |
