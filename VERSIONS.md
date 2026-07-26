@@ -42,7 +42,7 @@ The two most worth playing with first:
 
 ## Versions
 
-### 21 — health, hit points, and no more rounds (current)
+### 21 — health, hit points, and no more rounds
 
 The biggest change since the game was rebuilt. **The scoreboard is gone.** Your
 flagship has hit points, and the match ends when one of them is destroyed.
@@ -90,6 +90,58 @@ from 23 to 18.
 
 All four numbers — hit points, health per 3, when the war escalates and by how
 much — are in the Tune panel.
+
+---
+
+### 28 — you choose how to take the hit (current)
+
+Four things at once, and they lean on each other.
+
+**Cannon fodder.** When damage gets through, the round stops and asks you. Take it
+on the flagship, or **put one ship in front of it**. That ship soaks a flat **2**
+and loses half its faces for **4 rounds** — and *you* pick which half: **red-damaged**
+loses its evens and can still block and heal, **blue-damaged** loses its odds and
+can still shoot. A ship that's already crippled can be thrown in again, which
+**destroys it** and frees the slot.
+
+The attacker never picks a target. That inversion is the whole point: when the
+attacker chose, economy-sniping won 84% of matches and left the loser with less
+than one ship. When the *defender* chooses, nobody ever takes a trade that's worse
+for them than the alternative, so the spiral can't start.
+
+Why a flat 2 rather than something scaled to the hull:
+
+| Soak | Always sacrificing beats never |
+| --- | ---: |
+| Half its faces (2/3/4/5) | 42% |
+| **Flat 2, crippled ships can be finished off** | **49.6%** |
+| Flat 5 | 67% — you'd always do it |
+
+And flat is right because **half a d10 is barely worth more than half a d4** (12.8
+against 9.5 over four rounds). Scale the soak to size and your capital ship
+becomes the best fodder in the fleet, which is backwards. Flat makes cheap hulls
+the fodder, which is both the fantasy and the first real job d4s have had.
+
+**Straights need five dice now, and the flagship can join one.** At four, a
+mid-game fleet landed a straight in **82% of rounds** — and our own rule says a
+bonus firing above 75% is just base attack with extra steps. Five brings it to
+52%, and letting the flagship in brings it back to 59%.
+
+The flagship lends its **number** to the line and nothing else — no shields, no
+attack — and its boost doesn't fire that round. Measured, the face worth spending
+is the **5**, by a mile: 27% of rounds against 3–6% for every other face, because
+your d4s already cover 1 to 4 and 5 is the wall they can never get past. Since the
+5 face is Shields, the marquee decision is *take the shields, or finish the line?*
+
+**Face 2 is the Reactor.** Take **4 Energy now**, or **+1 to your base Energy for
+the rest of the match**, capped at +3. Base Energy is worth exactly the rounds
+remaining, so the engine is right early and the cash is right late — the hinge is
+about round seven. It's the only face that changes your future rather than your
+round.
+
+**The chevrons are on the 4** — but only while your flagship is actually firing
+Direct, so the mark never promises damage that isn't happening. The card takes a
+violet edge at the same time.
 
 ---
 
