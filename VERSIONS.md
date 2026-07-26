@@ -42,7 +42,54 @@ The two most worth playing with first:
 
 ## Versions
 
-### 73 — two reference pages, and Tune gets out of the way (current)
+### 74 — the nudge is gone, and the Energy page is a price list (current)
+
+I built you the wrong page. You asked for **store prices you can check to decide
+whether to save**, and I wrote an essay about Energy in general — with the nudge
+as its headline, a mechanic you did not want.
+
+**The nudge is deleted.** The `+1` / `-1` buttons, `doNudge`, the `nudgeCost`
+setting, the wiring, and the two old comments that still listed nudging as one of
+the things Energy is for. Energy now has exactly two uses: **extra rerolls during
+a round**, and **everything in the shop**.
+
+**The page is now called Prices**, and it does one job — tells you whether to
+save. It opens with the only sentence that matters, and it changes as you play:
+
+> You have **7 Energy** and **+2** comes in each round. Enough for a **d6** right
+> now, and **2** more reaches a **d8**.
+
+With nothing banked it says *"Not enough for anything yet, and 4 more reaches a
+d4."* Every hull you can already afford carries a small green **YOU CAN AFFORD
+THIS**, so the list answers "what can I buy" before you do any arithmetic.
+
+Then: the four hull prices with what each averages and which straight tier it
+lifts you to · both flagship levels and which one you are on · the reroll cost ·
+where Energy comes from · and how many berths you have left, because that is the
+real constraint:
+
+> **Save or spend?** You only have 8 berths, and scrapping loses half the price —
+> so a berth is worth more than the Energy it takes to fill. Waiting a round for
+> a **d10** beats filling two berths with **d4**s you will later pay to remove.
+
+**Balance:** unchanged, and I want to be exact about why. The simulation never
+used the nudge, so removing it moves no measured number — 18 matches came in at
+50% and ~12.8 rounds, the same place as v72. What actually changed is the game
+for a **human**, who now has one fewer thing to spend on, so slightly more Energy
+reaches the shipyard. That is a real shift the harness cannot see, and it wants a
+play session rather than a simulation.
+
+**Two near-misses worth recording.** A draft line `var next = [4,6,10,13].length
+? null : null` survived into the file doing nothing — caught by reading the
+rendered page, not the diff. Then removing it, my search for `"  var next = "`
+matched the **flagship upgrade** line first and would have deleted that instead;
+the assertion that the upgrade line must survive is what stopped it. Both of
+these are the v45 lesson again: an edit that reports success has not proved
+anything.
+
+---
+
+### 73 — two reference pages, and Tune gets out of the way
 
 You asked whether **Tune** matters and whether that space could tell people what
 Energy is for — because they will sit on a pile of it without knowing why.
