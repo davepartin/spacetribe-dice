@@ -42,7 +42,40 @@ The two most worth playing with first:
 
 ## Versions
 
-### 68 — both rolls, side by side, straights in a gold box (current)
+### 69 — every flagship power rings the dice it is paying (current)
+
+You liked the thin violet line round a **4** while the flagship is firing Direct,
+and asked for it on every power. Right instinct — and the reason it was worth
+doing is that having it on Direct alone quietly said the other five faces were
+doing less. They are not. They multiply just as hard.
+
+| Flagship face | What it rings | Colour |
+| --- | --- | --- |
+| **#6 Attack** | every even die | red |
+| **#5 Shields** | every odd die | blue |
+| **#4 Direct Hit** | every 4 | violet |
+| **#3 Repair** | every 3 | green |
+| **#2 Energy** | every 2 | yellow |
+| **#1 Reactor** | *nothing, on purpose* | — |
+
+The **#1** stays bare exactly as you said. The Reactor raises your standing
+income for the rest of the match and does not care what any die shows, so there
+is nothing to point at. A ring there would be a lie.
+
+The risk in a feature like this is a ring appearing on a die that is not actually
+paying — worse than no ring at all, because the board would be teaching a rule
+the engine does not follow. So the test does not check the colours; it sets the
+flagship to each face in turn over a fleet showing 1 through 6, counts the rings,
+then asks the engine what that panel really paid and checks
+`rings × multiplier = payout`. **All six agree.** That check is
+`test-flagship-rings.mjs` and runs from now on.
+
+The old `pierce` class is gone rather than left lying about — dead furniture from
+a removed rule is how this project has fooled itself before.
+
+---
+
+### 68 — both rolls, side by side, straights in a gold box
 
 You said the result screen is as important as the rolling screen — it is how you
 enjoy knowing what happened — and that it never showed **their flagship number**.
