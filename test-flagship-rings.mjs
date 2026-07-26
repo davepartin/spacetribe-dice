@@ -26,8 +26,8 @@ for(const [id,label] of Object.entries(PANEL)){
   });
   console.log(label.padEnd(12), ring.join(" "));
   // cross-check against what applyPanel actually counts
-  const t=w.tally(w.runDice(w.G.you), id, false, 2, null);
-  const base=w.tally(w.runDice(w.G.you), null, false, 2, null);
+  const t=w.tally(w.runDice(w.G.you), id, 2, null);
+  const base=w.tally(w.runDice(w.G.you), null, 2, null);
   const paid=(t.attack-base.attack)+(t.defense-base.defense)+(t.heal-base.heal)+
              (t.energy-base.energy)+(t.direct-base.direct);
   const rings=cards.filter(c=>["fr","fb","fh","fe","fd"].some(x=>c.classList.contains(x))).length;

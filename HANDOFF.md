@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v70)
+## The rules as they stand (v72)
 
 ### Every ship die
 

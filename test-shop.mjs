@@ -13,6 +13,11 @@ w.G.you.energy=26; w.render();
 console.log("phase:", w.G.phase, "· screen:", d.querySelector("h2").textContent, "\n");
 console.log("PURSE:", [...d.querySelectorAll(".purse > div")].map(x=>
   x.querySelector(".l").textContent+" = "+x.querySelector(".n").textContent).join("  |  "));
+console.log("\nSECTIONS, in order:");
+[...d.querySelectorAll(".shead")].forEach((h,i)=>console.log("  "+(i+1)+". ["+
+  [...h.classList].filter(c=>c!=="shead")[0]+"] "+h.querySelector("h3").textContent+
+  "  —  "+h.querySelector(".ssub").textContent));
+console.log("\nflagship panel store present?", d.body.textContent.includes("Fit which panel")||d.body.textContent.includes("Flagship panels")?"YES (!!)":"no");
 console.log("\nSHIPYARD");
 [...d.querySelectorAll(".ship")].forEach(c=>{
   const g=q=>c.querySelector(q)?.textContent.trim().replace(/\s+/g," ")??"";
@@ -24,7 +29,7 @@ console.log("\nSHIPYARD");
 console.log("\nface counts vs the engine:");
 for(const sd of [4,6,8,10]){
   let hit=0,blk=0;
-  for(let v=1;v<=sd;v++){ const t=w.tally([{sides:sd,value:v}],null,false,2,null);
+  for(let v=1;v<=sd;v++){ const t=w.tally([{sides:sd,value:v}],null,2,null);
     hit+=t.attack?1:0; blk+=t.defense?1:0; }
   const card=[...d.querySelectorAll(".ship")].find(c=>c.querySelector(".sname").textContent==="d"+sd);
   const said=card.querySelector(".sfaces").textContent.match(/\d+/g).map(Number);

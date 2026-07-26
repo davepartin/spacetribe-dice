@@ -42,7 +42,61 @@ The two most worth playing with first:
 
 ## Versions
 
-### 70 — the shop looks like the game (current)
+### 72 — the old panel game is deleted (current)
+
+You looked at what I was doing and said: *this is all old game mechanics, only
+use the mechanics of the flagship dice we have made and the different dice
+sides.* You were right, and I had it backwards — I spent four measurements
+balancing the opponent's **Rocket** instead of noticing the Rocket should not
+exist any more.
+
+**Deleted, not retired.** About 8,900 characters of a different game came out:
+
+- the **Rocket** — a one-shot that filled two faces and launched itself
+- **charged panels** — Overload, Bulwark, Full Spread, Refit Bay, and the whole
+  pay-Energy-to-fire mechanic with its button, its `charged` flag and its "at
+  full power" report line
+- the **bought panel tiers** — Medical Bay, Attack +2 each, Shield +2 each,
+  Energy +5, Attack +9
+- the **panel store**: the face picker, the offer list, `storePanels`,
+  `panelCost`, `mountPanel`, `countPanel`, `facesUsed`, `isOneShot`,
+  `launchIfRocket`, `panelPick`, and both click handlers
+- the settings that only served them: `maxSame`, `rocketPay`, `rocketCost`
+- the opponent's grants of `atkEach2`, `atk9` and a Rocket on a schedule
+
+What is left is the game we actually built: **six flagship faces, one per number,
+each boosting the dice showing that number**, and one purchase that raises all
+six together. Nothing to fit, nothing to choose, nothing to look up.
+
+**The shop, in your order.**
+
+1. **Scrap a ship for Energy** (red) — the only room that *raises* Energy, so it
+   goes first. Your own 3×3 board with a Scrap price on each hull.
+2. **Buy a new ship** (blue) — the four hulls drawn as hulls.
+3. **Upgrade your flagship** (gold) — the level ladder, all three rungs visible
+   at once, with the six faces listed for reference.
+
+Headings are coloured and say what you *do* there. "Shipyard" was a place;
+"Buy a new ship" is an action.
+
+**The price never dims.** You asked for exactly this: the hull greys out when you
+cannot afford it, but the price stays bright yellow and readable, with a small
+`3 SHORT` beneath it rather than the price being replaced by an excuse.
+
+**What deleting the Rocket cost the opponent.** Measured on equal play — same
+holds, same three rolls, buying the biggest hull affordable — the bot went from
+winning most matches to losing them: **you now win about 56–61%** across three
+runs of 18 (56%, 61%, and 44% at pace 1.5). Matches still run ~12 rounds. The
+Rocket and its two attack panels had been carrying the opponent's late game.
+
+That is a small sample and I am not going to dress it up: 18 matches gives about
+±12 points. The honest read is that a well-played fleet is now slightly favoured
+at the default, and **"How fast they grow" in the Tune panel is the knob** — 1.5
+measured harder. Worth a longer run before we call it balanced.
+
+---
+
+### 70 — the shop looks like the game
 
 The store was the last screen still made of grey text rows with a button on the
 right. Everywhere else in this game you look at **hulls**; in the shop you read a
