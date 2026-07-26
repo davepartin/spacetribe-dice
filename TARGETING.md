@@ -598,28 +598,68 @@ question you want the player asking.
 4, d10 soaks 5 — one ship a round, dark for four rounds. Legible, too: *you give
 up half the die, it soaks half its number.*
 
-### Pierce, the counter
+### Direct — the counter
 
 Once ships can eat damage, a wall of hulls becomes the dominant defence — and
 that's precisely when your pierce idea earns its place. Back in DIRECTIONS.md we
 parked it because there was no wall to punch through. Now there is.
 
-**Pierce turns your 4s into undefendable damage — past shields, and past the
-hulls.** A purple symbol on the 4, sitting alongside yellow bolts on the 1 and 2
-and green crosses on the 3, so every low face carries a meaning and the die reads
-as a complete vocabulary:
+**A Direct Hit goes past the shields and past the hulls, straight to the
+flagship.** It's the only damage in the game your opponent cannot answer.
+
+**The name.** We landed on **Direct** over Pierce because this is space combat and
+the natural sentence is *"he hit me for 3 direct"* — the word describes where the
+shot went, not what it did to the armour. It also keeps the totals row to three
+one-word currencies that read across cleanly:
+
+> **1 Energy · 3 Health · 2 Direct**
+
+The moment is a **Direct Hit**; the quantity is **Direct**.
+
+### The symbol
+
+A violet **double chevron**, `»`, in the purple that Energy vacated when it turned
+yellow. Chosen over the alternatives because it *points* — which is what the
+mechanic does, it goes through rather than landing on something — and because it
+is geometrically unrelated to the other two marks, so at phone size you are not
+telling apart similar blobs:
+
+| Mark | Shape | Reads as |
+| --- | --- | --- |
+| Energy bolt | jagged, diagonal | electricity |
+| Health cross | orthogonal, blocky | medical |
+| **Direct chevron** | **directional, open** | **straight through** |
+
+**One chevron is one Direct**, the same grammar as one bolt for one Energy and
+three crosses for three Health. So the whole die now reads without a rulebook:
 
 | Face | Carries |
 | --- | --- |
 | 1 | two Energy bolts |
 | 2 | one Energy bolt |
 | 3 | three health crosses |
-| **4** | **a pierce mark, with the right panel** |
+| **4** | **two Direct chevrons, with the right panel** |
+| 5 and up | just a number |
 
-Fours come up about 1.53 times a round on a mid fleet, so **+2 a four is roughly
-3 undefendable damage a round.** That's modest against an open flagship and
-devastating against a player hiding behind their fleet, which is the right shape
-for a counter — it should be a bad buy until someone forces you into it.
+**1 fuels, 2 fuels a little, 3 heals, 4 hits direct** — and from 5 up a face is
+only its number. All the texture lives in the low faces, which is another quiet
+reason small dice stay worth owning.
+
+### What it should cost
+
+Fours come up about 1.53 times a round on a mid fleet, so **2 Direct on a four is
+roughly 3 unanswerable damage a round.** Modest against an open flagship and
+brutal against someone hiding behind their fleet, which is the right shape for a
+counter — it should be a poor buy until an opponent forces you into it.
+
+
+rule it just hands everyone 3 more damage a round and shortens the game; as a
+panel it's an answer you reach for when the other side starts turtling.
+
+One open question for when we build it: **should a card announce itself when a
+Direct face lands?** Right now a 4 is a plain red attack face like any other, and
+Direct is the only thing in the game that cannot be answered — it arguably
+deserves a violet edge on the card so you see it coming.
 
 I'd gate it behind a flagship panel rather than making it a base rule. As a base
 rule it just hands everyone 3 more damage a round and shortens the game; as a
