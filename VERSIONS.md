@@ -42,7 +42,55 @@ The two most worth playing with first:
 
 ## Versions
 
-### 67 — the result screen adds up (current)
+### 68 — both rolls, side by side, straights in a gold box (current)
+
+You said the result screen is as important as the rolling screen — it is how you
+enjoy knowing what happened — and that it never showed **their flagship number**.
+
+**Both rolls now sit one above the other**, yours then theirs, as plain numbers.
+Red for even, blue for odd, and the flagship drawn as a white number ringed in
+gold so you can see it took part.
+
+The numbers are **sorted low to high**, which is the whole trick: once sorted,
+every value inside a straight is contiguous, so the run can be wrapped in a
+single gold box and read as `3 4 5 6 7` at a glance. Slot order carries no
+meaning by the time the round is over, and the notes still name the slot for
+anything that mattered.
+
+Under each row, what the straight was worth — and if you cashed it short,
+it says so: *"6 in a row — cashed as 5 for 12 Energy."* Theirs says the same,
+so you can finally see what the opponent chose.
+
+**A bug found while wiring this up.** `tally()` read your `straightPick` for
+*both* fleets, so when you cashed a straight short, **the opponent was forced to
+cash theirs short too.** Measured over 90 matches with a player who always takes
+the shortest tier: the bot was dragged down off its own straight in **11 of 88
+straights**. Now it takes its full length every time. It never favoured you — it
+just meant their result depended on your button, which is not a rule anyone
+agreed to.
+
+**The blank space.** Your shot and their shot now sit **side by side** the moment
+the screen is wide enough, and the notes flow into columns instead of giving one
+short sentence a full-width row. On a phone both stack, unchanged.
+
+**The bottom bar** said `BANKED` and `BASE A ROUND`, which named nothing. It now
+reads **Energy bank** — in larger type, since it is the number you spend — and
+**Base energy per round**, which is the standing income the flagship's **#1**
+face grows.
+
+Measured: 230 result screens with a machine checking every row — the chips must
+equal the roll, the gold box must hold exactly the run and nothing else, and
+each side must show exactly one flagship. All pass, and the ledgers still add up
+across another 195 screens.
+
+**One thing worth knowing, not yet acted on.** Playing both sides equally well —
+same holds, same three rolls, buying the biggest ship affordable — 16 matches ran
+**8 to 17 rounds, median 12**, and you won 7 of 16. Small sample, but the shape
+is right: no stalls, no runaway.
+
+---
+
+### 67 — the result screen adds up
 
 You said the score screen could be better and that the **+3 repair was red when
 it should be green**. The colour was a one-line fix — `.hit` set red and `.hp`
