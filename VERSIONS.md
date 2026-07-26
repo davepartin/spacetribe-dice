@@ -42,7 +42,56 @@ The two most worth playing with first:
 
 ## Versions
 
-### 69 — every flagship power rings the dice it is paying (current)
+### 70 — the shop looks like the game (current)
+
+The store was the last screen still made of grey text rows with a button on the
+right. Everywhere else in this game you look at **hulls**; in the shop you read a
+table and then had to go find the shape on the board. Two languages for one
+object.
+
+**The shipyard now shows the ship.** Same hull the board draws, at the same
+angle, with the price under it. Affordable hulls are lit and outlined;
+unaffordable ones dim and the button says **"need 4⚡ more"** instead of going
+quietly grey. A full fleet says **"No berth."**
+
+**The scrapyard is your own board.** Same 3×3, same berth numbers, same hulls,
+with a small **Scrap 2⚡** under each ship and the free berths drawn as free
+berths. *"Scrap the d4 in slot 2"* is now something you can see instead of
+something you have to translate from a list.
+
+**The shop was lying about what a ship carries.** It said a d10 had *"4 attack
+faces, 4 shield"* — it was skipping the 1 and the 2, which was true of a rule we
+dropped long ago. Every face fights: **evens hit, odds block**, and the 1 and 2
+pay Energy *on top of that*. A d10 is **5 hit, 5 block**. The card now counts the
+faces rather than describing them, and the test compares those counts against
+what the engine actually scores, face by face, for all four hulls.
+
+**Something the shop had never said out loud.** I first gave each hull a row of
+its special marks — and all four rows came out identical, because every die from
+a d4 up carries exactly one 1, 2, 3 and 4. Four cards saying the same thing is
+four cards saying nothing. So it is stated once, for the whole shipyard:
+
+> Every hull carries the same low faces — ⚡1 ⚡2 ✚3 ⟩⟩4 — so paying more never
+> buys you more Energy, repair or Direct. It buys reach and size.
+
+That is a real strategic fact the store had never told anyone. Each card instead
+carries what genuinely differs: hit and block faces, its **average roll**, and
+which **straight tier** it lifts a line to.
+
+**Also fixed:** damage is red everywhere — *You took* was drawn in white. And a
+duplicate `.rep` rule left behind by the v67 edit sat *after* the new one and
+reset `display:grid`, so the two-column notes promised in v68 were never
+actually columning up. They are now. Claiming a layout worked without checking
+the rendered result is exactly the mistake this project keeps writing down.
+
+Measured: every buy and scrap driven through the real buttons — affordability at
+0, 7 and 40 Energy, buying a d10, scrapping for the right refund, a full fleet
+locking all four buttons, and a damaged ship refusing to scrap when clicked. All
+pass, alongside the ring, ledger, roll-row and full-match suites.
+
+---
+
+### 69 — every flagship power rings the dice it is paying
 
 You liked the thin violet line round a **4** while the flagship is firing Direct,
 and asked for it on every power. Right instinct — and the reason it was worth
