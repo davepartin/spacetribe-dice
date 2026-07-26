@@ -953,3 +953,76 @@ best-feeling decision in the game already.
 **Recommended:** minimum five dice, and the flagship may join a straight instead
 of firing its boost — never both. One line of rules, one decision a round, and it
 gives buying your fifth ship a purpose you can feel.
+
+---
+
+## 18 · Base Energy, and what face 2 should do
+
+### Have we decided on a base? Yes — it's zero
+
+There is no base income today. Every point of Energy comes from a face, a
+straight, or the flagship. Here's what a round actually earns:
+
+| Round | Median | Mean | Rounds earning 0 or 1 | What +1 base would add |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 3 | 3.7 | **22%** | **+27%** |
+| 3 | 5 | 5.8 | 14% | +17% |
+| 5 | 8 | 8.2 | 6% | +12% |
+| 7 | 9 | 8.9 | 5% | +11% |
+| 11 | 5 | 7.8 | 13% | +13% |
+
+**Your instinct is exactly right: base Energy is an early-game effect.** A flat
++1 is worth 27% in round one and 11% by round seven, because income roughly
+doubles as the fleet grows while the base stays still.
+
+### Why I'd keep the base at zero and make you earn it
+
+A universal base has a quiet problem. Energy per die per round is 0.75 on a d4
+and 0.30 on a d10, so a flat handout helps the *capital* fleet proportionally far
+more:
+
+| Fleet | Earns per round | With +2 base | Gain |
+| --- | ---: | ---: | ---: |
+| Eight d4s | 6.0 | 8.0 | +33% |
+| Eight d10s | 2.4 | 4.4 | **+83%** |
+
+DIRECTIONS.md warns that **fuel is the only thing stopping bigger-is-always-better**
+and that any mechanic handing out free Energy is quietly attacking it. A flat base
+is precisely that, and it aims at the wrong target.
+
+So: **base stays 0, and face 2 is how you raise it.** Base income becomes
+something you build rather than something you're given — which is a better story
+and doesn't touch the brake.
+
+### Face 2, and the problem with "+1 forever"
+
+As a straight permanent gain it's worth about **9 Energy over a match** in
+expectation — you roll the 2 about 1.8 times in eleven rounds, and each +1 is
+worth (rounds remaining).
+
+But the spread is ugly. Roll it in rounds one and two and you're +2 for nine
+rounds — **18 free Energy, a d10 and a half.** Never roll it and you get nothing.
+That's a large swing driven entirely by luck with no decision attached to it, and
+it compounds, which is the one thing our rules say never to allow.
+
+**The fix is to make it a choice:**
+
+> **Face 2 — Reactor.** Take **4 Energy now**, or **+1 to your base Energy for the
+> rest of the match**. Base may not go above +3.
+
+The crossover is clean, because +1 base is worth exactly the rounds remaining:
+
+| You roll the 2 in… | +1 base is worth | 4 now is worth | Take |
+| ---: | ---: | ---: | --- |
+| Round 2 | 9 | 4 | the engine |
+| Round 5 | 6 | 4 | the engine |
+| **Round 7** | **4** | **4** | either — the hinge |
+| Round 9 | 2 | 4 | the cash |
+
+So it's an investment early and a payday late, it self-limits (nobody takes the
+engine in round ten, so there's no runaway), and the cap at +3 bounds the worst
+case. Same shape as the charged panels, which is the best-feeling decision we
+have.
+
+It also gives the flagship a fifth thing to be, and it's the only face that
+changes your future rather than your round.
