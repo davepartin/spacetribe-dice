@@ -1,3 +1,12 @@
+> **Note — this README describes an older, different project (Apogee Forge) that
+> shares this folder. It is not Fleet Dice.**
+>
+> **For Fleet Dice, read [HANDOFF.md](HANDOFF.md).** That file has the current
+> rules, the numbers, the file map and the working process, and it contains the
+> prompt to give a new assistant.
+
+---
+
 # Apogee Forge
 
 A mobile-first, ten-battle solo fleet game about hidden orders, simultaneous counters, and dice that grow from Ship-4 to Ship-20. Read the enemy signal, Forge individual faces, route Energy into charged systems, then lock your plan before the enemy dice are revealed.
