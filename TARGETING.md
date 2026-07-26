@@ -880,3 +880,76 @@ rule, and here's everything that overrides it:
 | Soak | **A flat 2, any hull** |
 | Cost | Half that die goes blank for 4 rounds — **you choose red or blue** |
 | Already crippled? | It may soak again, and is **destroyed** — the slot frees up |
+
+---
+
+## 17 · Should the flagship join the straight?
+
+Yes — and your instinct to raise the minimum to five is right for a reason from
+our own rulebook.
+
+### How much does a ninth die distort things?
+
+| Fleet | Straight of 5+ — ships only | with the flagship | Flagship helps |
+| --- | ---: | ---: | ---: |
+| Mid — 4d4 2d6 2d8 | 52% | **60%** | 13% |
+| Late — 2d4 2d6 2d8 2d10 | 47% | **56%** | 15% |
+| Capital — 2d6 3d8 3d10 | 42% | **51%** | 16% |
+
+About **eight points at every tier**, and it bites in one round in seven. Real,
+but not a takeover.
+
+### Why five is the right minimum anyway
+
+At a minimum of four, **a mid-game fleet lands a straight in 82% of rounds.** One
+of the six rules we wrote after the early disasters says: *a bonus that fires most
+rounds isn't a bonus — at 75% it's just base attack with extra steps.* We broke
+our own rule and hadn't noticed.
+
+| Minimum | Mid-fleet rounds with a straight |
+| ---: | ---: |
+| 4 | **82%** |
+| 5 | 52% |
+| 5, with the flagship allowed to join | **59%** |
+
+Five plus the flagship lands at 59% — often enough to chase every round, rare
+enough to feel like something happened. **Raising the minimum pays for the ninth
+die almost exactly.**
+
+The cost lands on the opening: four d4s cannot make a straight of five at all,
+because that's only four dice. Which turns out to be a feature — see below.
+
+### The best part: it's the 5 that matters
+
+I measured which flagship face is actually worth spending, and it isn't close:
+
+| Fleet | 1 | 2 | 3 | 4 | **5** | 6 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Start — 4× d4 | 0% | 0% | 0% | 0% | **23%** | 0% |
+| Mid — 4d4 2d6 2d8 | 3% | 5% | 5% | 5% | **27%** | 6% |
+| Late | 5% | 7% | 9% | 10% | **21%** | 9% |
+
+**Your guess was backwards, and the reason is the good bit.** Low faces are
+nearly worthless to a straight *because your d4s already cover 1 to 4.* The
+flagship's 5 is the one number your small ships can never reach — it's the wall
+your fleet keeps hitting, and the flagship is the only thing that breaks it.
+
+Which produces a focal point the game didn't have to be given:
+
+> **The 5 face is the Shields boost.** So the marquee decision, three or four
+> times a match, is *do I take the shields, or spend the 5 to finish my line?*
+
+And for the starting fleet it's the **only** way in — four d4s make 1-2-3-4, and
+the flagship's 5 completes it 23% of the time. Your first straights will all be
+that exact moment, which is a very good thing to have happen in round two.
+
+### The fun read
+
+The trade prices itself. A flagship boost is worth about **6 a round**; stepping
+a straight up a tier is worth about **8 to 10**. So joining is usually right and
+skipping is never a disaster — the same shape as the charged panels, which is the
+best-feeling decision in the game already.
+
+**Recommended:** minimum five dice, and the flagship may join a straight instead
+of firing its boost — never both. One line of rules, one decision a round, and it
+gives buying your fifth ship a purpose you can feel.
