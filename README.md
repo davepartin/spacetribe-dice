@@ -26,13 +26,14 @@ assistant.
 | File | What it holds |
 | --- | --- |
 | [HANDOFF.md](HANDOFF.md) | The entry point — rules, numbers, process |
+| [IDEAS.md](IDEAS.md) | The v77 review: what the playtests found, and five things to build |
 | [VERSIONS.md](VERSIONS.md) | Every version, newest first, with the measurements behind each change |
 | [TARGETING.md](TARGETING.md) | Designed and measured, mostly unbuilt: targeting, cannon fodder, Direct hits |
 | [PANELS.md](PANELS.md) | The flagship panel catalogue and how to price one |
 | [DIRECTIONS.md](DIRECTIONS.md) | Paths to victory, bluffing, and the team layer |
 | [DECISIONS.md](DECISIONS.md) | Every decision a player makes, marked strong or thin |
 
-`simple01.html` through `simple32.html` are frozen snapshots. They never change,
+`simple01.html` through `simple77.html` are frozen snapshots. They never change,
 so if an idea makes the game worse we open the previous number and we're back
 where we were. Nothing is ever lost by trying something.
 

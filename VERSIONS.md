@@ -42,7 +42,92 @@ The two most worth playing with first:
 
 ## Versions
 
-### 76 — the top button says "Upgrade costs" (current)
+### 77 — full review: the missing straight screen, and a solved game (current)
+
+A slow pass over every screen and every process, the dead code out, and playtests.
+The housekeeping is below; the finding is first, because it changes what to build
+next. **Full write-up in `IDEAS.md`.**
+
+**The game is currently solved.** Five plans a person might actually adopt, each
+played through full matches:
+
+| Plan | Wins |
+| --- | --- |
+| Fill all 8 slots with d4s, then trade up | **100%** |
+| Only ever buy d4s | 57% |
+| Flagship levels first | 43% |
+| Buy the biggest hull affordable | 21% |
+| Save up for d10s only | 7% |
+
+93 points of spread, and **the shop was recommending one of the worst lines.**
+
+Two measurements that pull opposite ways explain it. At equal ship *count* eight
+d10s beat eight d4s **96%**. At equal *money* eight d4s beat two d10s **100%**. So
+what wins is **slot count**, not hull size — and slots are nearly free.
+
+The second half is the low faces. Eight ships of one size, 4,000 rounds each:
+
+| Fleet | Cost | Attack | Repair | Direct | Straight% |
+| --- | --- | --- | --- | --- | --- |
+| 8 × d4 | 32⚡ | 15.0 | **9.4** | **6.57** | 13% |
+| 8 × d6 | 48⚡ | 25.0 | 3.5 | 2.42 | **63%** |
+| 8 × d10 | 104⚡ | 34.4 | 2.5 | 1.69 | 40% |
+
+Every hull carries exactly one 1, 2, 3 and 4, so a small die shows a special face
+far more often. A d4 fleet makes **4× the Direct and 4× the repair** — the two
+outputs nothing can block — while big hulls buy attack, the only output shields
+eat. Size buys the weak resource and sells the strong ones.
+
+Also worth knowing: **d6 is the best straight fleet at 63%**, beating d10 at 40%,
+because a d6 covers 1–6 tightly while a d10 spreads across ten numbers and misses
+the middle.
+
+The shop copy is fixed so it no longer points at a losing plan. **The balance is
+untouched** — that is a design decision, and it is ideas 1 to 3 in `IDEAS.md`.
+
+**A rule with no way to use it.** You may cash a long straight at a shorter
+length. It is in the rules and the report had a line for it — and there was **no
+control anywhere on screen.** `straightPick` was never set by a human, so that
+branch was unreachable. Worse, a straight announced itself with a faint orange
+underline and nothing else. There is now a **straight banner**: what you rolled,
+whether the flagship is in the line, and a button per tier showing what each pays,
+with the totals moving live as you choose. Dave asked for this around v28 — *"the
+selection of options should be clear, choose your reward"* — and it was lost in a
+layout pass. A tier you pick now also resets on a reroll, so you cannot choose 5,
+reroll into 7, and quietly cash the short one.
+
+**Dead code, found by script rather than by eye.** 18 CSS rules for classes nothing
+applies, 3 uncalled functions, 4 stray modifier rules. `test-dead-code.py` and
+`test-dead-css.py` will catch the next batch.
+
+**Comments describing a game we no longer have** — worse bloat than dead code,
+because they misinform whoever reads next. The flagship comment said you design its
+six faces and that it cannot join a straight; both were once true. The straight
+comment described the pre-v12 ladder. The rules header said a 1 has no combat
+value. The Rocket sat at the top of the file as an idea to build, long after we
+removed it; it is now recorded as a decision with a pointer to its measurements.
+
+**One word per thing.** "Berth" was mine, "slot" is Dave's — slot everywhere.
+"Hit points" and "health" were one number under two names — health. A toast still
+said *sell a ship*. Internally `panel` was the deleted store's word and collided
+with the `--panel` colour and the Tune panel: `PANELS` → `FACES`, `flagPanel` →
+`flagFace`, `flag.panels` → `flag.faces`.
+
+**Twelve smaller fixes the review turned up:** the brace screen blamed your fleet
+when the real limit was your one-ship allowance · it advertised "blocks 4" on cards
+you could no longer tap · the report repeated the health strip three inches above
+it · "They attacked" against "Your fleet attacked" for the same act · their repair
+buried in a note about your Energy while their flagship visibly rose · the shop
+drew a number in each hull meaning its *maximum* where the same picture on the
+board means the *current roll* · the payout table stopped at 7 and never showed the
+free-ship tier · "They finished it in 1 rounds" · and "no round limit" where a
+40-round backstop exists.
+
+21 test scripts now run on every change.
+
+---
+
+### 76 — the top button says "Upgrade costs"
 
 Renamed as you asked. Two things went with it, because a button that disagrees
 with the page it opens is its own small confusion: the page heading changed from
