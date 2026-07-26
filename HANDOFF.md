@@ -98,8 +98,13 @@ choosing in this game lives in which dice you reroll.
 | **6** | Every red die hits **2** more |
 
 The flagship **also lends its number to your straight**, and its boost still
-fires. It never scores as attack or shields — that would be three jobs from one
-roll.
+fires.
+
+**It never scores itself.** Its number bridges a straight and nothing else — it is
+not attack, not shields, and it does not count as a match for its own face. A
+flagship on 6 is not a red die for "+2 per attack"; a flagship on 4 is not one of
+the 4s for Direct. Only ships pay. This has been got wrong three separate times,
+so if a total looks high, check this first.
 
 ### A round
 
