@@ -65,7 +65,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v63)
+## The rules as they stand (v64)
 
 ### Every ship die
 
@@ -76,11 +76,14 @@ One rule covers every face on every ship:
 | **1** | blocks for 1 | **two yellow bolts** — 2 Energy |
 | **2** | hits for 2 | **one yellow bolt** — 1 Energy |
 | **3** | blocks for 3 | **three green crosses** — 3 Repair |
-| **4** | hits for 4 | **two violet chevrons** — the face's picture; Direct lands when your flagship is firing Direct |
+| **4** | hits for 4 | **one violet chevron** — 1 Direct, **always**, unblockable |
 | **5 and up** | odd blocks, even hits | nothing — a big face is just its number |
 
 **Even hits, odd blocks.** All the texture lives in the low faces, which is why
 small dice stay worth owning: a d4 shows a 1, 2 or 3 three quarters of the time.
+
+**Every printed symbol always pays.** A 1 always gives Energy, a 3 always repairs,
+a 4 always sends 1 Direct. The flagship boosts them; it never switches them on.
 
 ### The flagship — a normal d6
 
@@ -97,7 +100,7 @@ the shipyard, not one face at a time.
 | **1** | **Reactor** — your base Energy rises by **2**, for the rest of the match |
 | **2** | Every **2** pays **2** more Energy |
 | **3** | Every **3** repairs **2** more |
-| **4** | Every **4** hits for **2** Direct |
+| **4** | Every **4** pays **2** more Direct, on top of the 1 it always pays |
 | **5** | Every blue die blocks **2** more |
 | **6** | Every red die hits **2** more |
 
