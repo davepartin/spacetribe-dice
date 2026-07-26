@@ -42,7 +42,48 @@ The two most worth playing with first:
 
 ## Versions
 
-### 74 — the nudge is gone, and the Energy page is a price list (current)
+### 75 — "pays" becomes "adds", everywhere (current)
+
+You pointed at *"every face pays 3"* and said it should be **adds** — that what
+really happens is **each matching face gets a bonus**. You are right, and the old
+wording was doing real damage: *"every face pays 3"* sounds like the flagship
+hands you three of something. It does not. It adds to **each of your dice showing
+that number**, so on a fleet with four 3s a flagship 3 is worth twelve, not three.
+The old sentence hid the most important thing about the flagship — that its value
+scales with how many dice match.
+
+Rewritten in all ten places it appeared:
+
+| Was | Now |
+| --- | --- |
+| every face pays 3 | each matching die gets **+3** |
+| Every face goes from 2 to 3 | The bonus on every face rises from **+2** to **+3** |
+| One purchase lifts all six faces | One purchase **raises the bonus** on all six faces |
+| a flagship 3 pays extra repair for each of your 3s | a flagship 3 **adds** repair to each of your 3s |
+| Flagship upgraded — every face now pays 3 | Flagship upgraded — each matching die now gets **+3** |
+
+The explanation now shows the mechanic instead of naming it: *"Every ship showing
+that same number gets a bonus — a flagship 3 adds repair to each of your 3s, a
+flagship 6 adds attack to each of your evens."*
+
+**And the one exception is now stated where the claim is made.** "Each matching
+die gets +2" is not true of the **#1** face — the Reactor has no matching die, it
+raises your standing Energy. That was only explained on the How to play page, so
+the shop was making a promise with a silent exception. It says so now, right under
+the ladder.
+
+The Tune panel notes were carrying the old wording too, so those changed with the
+rest. A screen and a settings panel disagreeing about what a rule does is how this
+project has confused itself before.
+
+Measured: the shop's flagship section, the level ladder, the upgrade button, the
+ceiling notice, the toast and the How to play page all read the new way, the
+ceiling correctly offers no purchase, and nothing anywhere still says "face pays".
+`test-flagship-language.mjs` checks that last one on every future change.
+
+---
+
+### 74 — the nudge is gone, and the Energy page is a price list
 
 I built you the wrong page. You asked for **store prices you can check to decide
 whether to save**, and I wrote an essay about Energy in general — with the nudge
