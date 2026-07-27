@@ -6,9 +6,13 @@ import { absoluteAppUrl } from "@/lib/paths";
 export function InvitePanel({
   matchId,
   code,
+  onCancel,
+  busy = false,
 }: {
   matchId: string;
   code: string;
+  onCancel?: () => void;
+  busy?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const url = useMemo(
@@ -63,6 +67,16 @@ export function InvitePanel({
         >
           Text invite
         </a>
+        {onCancel ? (
+          <button
+            className="action-button outline-action"
+            disabled={busy}
+            onClick={onCancel}
+            type="button"
+          >
+            Cancel game
+          </button>
+        ) : null}
       </div>
       <p className="waiting-note">
         Keep this page open. Your battlefield will appear automatically.

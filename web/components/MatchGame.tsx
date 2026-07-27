@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "./Brand";
@@ -19,7 +19,12 @@ import {
   type PlayerState,
   type RoundReport,
 } from "@/lib/game";
-import { playLiveAction, watchLiveMatch, type LiveMatch } from "@/lib/firebase-match";
+import {
+  cancelLiveMatch,
+  playLiveAction,
+  watchLiveMatch,
+  type LiveMatch,
+} from "@/lib/firebase-match";
 
 const FLAG_NAMES = ["", "Reactor", "Direct", "Repair", "Energy", "Shields", "Attack"];
 
@@ -36,10 +41,12 @@ function friendlyFirebaseError(reason: unknown): string {
 
 export function MatchGame() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const matchId = searchParams.get("id")?.trim() || "";
   const [match, setMatch] = useState<LiveMatch | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   useEffect(() => {
     let stopped = false;
@@ -104,6 +111,21 @@ export function MatchGame() {
     }
   }
 
+  async function confirmAndCancel() {
+    if (!match || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await cancelLiveMatch(match.id);
+      setConfirmCancel(false);
+      router.push("/");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "The match could not be cancelled.");
+      setBusy(false);
+      setConfirmCancel(false);
+    }
+  }
+
   if (!match) {
     return (
       <main className="page-shell">
@@ -120,12 +142,28 @@ export function MatchGame() {
 
   const you = match.state.players[match.side]!;
   const enemy = match.state.players[opponentOf(match.side)];
+  const cancelled = match.state.status === "finished" && Boolean(match.state.cancelledBy);
 
   return (
     <main className="match-shell">
       <SiteHeader code={match.state.code} round={match.state.round} />
-      {match.state.status === "waiting" ? (
-        <InvitePanel code={match.state.code} matchId={match.id} />
+      {cancelled ? (
+        <section className="waiting-card">
+          <p className="eyebrow">MATCH CANCELLED</p>
+          <h1>{match.state.cancelledBy} ended this game.</h1>
+          <p>The room is closed. Start a new match whenever you’re ready.</p>
+          <div className="end-actions">
+            <Link className="action-button light-action" href="/">Return home</Link>
+            <Link className="action-button red-action" href="/versus">New match</Link>
+          </div>
+        </section>
+      ) : match.state.status === "waiting" ? (
+        <InvitePanel
+          busy={busy}
+          code={match.state.code}
+          matchId={match.id}
+          onCancel={() => setConfirmCancel(true)}
+        />
       ) : enemy ? (
         <>
           <HealthBoard enemy={enemy} you={you} />
@@ -138,7 +176,53 @@ export function MatchGame() {
             play={play}
             you={you}
           />
+          {match.state.status === "active" ? (
+            <div className="cancel-row">
+              <button
+                className="action-button outline-action"
+                disabled={busy}
+                onClick={() => setConfirmCancel(true)}
+                type="button"
+              >
+                Cancel game
+              </button>
+            </div>
+          ) : null}
         </>
+      ) : null}
+
+      {confirmCancel ? (
+        <div
+          className="confirm-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cancel-title"
+        >
+          <div className="confirm-card">
+            <p className="eyebrow">LEAVE THE FIELD</p>
+            <h2 id="cancel-title">Cancel this game?</h2>
+            <p>This ends the match for both commanders and removes it from the live board.</p>
+            {error ? <p className="form-error">{error}</p> : null}
+            <div className="confirm-actions">
+              <button
+                className="action-button red-action"
+                disabled={busy}
+                onClick={confirmAndCancel}
+                type="button"
+              >
+                {busy ? "Cancelling…" : "Yes, cancel game"}
+              </button>
+              <button
+                className="action-button outline-action"
+                disabled={busy}
+                onClick={() => setConfirmCancel(false)}
+                type="button"
+              >
+                Keep playing
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </main>
   );
@@ -564,9 +648,12 @@ function RoundResult({
   busy: boolean;
 }) {
   const finished = match.state.status === "finished";
+  const cancelled = Boolean(match.state.cancelledBy);
   const won = match.state.winner === match.side;
   const title = finished
-    ? match.state.winner === "draw"
+    ? cancelled
+      ? `${match.state.cancelledBy} ended this game.`
+      : match.state.winner === "draw"
       ? "Both flagships fell."
       : won
         ? "Enemy flagship destroyed."
@@ -575,7 +662,7 @@ function RoundResult({
   return (
     <section className="stage report-stage">
       <div className="report-title">
-        <p className="eyebrow">{finished ? "MATCH OVER" : "BOTH FLEETS REVEALED"}</p>
+        <p className="eyebrow">{finished ? (cancelled ? "MATCH CANCELLED" : "MATCH OVER") : "BOTH FLEETS REVEALED"}</p>
         <h1>{title}</h1>
       </div>
       <div className="report-grid">

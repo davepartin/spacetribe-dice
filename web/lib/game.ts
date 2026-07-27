@@ -97,6 +97,8 @@ export type MatchState = {
     guest: PlayerState | null;
   };
   winner: SideId | "draw" | null;
+  /** Set when a commander abandons the room. */
+  cancelledBy?: string | null;
 };
 
 export type MatchAction =

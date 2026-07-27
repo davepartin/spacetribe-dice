@@ -208,6 +208,45 @@ export async function playLiveAction(
   });
 }
 
+export async function cancelLiveMatch(matchId: string): Promise<void> {
+  const db = requireDb();
+  const user = await ensurePlayerIdentity();
+  const matchRef = doc(db, "matches", matchId);
+  const boardRef = doc(db, "liveBattles", matchId);
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(matchRef);
+    const boardSnap = await transaction.get(boardRef);
+    if (!snapshot.exists()) throw new Error("That match no longer exists.");
+    const data = snapshot.data() as MatchDocument;
+    const state = structuredClone(data.state);
+    const side = roleFor(state, user.uid);
+    if (!side) throw new Error("You are not a commander in this match.");
+    if (state.status === "finished") return;
+
+    const canceller = state.players[side]!.name;
+    state.status = "finished";
+    state.winner = null;
+    state.cancelledBy = canceller;
+    state.players.host.phase = "over";
+    if (state.players.guest) state.players.guest.phase = "over";
+
+    const codeRef = doc(db, "codes", state.code);
+    const codeSnap = await transaction.get(codeRef);
+
+    transaction.update(matchRef, {
+      status: "finished",
+      state,
+      version: data.version + 1,
+      updatedAt: serverTimestamp(),
+    });
+    if (boardSnap.exists()) transaction.delete(boardRef);
+    if (codeSnap.exists() && data.hostUid === user.uid) {
+      transaction.delete(codeRef);
+    }
+  });
+}
+
 export async function watchLiveMatch(
   matchId: string,
   onMatch: (match: LiveMatch) => void,

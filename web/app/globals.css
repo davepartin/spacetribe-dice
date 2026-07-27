@@ -1559,6 +1559,46 @@ input:focus {
   gap: 10px;
 }
 
+.cancel-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+  padding-bottom: 12px;
+}
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #050914d8;
+}
+
+.confirm-card {
+  width: min(420px, 100%);
+  padding: 28px 26px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #10182a;
+}
+
+.confirm-card h2 {
+  margin: 8px 0 10px;
+  font-size: 28px;
+}
+
+.confirm-card > p {
+  color: var(--dim);
+  margin: 0 0 18px;
+}
+
+.confirm-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .waiting-card,
 .loading-card {
   margin-top: 4vh;
