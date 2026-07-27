@@ -432,6 +432,71 @@ input:focus {
   margin: -15px 0 0;
 }
 
+.live-board {
+  margin-top: 18px;
+  padding: 28px 30px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #0c1424cc;
+}
+
+.live-board-head h2 {
+  margin: 6px 0 0;
+  font-size: 27px;
+}
+
+.live-board-list {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.live-board-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.live-board-list li:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.live-names {
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: .02em;
+}
+
+.live-names b {
+  color: var(--red);
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin: 0 6px;
+}
+
+.live-meta {
+  color: var(--dim);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.live-board-empty {
+  margin: 14px 0 0;
+  color: var(--dim);
+  font-size: 15px;
+}
+
 .home-footer {
   display: flex;
   justify-content: space-between;
@@ -1596,6 +1661,14 @@ input:focus {
 
   .join-strip .form-error {
     grid-column: 1;
+  }
+
+  .live-board {
+    padding: 23px;
+  }
+
+  .live-board-head h2 {
+    font-size: 23px;
   }
 
   .home-footer {

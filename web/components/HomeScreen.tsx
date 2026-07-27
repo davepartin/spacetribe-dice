@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Brand } from "./Brand";
+import { LiveBattlesBoard } from "./LiveBattlesBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
 import { joinLiveMatchByCode } from "@/lib/firebase-match";
 import { withBasePath } from "@/lib/paths";
@@ -38,7 +39,7 @@ export function HomeScreen() {
     <main className="home-shell">
       <nav className="home-nav">
         <Brand />
-        <a className="nav-link" href={withBasePath("/fleet-dice-v82.html#ref")}>
+        <a className="nav-link" href={withBasePath("/fleet-dice-v83.html#ref")}>
           How to play
         </a>
       </nav>
@@ -65,7 +66,7 @@ export function HomeScreen() {
           </div>
           <p className="card-kicker">PLAY NOW</p>
           <h2>Solo Command</h2>
-          <p>Build your fleet against the computer. The complete v82 game.</p>
+          <p>Build your fleet against the computer. The complete v83 game.</p>
           <Link className="action-button light-action" href="/solo/">
             Start solo
             <span aria-hidden="true">→</span>
@@ -117,6 +118,8 @@ export function HomeScreen() {
         </form>
         {error ? <p className="form-error">{error}</p> : null}
       </section>
+
+      <LiveBattlesBoard />
 
       <footer className="home-footer">
         <p>No account to create. No app download. Your browser remembers you.</p>
