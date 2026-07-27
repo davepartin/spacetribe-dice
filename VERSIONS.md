@@ -28,21 +28,79 @@ That way the numbers stay in your hands and the rules stay a conversation.
 Thirty-odd settings, all live. Change one, hit **Start a fresh match**, and feel it.
 **Reset to defaults** puts everything back.
 
-The two most worth playing with first:
+The three most useful settings for the current game:
 
-- **Straight bonus multiplier** — currently 1, so a d6 straight of three adds 6.
-  Set it to 2 and straights become the whole game. Set it to 0 and see whether the
-  game still holds up without them.
-- **Energy from rolling a 2** — currently 1. Set it to 0 to feel version 01 again,
-  or 2 if Energy feels too tight.
-- **How fast they grow** — 1 is an even match. Drop it to 0.5 if the opponent is
-  running away from you while we're still tuning other things.
+- **Straight bonus multiplier** — currently 1. It scales every prize on the
+  five-through-eight straight ladder.
+- **Extra damage per round after escalation** — currently 4. Lower it if late
+  matches end too abruptly; raise it if defensive matches still drag.
+- **How fast they grow** — 1 is the present baseline. Drop it to 0.5 if the
+  opponent is running away while other numbers are still being tuned.
 
 ---
 
 ## Versions
 
-### 80 — grow the fleet, or widen it (current)
+### 81 — the first phone playtest (current)
+
+Dave played v80 on his phone and reported the things that only appear when a
+human thumb meets the game.
+
+**The roll now begins Ready.** Entering a round shows every available die marked
+Ready and a large `Roll 1 of 3` button. Rolls 2 and 3 use the same language after
+the player selects what should roll again. The shipyard now says `Go to round N`.
+A paid flagship-only reroll was also broken: the button counted selected ship
+dice but ignored the selected flagship, so it disabled itself. The flagship now
+counts as one selected die and costs 1 Energy like everything else.
+
+**Damage may be spread across as many ships as the defender wants.** Every chosen
+ship blocks its own size and misses the next round. This replaces the often
+obvious “pick the one ship closest to the damage” answer with a larger decision:
+how much health to save now versus how many dice to give up next round. Direct
+still reaches the flagship.
+
+Repeated ship defense stretched the first simulation from roughly 13 rounds to
+16. The existing war-escalation timer was therefore tested at +3 and +4 attack
+per late round. +4 restored the five policies to a 13.7-round average. It begins
+in round 9: +4, then +8, then +12. The instructions now explain this explicitly.
+
+**Prices came down.** Slots 5–8 now cost 7 / 8 / 9 / 10 Energy — always two more
+than the slot number. Flagship levels fell from 16 / 26 to 10 / 16. Fifty matches
+per policy against the pace-1 opponent:
+
+| Plan | Win rate | Average rounds |
+| --- | ---: | ---: |
+| Formation first | 42% | 13.9 |
+| Capital ship | 36% | 13.5 |
+| Balanced growth | 48% | 13.7 |
+| Flagship first | 32% | 13.8 |
+| Fill then grow | 44% | 13.4 |
+
+The command policy now actually buys flagship levels (average 2.1) without
+becoming dominant. The 32–48% range is encouraging, but 50 matches per policy is
+still only a first pass.
+
+**The screens now tell the truth more directly.**
+
+- Player-facing copy uses ship or die, never “hull.”
+- Buttons show their price without calculating “3 short” for the player.
+- Grow sits above each ship; Scrap stays below it.
+- Flagship face 4 says exactly what it does: each ship showing 4 earns the
+  flagship bonus as Energy.
+- How to play lists all 28 faces across d4, d6, d8, and d10, including every
+  printed mark.
+- Roll, shipyard, and damage decisions have `Reset choices on this page`.
+- The result shows two side-by-side health stories: previous health, damage,
+  repair, and current health. The full ledgers remain below.
+
+**Two navigation bugs closed.** Clicking Upgrade costs while already there used
+to replace the return destination with the same page, trapping the player. The
+button now toggles back to the saved game screen. Reference navigation is tested
+from roll, report, and shipyard.
+
+---
+
+### 80 — grow the fleet, or widen it
 
 This version makes the two changes that most directly attack the solved economy
 and add recurring decisions to the shipyard.

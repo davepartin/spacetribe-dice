@@ -33,7 +33,7 @@ assistant.
 | [DIRECTIONS.md](DIRECTIONS.md) | Paths to victory, bluffing, and the team layer |
 | [DECISIONS.md](DECISIONS.md) | Every decision a player makes, marked strong or thin |
 
-`simple01.html` through `simple80.html` are frozen snapshots. They never change,
+`simple01.html` through `simple81.html` are frozen snapshots. They never change,
 so if an idea makes the game worse we open the previous number and we're back
 where we were. Nothing is ever lost by trying something.
 

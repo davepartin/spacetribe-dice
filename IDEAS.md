@@ -1,9 +1,9 @@
 # Five ideas — after a full review of v77
 
-> **v80 status:** ideas 1 (grow hulls in place), 2 (escalating marks on new
+> **v81 status:** ideas 1 (grow ships in place), 2 (escalating marks on new
 > faces), and 3 (buy fleet slots) are now built and under playtest. The analysis
 > below is preserved because it explains why those changes were chosen; its
-> “current game” numbers describe v77, not v80.
+> “current game” numbers describe v77, not v81.
 
 Dave, I went through every screen, every process, pulled out the dead code, and
 ran playtests. Most of it was tidying. But the playtests turned up something that

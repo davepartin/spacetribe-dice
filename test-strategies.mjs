@@ -25,6 +25,7 @@ async function run(opts,N){
           w.G.you.energy-=w.priceOf(sd); w.G.you.dice.push(w.newShip(sd)); }
         w.startRound(); continue; }
       if(w.G.phase==="roll"){
+        if(w.G.you.rolls===0) w.doReroll();
         for(let k=1;k<w.K("rollsPerRound");k++){
           const keep=w.botHolds(w.G.you.values);
           for(let i=0;i<w.G.you.values.length;i++)

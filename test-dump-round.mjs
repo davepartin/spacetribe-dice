@@ -17,7 +17,8 @@ const screen=t=>{ console.log("\n\n████ "+t+" ████\n"+text(d.get
 w.newGame();
 // drive to a brace with damage on both sides
 for(let i=0;i<30;i++){ if(w.G.phase==="brace") break;
-  if(w.G.phase==="roll") w.submit(); else if(w.G.phase==="report") w.nextRound();
+  if(w.G.phase==="roll"){ if(w.G.you.rolls===0) w.doReroll(); w.submit(); }
+  else if(w.G.phase==="report") w.nextRound();
   else if(w.G.phase==="shop") w.startRound(); else break; }
 if(w.G.phase==="brace") screen("BRACE"); else console.log("(could not reach brace)");
 if(w.G.phase==="brace"){ const p=d.querySelector("[data-brace]"); if(p) p.click();

@@ -58,19 +58,21 @@ const PLANS = {
   },
 };
 
-async function run(name, matches, pace){
+async function run(name, matches, pace, escalationPer){
   let wins = 0, done = 0, rounds = 0, ships = 0, sides = 0, levels = 0;
   for (let m = 0; m < matches; m++){
     const dom = new JSDOM(src, { runScripts:"dangerously", pretendToBeVisual:true });
     await new Promise(r => setTimeout(r, 90));
     const w = dom.window, d = w.document;
     w.C.botPace.v = pace;
+    if (escalationPer !== null) w.C.escPer.v = escalationPer;
     w.newGame();
     for (let guard = 0; guard < 400 && w.G.phase !== "over"; guard++){
       if (w.G.phase === "shop"){
         for (let action = 0; action < 20 && PLANS[name](w); action++);
         w.startRound();
       } else if (w.G.phase === "roll"){
+        if (w.G.you.rolls === 0) w.doReroll();
         for (let r = 1; r < w.K("rollsPerRound"); r++){
           const keep = w.botHolds(w.G.you.values);
           for (let i = 0; i < w.G.you.values.length; i++)
@@ -78,10 +80,11 @@ async function run(name, matches, pace){
         }
         w.submit();
       } else if (w.G.phase === "brace"){
-        const lethalSoon = w.G.you.hp - (w.pending.incoming + w.pending.direct) <= 25;
-        if (lethalSoon){
+        while (w.G.you.hp -
+          (Math.max(0,w.pending.incoming-w.pending.soaked)+w.pending.direct) <= 25){
           const options = [...d.querySelectorAll("[data-brace]")];
-          if (options.length) options[options.length - 1].click();
+          if (!options.length) break;
+          options[options.length - 1].click();
         }
         d.getElementById("brace-done").click();
       } else if (w.G.phase === "report"){
@@ -113,5 +116,6 @@ async function run(name, matches, pace){
 const which = process.argv[2] || "all";
 const N = +(process.argv[3] || 14);
 const pace = +(process.argv[4] || 1);
+const escalationPer = process.argv[5] === undefined ? null : +process.argv[5];
 const names = which === "all" ? Object.keys(PLANS) : [which];
-console.table(await Promise.all(names.map(name => run(name, N, pace))));
+console.table(await Promise.all(names.map(name => run(name, N, pace, escalationPer))));

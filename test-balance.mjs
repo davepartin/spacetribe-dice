@@ -17,6 +17,7 @@ for(let m=0;m<N;m++){
         if(!got) break; }
       w.startRound(); continue; }
     if(w.G.phase==="roll"){
+      if(w.G.you.rolls===0) w.doReroll();
       for(let k=1;k<w.K("rollsPerRound");k++){
         const keep=w.botHolds(w.G.you.values);
         for(let i=0;i<w.G.you.values.length;i++)

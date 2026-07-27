@@ -3,7 +3,7 @@
 This is the single entry point for anyone new to the project, human or AI.
 Everything you need to be useful is either here or pointed at from here.
 
-**Current version: v80.** Open `simple.html`.
+**Current version: v81.** Open `simple.html`.
 
 ---
 
@@ -37,7 +37,7 @@ Copy everything between the lines.
 > 4. **Numbers are mine, rules are ours.** Anything numeric lives in the `C`
 >    object and is editable live in the Tune panel, so I can feel a change without
 >    a rebuild. If I tell you a setting felt right, make it the default.
-> 5. **Test in the real build, not just in a model.** There are 28 `test-*` scripts
+> 5. **Test in the real build, not just in a model.** There are 29 `test-*` scripts
 >    in this folder. Run them. They boot the actual file, play real matches and
 >    read what the screen says.
 > 6. **Assert before you write.** A find-and-replace that matches nothing reports
@@ -68,7 +68,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v80)
+## The rules as they stand (v81)
 
 ### Every ship die
 
@@ -98,7 +98,7 @@ Direct now pull against each other, which is a real decision.
 **Every printed symbol always pays.** The flagship boosts them; it never switches
 them on.
 
-The upper marks arrive only when a hull grows large enough to own that face. They
+The upper marks arrive only when a ship grows large enough to own that face. They
 make growth a genuine path: bigger ships still roll higher, and now their new
 faces add a rising repair/Direct ladder rather than being plain numbers.
 
@@ -132,9 +132,10 @@ separate times; if a total looks high, check this first.
 
 1. **Between rounds.** Grow a ship one size, scrap it, buy a new ship, unlock a
    fleet slot, or upgrade the flagship's level.
-2. **Roll.** Three rolls. Tap the dice you want to change, then Reroll. After the
-   free rolls it costs 1 Energy a die. Whatever you send back gambles the attack
-   it was already showing.
+2. **Roll.** The page begins with every available die Ready. Roll 1 rolls
+   everything. Before rolls 2 and 3, tap only the dice you want to change.
+   Afterward an extra reroll costs 1 Energy per selected die, including the
+   flagship. Whatever you send back gambles the attack it was already showing.
 3. **Straights.** Five or more consecutive numbers across the fleet, and the
    flagship's number counts toward the line. **Length** decides what kind of prize;
    the **biggest ship in the line** decides how big. A long straight may be cashed
@@ -144,23 +145,24 @@ separate times; if a total looks high, check this first.
    shields`. **Direct** is tracked separately and **nothing stops it** — not
    shields, not a ship thrown in front of it.
 5. **Take the hit.** If the volley got through, *you* decide: all on the flagship,
-   or put **one ship** in front of it. That ship blocks its own size — a d10
-   blocks 10 — and is **Damaged** for the next round: greyed in its slot, not
-   rolling, not rerollable, not scrappable. Back the round after. **A fed ship
-   cannot touch Direct.**
+   or put **as many available ships as you want** in front of it. Each blocks its
+   own size — a d10 blocks 10 — and is **Damaged** for the next round: greyed in
+   its slot, not rolling, not rerollable, not scrappable. Every ship used is one
+   less die next round. **No ship can touch Direct.**
 6. **Repair.** Your 3s repair your flagship.
 
 ### Winning
 
 The match ends when a flagship reaches zero. There is no round limit in practice
-(a 40-round backstop exists and measurement says it never fires). Matches run
-about 8 to 17 rounds, median 12.
+(a 40-round backstop exists and measurement says it never fires). The current
+five-policy pass averaged 13.7 rounds.
 
 If both flagships fall in the same round the tiebreak runs: **heavier final
 volley**, then **most damage across the match**, then a true draw.
 
-From round 8 **the war escalates** — every attack gains 2 more each round — so a
-stubborn pair of walls cannot drag a match into a fourth week.
+After round 8 **the war escalates**: ordinary attack gets +4 in round 9, +8 in
+round 10, +12 in round 11, and so on. Dice and Direct do not change. This is the
+long-game timer that stops repeated ship sacrifices from stalling the match.
 
 ---
 
@@ -180,15 +182,15 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 | Ship prices — d4/d6/d8/d10 | 4 / 6 / 9 / 13 | priced by measured value, not by size |
 | Scrap value | 50% | |
 | Fleet slots | 4 open of 8 | plus the flagship. You start with 4 d4s and 0 Energy |
-| Unlock slots 5 / 6 / 7 / 8 | 6 / 10 / 15 / 20⚡ | width is an investment |
+| Unlock slots 5 / 6 / 7 / 8 | 7 / 8 / 9 / 10⚡ | always 2 more than the slot number |
 | Grow d4→d6 / d6→d8 / d8→d10 | 2 / 3 / 4⚡ | the difference between ship prices |
 | Rolls a round | 3 | then 1 Energy a die |
 | A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
-| Ships you may feed a round | **1** | at 2, careless play loses far too hard |
+| Ships you may feed a round | **as many as you want** | each misses the next round |
 | Flagship level | 1 of 3 | the bonus is 2, then 3, then 4 |
-| Flagship upgrades | 16⚡ then 26⚡ | one purchase raises all six faces |
+| Flagship upgrades | 10⚡ then 16⚡ | one purchase raises all six faces |
 | Reactor cap / overflow | 6 / 2⚡ | once base is capped it pays Energy instead |
-| War escalates after round | 8, by 2 a round | |
+| War escalates after round | 8, by 4 a round | |
 | **How fast they grow** | **1** | a rate, not a chance |
 
 **The straight ladder**, with `runMin` at 5:
@@ -204,8 +206,9 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 
 ## Where the game stands — read this before changing anything
 
-v80 attacks the previously solved slot economy in two connected ways. You start
-with four open slots and must buy width; or you can spend small amounts growing
+v81 keeps v80's growth and slot economy, then revises the game from Dave's first
+phone playtest. You start with four open slots and must buy width; or you can
+spend small amounts growing
 the four ships already in formation. The player now has the same in-place growth
 language as the opponent, although the opponent's schedule remains a difficulty
 abstraction and does not spend Energy.
@@ -215,11 +218,11 @@ played the real game against the pace-1 opponent:
 
 | Plan | Preliminary win rate |
 | --- | ---: |
-| Unlock slots and add d4s | 22% |
-| Build a fifth d6, then grow the largest hull | 34% |
+| Unlock slots and add d4s | 42% |
+| Build a fifth d6, then grow the largest ship | 36% |
 | Build toward six ships, then grow the smallest | 48% |
-| Flagship levels first, then balanced growth | 26% |
-| Unlock every slot with d4s, then grow | 32% |
+| Flagship levels first, then balanced growth | 32% |
+| Unlock every slot with d4s, then grow | 44% |
 
 No plan swept the field; the old fill-first plan had won **100%**. These policies
 are deliberately simple and this is a 50-match sample per plan, still only about
@@ -249,7 +252,7 @@ their faces are larger.
 | File | What it is |
 | --- | --- |
 | **`simple.html`** | The game. One file, no dependencies, opens by double-click. Always newest. |
-| **`simple01.html` … `simple80.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
+| **`simple01.html` … `simple81.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
 | **`HANDOFF.md`** | This file. The entry point. |
 | **`IDEAS.md`** | Where the game stands now, what the playtests found, and five things worth building. Read after this. |
 | **`VERSIONS.md`** | Every version, newest first, with the measurements that justified it. |
@@ -257,7 +260,7 @@ their faces are larger.
 | **`DIRECTIONS.md`** | Paths to victory, bluffing, Secret Directives, Trumps, the 2v2 layer. |
 | **`DECISIONS.md`** | Every decision a player makes, marked strong or thin. |
 | **`PANELS.md`** | The old flagship-panel catalogue. **Historical** — that store was removed in v72. Do not rebuild from it without reading VERSIONS.md v72 first. |
-| **`test-*.mjs` / `test-*.py`** | 28 scripts. See below. |
+| **`test-*.mjs` / `test-*.py`** | 29 scripts. See below. |
 
 `README.md` is accurate and describes this project.
 
@@ -291,7 +294,7 @@ w.newGame();
 while (w.G.phase !== "over") { /* drive the phases */ }
 ```
 
-**The 28 test scripts, and what each is for:**
+**The 29 test scripts, and what each is for:**
 
 | Script | Checks |
 | --- | --- |
@@ -301,11 +304,12 @@ while (w.G.phase !== "over") { /* drive the phases */ }
 | `test-flagship-rings.mjs` | rings × multiplier = what the face actually paid, for all six faces |
 | `test-flagship-levels.mjs` | the level ladder and the ceiling |
 | `test-flagship-language.mjs` | nothing anywhere says "face pays" instead of "adds" |
-| `test-face-marks.mjs` | what each face pays, and what gets drawn on the hull |
+| `test-face-marks.mjs` | what each face pays, and what gets drawn on the ship |
 | `test-shop.mjs`, `test-shop-actions.mjs` | every buy and scrap button, at 0 / 7 / 40 Energy, full fleet, damaged ship |
 | `test-prices-page.mjs`, `test-reference-pages.mjs`, `test-reference-nav.mjs` | the two reference screens open and return from every phase |
 | `test-dump-roll.mjs`, `test-dump-round.mjs`, `test-dump-pages.mjs` | print every screen as plain text — read these when reviewing copy |
-| `test-v80-economy.mjs` | the current five-policy growth/slot win-rate table |
+| `test-v81-economy.mjs` | the current five-policy growth/slot/flagship win-rate table |
+| `test-v81-playtest.mjs` | every request from the first v80 phone playtest |
 | `test-strategies.mjs` | historical pre-v80 economy comparison |
 | `test-fleet-output.mjs`, `test-fleet-value.mjs` | what a fleet of one size produces a round |
 | `test-head-to-head.mjs` | frozen fleets against each other |
@@ -327,14 +331,14 @@ because of a bug in the harness, not the game.
 
 - **Moving Direct from the 4 to the 2 halved the d4's Direct**, even though the
   two faces are equally likely. What changed was what players *hold*.
-- **At equal ship count big hulls dominate** (8 d10 beat 8 d4, 96%). **At equal
-  money small hulls dominate** (8 d4 beat 2 d10, 100%). The thing that wins is
+- **At equal ship count big ships dominate** (8 d10 beat 8 d4, 96%). **At equal
+  money small ships dominate** (8 d4 beat 2 d10, 100%). The thing that wins is
   slot count.
 - **A d6 is the best straight fleet**, better than a d10.
 - **Attacker-chosen targeting won 84%** and stripped the loser to under one ship.
   Defender-chosen absorption fixes it completely.
 - **Price cannot balance a consumable you can time.**
-- **Half a d10 is barely worth more than half a d4**, so a soak scaled to hull
+- **Half a d10 is barely worth more than half a d4**, so a soak scaled to ship
   size makes your capital ship the best fodder — backwards.
 - **Energy saturates.** Doubling the Reactor barely moved its worth, because
   slots fill up and there is nothing left to buy.

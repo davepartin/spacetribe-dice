@@ -13,7 +13,7 @@ for(const target of reach){
   // drive to the phase
   w.newGame();
   for(let i=0;i<40 && w.G.phase!==target;i++){
-    if(w.G.phase==="roll") w.submit();
+    if(w.G.phase==="roll"){ if(w.G.you.rolls===0) w.doReroll(); w.submit(); }
     else if(w.G.phase==="brace") (d.getElementById("brace-done")||{click(){}}).click();
     else if(w.G.phase==="report") w.nextRound();
     else if(w.G.phase==="shop") w.startRound();
@@ -32,5 +32,10 @@ for(const target of reach){
   }
   console.log(target.padEnd(7), "→ Energy and How-to-play both open and return ✓");
 }
+// Reopening Upgrade costs must return instead of overwriting the saved phase.
+w.newGame();
+d.getElementById("costs").click();
+d.getElementById("costs").click();
+if(w.G.phase!=="roll") bad.push("second Upgrade costs click trapped the game on "+w.G.phase);
 console.log("\nfaults:", bad.length?bad:"none");
 console.log("errors:", errs.length?[...new Set(errs)]:"none");

@@ -15,6 +15,7 @@ for(const [id,label] of Object.entries(PANEL)){
   if(face<0){ console.log("!! no face carries",id); continue; }
   w.G.you.flag.face=face;
   w.startRound();
+  w.G.you.rolls=1;
   w.G.you.values=[1,2,3,4,5,6].map((v,i)=>({sides:10,value:v}));
   w.G.you.flag.face=face;
   w.render();

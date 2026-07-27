@@ -30,6 +30,6 @@ w.newGame();
 screen("ROLL — round 1, fresh fleet of four d4s");
 w.G.you.values=[{sides:10,value:3},{sides:8,value:4},{sides:6,value:5},{sides:4,value:1},{sides:10,value:2}];
 w.G.you.dice=[{s:10,out:0},{s:8,out:0},{s:6,out:0},{s:4,out:0},{s:10,out:0}];
-w.G.you.flag.face=5; w.G.you.energy=9; w.render();
+w.G.you.rolls=1; w.G.you.flag.face=5; w.G.you.energy=9; w.render();
 screen("ROLL — mid fleet with a straight and an Attack flagship");
 console.log("\nerrors:", errs.length?errs:"none");

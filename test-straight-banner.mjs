@@ -6,6 +6,7 @@ dom.window.onerror=x=>errs.push("onerror: "+x);
 await new Promise(r=>setTimeout(r,220));
 const w=dom.window,d=dom.window.document;
 w.newGame();
+w.G.you.rolls=1;
 function show(label){
   w.render();
   const k=d.querySelector(".strk");

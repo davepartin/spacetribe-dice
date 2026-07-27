@@ -10,7 +10,7 @@ for(let m=0;m<25;m++){
   const w=dom.window,d=dom.window.document; w.newGame();
   for(let r=0;r<200 && w.G.phase!=="over";r++){
     if(w.G.phase==="shop"){ w.startRound(); continue; }
-    if(w.G.phase==="roll"){ w.submit(); continue; }
+    if(w.G.phase==="roll"){ if(w.G.you.rolls===0) w.doReroll(); w.submit(); continue; }
     if(w.G.phase==="brace"){ if(Math.random()<.5){const p=d.querySelector("[data-brace]"); if(p)p.click();}
       (d.getElementById("brace-done")||{click(){}}).click(); continue; }
     if(w.G.phase==="report"){

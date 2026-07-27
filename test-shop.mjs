@@ -6,6 +6,7 @@ dom.window.onerror=x=>errs.push("onerror: "+x);
 await new Promise(r=>setTimeout(r,200));
 const w=dom.window,d=dom.window.document;
 w.newGame();
+w.doReroll();
 w.submit();
 if(w.G.phase==="brace") (d.getElementById("brace-done")||{click(){}}).click();
 w.nextRound();                       // lands in the shop

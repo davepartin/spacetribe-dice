@@ -5,7 +5,7 @@ const errs=[]; dom.virtualConsole.on("jsdomError",e=>errs.push(String(e).split("
 dom.window.onerror=x=>errs.push("onerror: "+x);
 await new Promise(r=>setTimeout(r,200));
 const w=dom.window,d=dom.window.document;
-const toShop=()=>{ w.submit(); if(w.G.phase==="brace")(d.getElementById("brace-done")||{click(){}}).click(); w.nextRound(); };
+const toShop=()=>{ w.doReroll(); w.submit(); if(w.G.phase==="brace")(d.getElementById("brace-done")||{click(){}}).click(); w.nextRound(); };
 const buttons=()=>[...d.querySelectorAll(".sbuy")].map(b=>b.textContent+(b.disabled?" [off]":" [on]")).join("  ");
 w.newGame(); toShop();
 
