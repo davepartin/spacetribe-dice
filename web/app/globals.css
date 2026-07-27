@@ -1119,6 +1119,99 @@ input:focus {
   margin: 19px 0 14px;
 }
 
+.fleet-formation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 19px 0 14px;
+}
+
+.fleet-cell {
+  min-width: 0;
+}
+
+.fleet-cell .fleet-die,
+.fleet-cell .empty-slot {
+  width: 100%;
+}
+
+.empty-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 118px;
+  border: 1px dashed color-mix(in srgb, var(--line) 80%, transparent);
+  border-radius: 15px;
+  background: rgba(8, 14, 26, 0.35);
+}
+
+.empty-slot span {
+  color: var(--faint);
+  font-size: 18px;
+  font-weight: 800;
+  opacity: 0.55;
+}
+
+.slot-badge {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  z-index: 1;
+  color: var(--teal);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.fleet-die.hurt {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.fleet-die.no-pick {
+  cursor: default;
+}
+
+.brace-flag {
+  cursor: default;
+  gap: 4px;
+}
+
+.brace-flag-label {
+  color: var(--faint);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.brace-flag-hp {
+  font-size: 34px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.brace-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.ship-card .hull,
+.buy-die .hull {
+  display: block;
+  margin: 0 auto 6px;
+}
+
+.ship-card .hull {
+  width: 78px;
+  max-height: 78px;
+}
+
+.buy-die .hull {
+  width: 44px;
+  max-height: 44px;
+}
+
 .fleet-die {
   position: relative;
   display: flex;
@@ -1433,7 +1526,7 @@ input:focus {
 
 .brace-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 17px;
 }
@@ -1864,7 +1957,8 @@ input:focus {
     gap: 7px;
   }
 
-  .fleet-die {
+  .fleet-die,
+  .empty-slot {
     min-height: 112px;
   }
 
@@ -1895,8 +1989,9 @@ input:focus {
     margin-top: 10px;
   }
 
-  .brace-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .brace-grid,
+  .fleet-formation {
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .report-grid {

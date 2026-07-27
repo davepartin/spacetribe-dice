@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { SiteHeader } from "./Brand";
 import { InvitePanel } from "./InvitePanel";
 import {
@@ -345,6 +345,7 @@ function Shipyard({
             return (
               <article className={`ship-card die-size-${ship.sides} ${damaged ? "damaged" : ""}`} key={ship.id}>
                 <span className="slot-label">SLOT {index + 1}</span>
+                <ShipHull ready sides={ship.sides} value={0} />
                 <strong>d{ship.sides}</strong>
                 {damaged ? <small>DAMAGED THIS ROUND</small> : null}
                 <button
@@ -380,6 +381,7 @@ function Shipyard({
               key={sides}
               onClick={() => play({ type: "shop", operation: "buy", sides })}
             >
+              <ShipHull ready sides={sides} value={0} />
               <strong>d{sides}</strong>
               <span>{priceOf(sides)}⚡</span>
             </button>
@@ -474,23 +476,42 @@ function RollFleet({
             : "Your three free rolls are complete. Submit, use your Flagship Token, or spend Energy for an extra reroll."}
       </p>
 
-      <div className="dice-bay">
-        {you.phase === "ready" ? (
-          activeShips(you, round).map((ship) => (
-            <ReadyDie key={ship.id} sides={ship.sides} />
-          ))
-        ) : (
-          you.dice.map((die) => (
+      <FleetFormation
+        ships={you.ships}
+        renderFlag={() => {
+          if (you.phase === "ready") return <ReadyDie flag />;
+          const flag = you.dice.find((die) => die.flag);
+          if (!flag) return null;
+          return (
+            <FleetDie
+              die={flag}
+              onClick={() => toggleDie(flag.id)}
+              selected={selected.includes(flag.id)}
+            />
+          );
+        }}
+        renderShip={(index) => {
+          const ship = you.ships[index];
+          const damaged = ship.disabledRound === round;
+          if (you.phase === "ready") {
+            return (
+              <ReadyDie damaged={damaged} sides={ship.sides} slot={index + 1} />
+            );
+          }
+          const die = you.dice.find((entry) => entry.id === ship.id);
+          if (!die) {
+            return <ReadyDie damaged sides={ship.sides} slot={index + 1} />;
+          }
+          return (
             <FleetDie
               die={die}
-              key={die.id}
               onClick={() => toggleDie(die.id)}
               selected={selected.includes(die.id)}
+              slot={index + 1}
             />
-          ))
-        )}
-        {you.phase === "ready" ? <ReadyDie flag /> : null}
-      </div>
+          );
+        }}
+      />
 
       {preview ? <LiveTally tally={preview} /> : null}
 
@@ -569,6 +590,41 @@ function RollFleet({
   );
 }
 
+function FleetFormation({
+  ships,
+  renderShip,
+  renderFlag,
+}: {
+  ships: { id: string }[];
+  renderShip: (index: number) => ReactNode;
+  renderFlag: () => ReactNode;
+}) {
+  const cells = [];
+  for (let i = 0; i < 9; i += 1) {
+    if (i === 4) {
+      cells.push(
+        <div className="fleet-cell" key="flag">
+          {renderFlag()}
+        </div>,
+      );
+      continue;
+    }
+    const index = i < 4 ? i : i - 1;
+    cells.push(
+      <div className="fleet-cell" key={`slot-${index}`}>
+        {index < ships.length ? (
+          renderShip(index)
+        ) : (
+          <div className="empty-slot" aria-hidden="true">
+            <span>{index + 1}</span>
+          </div>
+        )}
+      </div>,
+    );
+  }
+  return <div className="fleet-formation">{cells}</div>;
+}
+
 function BraceFleet({
   you,
   round,
@@ -581,11 +637,19 @@ function BraceFleet({
   busy: boolean;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
-  const ships = activeShips(you, round);
-  const blocked = ships
+  const pickable = new Set(activeShips(you, round).map((ship) => ship.id));
+  const blocked = you.ships
     .filter((ship) => selected.includes(ship.id))
     .reduce((sum, ship) => sum + ship.sides, 0);
   const flagshipDamage = Math.max(0, you.incoming - blocked) + you.directIncoming;
+  const volleyLeft = Math.max(0, you.incoming - blocked);
+
+  function toggleShip(id: string) {
+    if (!pickable.has(id)) return;
+    setSelected((current) =>
+      current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
+    );
+  }
 
   return (
     <section className="stage brace-stage">
@@ -596,39 +660,70 @@ function BraceFleet({
         misses the next round. <b className="direct-text">Direct</b> always reaches the flagship.
       </p>
       <div className="incoming-numbers">
-        <div><span>VOLLEY</span><strong>{you.incoming}</strong></div>
+        <div><span>VOLLEY LEFT</span><strong>{volleyLeft}</strong></div>
         <div><span>DIRECT</span><strong className="direct-text">{you.directIncoming}</strong></div>
         <div><span>TO FLAGSHIP</span><strong className="damage-text">{flagshipDamage}</strong></div>
       </div>
-      <div className="brace-grid">
-        {ships.map((ship, index) => {
+
+      <FleetFormation
+        ships={you.ships}
+        renderFlag={() => (
+          <div className="fleet-die flag brace-flag static">
+            <div className="brace-flag-label">Flagship</div>
+            <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
+          </div>
+        )}
+        renderShip={(index) => {
+          const ship = you.ships[index];
+          const damaged = ship.disabledRound === round;
           const picked = selected.includes(ship.id);
+          const canPick = pickable.has(ship.id) && (picked || volleyLeft > 0);
           return (
             <button
-              className={`brace-ship die-size-${ship.sides} ${picked ? "selected" : ""}`}
+              className={`fleet-die shield-die ${picked ? "selected" : ""} ${damaged ? "hurt" : ""} ${canPick ? "" : "no-pick"}`}
+              disabled={!canPick || busy}
               key={ship.id}
-              onClick={() =>
-                setSelected((current) =>
-                  picked ? current.filter((id) => id !== ship.id) : [...current, ship.id],
-                )
-              }
+              onClick={() => toggleShip(ship.id)}
+              type="button"
             >
-              <span>SLOT {index + 1}</span>
-              <strong>d{ship.sides}</strong>
-              <small>{picked ? `BLOCKS ${ship.sides}` : "AVAILABLE"}</small>
+              <span className="slot-badge">{index + 1}</span>
+              <ShipHull ready sides={ship.sides} value={0} />
+              <span className="die-caption">
+                {damaged
+                  ? "Damaged"
+                  : picked
+                    ? `Blocks ${ship.sides}`
+                    : canPick
+                      ? `d${ship.sides} · tap`
+                      : `d${ship.sides}`}
+              </span>
             </button>
           );
-        })}
+        }}
+      />
+
+      <div className="brace-actions">
+        {selected.length ? (
+          <button
+            className="action-button outline-action"
+            disabled={busy}
+            onClick={() => setSelected([])}
+            type="button"
+          >
+            Reset choices
+          </button>
+        ) : null}
+        <button
+          className="action-button red-action full-action"
+          disabled={busy}
+          onClick={() => play({ type: "brace", ships: selected })}
+          type="button"
+        >
+          {flagshipDamage > 0
+            ? `Continue — flagship takes ${flagshipDamage}`
+            : "Continue — nothing gets through"}
+        </button>
       </div>
-      <button
-        className="action-button red-action full-action"
-        disabled={busy}
-        onClick={() => play({ type: "brace", ships: selected })}
-      >
-        {selected.length
-          ? `Damage ${selected.length} ship${selected.length === 1 ? "" : "s"} · flagship takes ${flagshipDamage}`
-          : `Flagship takes all ${flagshipDamage}`}
-      </button>
     </section>
   );
 }
@@ -737,11 +832,13 @@ function FleetDie({
   selected = false,
   onClick,
   staticDie = false,
+  slot,
 }: {
   die: DieValue;
   selected?: boolean;
   onClick?: () => void;
   staticDie?: boolean;
+  slot?: number;
 }) {
   const effect = die.flag
     ? flagFaceLabel(die.value)
@@ -755,6 +852,7 @@ function FleetDie({
       onClick={onClick}
       type="button"
     >
+      {slot ? <span className="slot-badge">{slot}</span> : null}
       {selected ? <span className="reroll-mark">REROLL</span> : null}
       {die.flag ? (
         <FlagHull value={die.value} />
@@ -768,11 +866,24 @@ function FleetDie({
   );
 }
 
-function ReadyDie({ sides, flag = false }: { sides?: DieSize; flag?: boolean }) {
+function ReadyDie({
+  sides,
+  flag = false,
+  damaged = false,
+  slot,
+}: {
+  sides?: DieSize;
+  flag?: boolean;
+  damaged?: boolean;
+  slot?: number;
+}) {
   return (
-    <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`}`}>
+    <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`} ${damaged ? "hurt" : ""}`}>
+      {slot ? <span className="slot-badge">{slot}</span> : null}
       {flag ? <FlagHull value={1} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
-      <span className="die-caption">{flag ? "FLAGSHIP · READY" : "Ready"}</span>
+      <span className="die-caption">
+        {flag ? "FLAGSHIP · READY" : damaged ? "Damaged" : "Ready"}
+      </span>
     </div>
   );
 }
