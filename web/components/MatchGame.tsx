@@ -277,23 +277,23 @@ function MatchDock({
     <div className="match-dock">
       <div className="match-dock-in">
         <div className="match-met">{metrics}</div>
-        <button className="howto-btn" onClick={onHelp} type="button">
-          How
-          <br />
-          to play
-        </button>
         {primary}
       </div>
-      {onCancel ? (
-        <button className="dock-cancel" onClick={onCancel} type="button">
-          Cancel game
+      <div className="match-dock-links">
+        <button className="howto-btn" onClick={onHelp} type="button">
+          How to play
         </button>
-      ) : null}
+        {onCancel ? (
+          <button className="dock-cancel" onClick={onCancel} type="button">
+            Cancel game
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
 
-function playerMetrics(you: PlayerState, enemy: PlayerState, earning = 0) {
+function playerMetrics(you: PlayerState, _enemy: PlayerState, earning = 0) {
   return (
     <>
       <div className="big">
@@ -310,10 +310,6 @@ function playerMetrics(you: PlayerState, enemy: PlayerState, earning = 0) {
       <div>
         <div className="n">{you.ships.length}/{you.slots}</div>
         <div className="l">Ships /<br />slots</div>
-      </div>
-      <div className="enemy-met">
-        <div className="n">{phaseText(enemy)}</div>
-        <div className="l">Enemy</div>
       </div>
     </>
   );
@@ -1117,15 +1113,4 @@ function LiveTally({ tally }: { tally: ReturnType<typeof previewTally> }) {
       <div className="dir"><div className="n">{tally.direct}</div><div className="l">Direct</div></div>
     </section>
   );
-}
-
-function phaseText(player: PlayerState): string {
-  if (player.phase === "shop") return "UPGRADING";
-  if (player.phase === "ready") return "READY";
-  if (player.phase === "rolling") return `ROLL ${Math.min(3, Math.max(1, player.rolls))}/3`;
-  if (player.phase === "submitted") return "LOCKED";
-  if (player.phase === "brace") return "BRACING";
-  if (player.phase === "report") return "REVEAL";
-  if (player.phase === "over") return "DONE";
-  return "…";
 }
