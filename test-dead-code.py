@@ -1,5 +1,6 @@
 import re, sys
-s=open("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html").read()
+from pathlib import Path
+s=Path(__file__).with_name("simple.html").read_text()
 # strip comments so a name mentioned only in prose does not look "used"
 code=re.sub(r"//[^\n]*","",s)
 code=re.sub(r"/\*.*?\*/","",code,flags=re.S)

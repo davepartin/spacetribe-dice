@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom"; import fs from "fs";
-const src=fs.readFileSync("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html","utf8");
+const src=fs.readFileSync(new URL("simple.html", import.meta.url),"utf8");
 const errs=[], bad=[];
 let shown=0;
 for(let m=0;m<25;m++){

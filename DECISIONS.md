@@ -1,139 +1,94 @@
-# Every decision a player makes
+# Every decision a player makes — v80
 
-Written out so we can see what's actually there, what's thin, and what's missing.
-A decision only counts if a reasonable player could go either way — anything with
-one right answer is a rule wearing a costume.
-
----
+This list is deliberately strict. A button is not a decision unless two sensible
+players could choose differently in the same situation.
 
 ## Between rounds — the shipyard
 
-**1. Do I buy a ship?**
-You have Energy or you don't, and there's usually *something* affordable. The
-real question is the next one.
+**Grow a ship, open a slot, buy a ship, or improve the flagship? — Strong.**
+These now compete for the same Energy. Growth improves a die already rolling;
+width adds another roll forever but requires both a slot and a hull; the flagship
+raises the value of matching results across the fleet.
 
-**2. Which size?**
-The live one. A d4 costs 4 and pays Energy on half its faces; a d10 costs 13 and
-fights on eight of ten. Prices are set so buying the biggest you can afford beats
-buying cheap by about 11%, but only because slots are scarce. **Strong decision.**
+**Which ship grows? — Strong, if the face ladder holds up.** Growing a d4 cheaply
+adds 5 and 6, growing a d8 completes the powerful 9 and 10 marks, and a mixed
+fleet covers straights differently from a uniform fleet. Human play must confirm
+that “always finish the biggest ship” is not secretly the answer.
 
-**3. Do I buy now or save for something bigger next round?**
-Honest answer: mostly buy now. Pure hoarding tested at 134 against 187 for
-spending as you go. The decision is really *can I afford better this round*, not
-*should I skip a turn.* **Thin, and probably correctly thin** — sitting on your
-hands shouldn't be rewarded.
+**Which new hull do I buy? — Good.** A d4 is cheap and rich in low marked faces.
+A d6 is the best straight hull. A d8 or d10 rolls higher and carries stronger
+upper marks. Open slots are expensive enough that buying a placeholder has a
+real opportunity cost.
 
-**4. Do I scrap a ship to free a slot?**
-Only bites once you're full, around round four. Then every purchase is a
-replacement and you eat a 50% loss on the sale. **Real, but only in the back
-half.**
+**Do I widen now or save? — Strong.** Slot prices rise 6 / 10 / 15 / 20. The
+fifth ship is accessible; the eighth is a strategic identity. Saving has a visible
+destination instead of being vague hoarding.
 
-**5. Do I upgrade a flagship panel, and which face do I replace?**
-Two decisions stacked: what to buy, and what to give up. The max-two rule forces
-a combination rather than six copies of the best thing. **Strong.**
+**Do I upgrade the flagship? — Good but delayed.** One purchase strengthens all
+six faces, but 16 and 26 Energy compete with several hull steps. It is a coherent
+command-fleet route, though the first automated pass underperformed and needs
+human timing.
 
-**6. Does my flagship match the fleet I'm building?**
-The quietest and best one. A panel naming 9 is worthless without a d10. A panel
-paying per red die wants eight ships. Choosing one commits you to the other.
-**Strong, and mostly invisible, which is why it's good.**
+**Do I scrap? — Situational.** Growth removes most forced scrapping. Scrap now
+means deliberately changing the fleet's shape or freeing an open slot, which is
+rarer but more meaningful than the old replacement tax.
 
----
+## During the roll
 
-## During the round — the roll
+**Which ship dice do I reroll? — Core decision.** A high even attacks, a high odd
+blocks, and a marked face may be worth keeping for Energy, Direct, repair, or a
+straight. The best raw number and the best tactical result often disagree.
 
-**7. Which dice do I nudge?**
-1 Energy moves a die by one. Rerolls are gone, so this is the only shaping tool
-and every Energy spent here is a ship you didn't buy. **Core decision of the
-game.**
+**Do I reroll the flagship? — Strong when the board gives evidence.** Its number
+can bridge a straight and boosts matching ship results. Keeping it is safer;
+rerolling can turn several existing dice into a much larger payout.
 
-**8. Up or down?**
-Up for a bigger number, down toward 2 for Energy. A 3 nudged to 4 is +4 attack; a
-3 nudged to 2 is +2 Energy. **Strong** — this is the tension the whole face model
-was built for.
+**Do I buy another reroll after the free rolls? — Good.** It costs 1 Energy per
+die, directly competing with permanent fleet growth. The decision is clearest
+when one missing number would complete a straight.
 
-**9. Nudge toward the straight, or toward the bigger number?**
-The best decision in the game. A 2 on a d8 pays Energy *and* can bridge a
-straight; a 4 on that same die just hits. **Strong.**
+**Which straight prize do I take? — Strong.** A longer line can be cashed shorter:
+Energy for future building, attack now, or a ship plus attack. An eight-card prize
+needs an open slot, so formation planning matters before the rare roll arrives.
 
-**10. Which tier do I cash my straight in at?**
-Four in a row pays Energy, five pays attack, six builds you a ship — and a longer
-straight can always be taken as a shorter one. Rolled five and want to build
-instead of fight? **Strong, and it's new in v08.**
+## When damage arrives
 
-**11. Do I fire the charged panel or bank the Energy?**
-Overload pays 20 attack for 3 Energy, or 5 for free. Worth about three times its
-charge, so firing is usually right — the question is whether *this* is the round.
-**Good, and it's the one decision made while looking at your dice rather than a
-shop.**
+**Flagship or ship? — Strong.** Feeding one ship protects the flagship by that
+ship's size but removes the ship for the next round. A larger hull blocks more
+and loses a more valuable roll.
 
-**12. Do I reroll the flagship if I don't like the panel?**
-Currently possible but rarely worth it, since rerolls are off by default.
-**Vestigial — probably should go.**
+**Which ship takes it? — Strong.** The player weighs block size, current fleet
+shape, upcoming growth, and straight coverage. Direct damage bypasses this choice,
+so it never becomes a universal answer.
 
----
+## Across the match
 
-## Across the match — the shape of your fleet
+**Wide formation, tall capital fleet, flagship command, or a hybrid? — Promising,
+not yet proven.** The latest v80 policies landed from 22% to 48% against the bot
+instead of the old dominant policy's 100%. That is enough to justify playtesting,
+not enough to declare four balanced archetypes.
 
-**13. Wide or tall?**
-Eight cheap ships or four expensive ones. Wide gets more Energy, more numbers for
-straights, and survives losing a ship. Tall hits harder per slot. Measured best
-is neither extreme: 3 d4 + 2 d6 + 2 d8 + 1 d10. **Strong.**
+**Straight coverage or raw output? — Strong.** A d6 fleet covers 1–6 most tightly.
+Larger hulls hit and block harder and own the strongest upper marks. Mixed fleets
+may bridge both.
 
-**14. Attack-lean or shield-lean?**
-Nudging decides this every round. A point of shield is now worth about a point of
-attack, since damage is `attack − their shields`. **Real but blunt** — you're
-guessing at their number, and there's no way to read them yet.
+**Attack, defence, Direct, repair, or economy this roll? — Strong but tactical.**
+The dice expose the tradeoff instead of asking the player to select an abstract
+stance.
 
-**15. Spread of sizes, or a stack of one size?**
-A spread makes straights easier because you cover more values. A stack of d10s
-hits harder but its numbers cluster high. **Good, and subtle.**
+## What is still thin
 
-**16. Do I chase straights at all?**
-They're 27% of attack. You could ignore them and just build raw numbers.
-**Real, though chasing is usually right.**
+- The opponent remains a transparent growth schedule, not a player whose plan can
+  be read or disrupted.
+- Scrapping may now be so rare that it is mostly an escape hatch.
+- Flagship-first measured weakest in the first automated pass; its expensive path
+  may need a clearer payoff or simply better human timing.
+- The escalating upper marks make capital fleets viable, but may make d10s too
+  universal. This needs live play, not more confident prose.
 
----
+## Decision-density target
 
-## What's thin
-
-Worth naming honestly rather than pretending the list above is all live.
-
-- **Saving Energy** barely pays. Hoarding loses.
-- **Scrapping** does nothing for the first four rounds.
-- **Rerolling the flagship** is a leftover.
-- **Shield-lean** is a guess, not a read — nothing tells you what's coming.
-
-## What's missing
-
-Every decision above is about *your own fleet.* Not one of them involves your
-opponent, which is the single biggest gap in the game right now.
-
-- **No decision that touches them.** Jam — cancel a named opponent's straight —
-  would be the first.
-- **No hidden information to act on.** Energy banks are already secret; nothing
-  makes you *use* that.
-- **No target choice.** Needs 2v2, where "who do we focus" becomes the team's
-  biggest shared call.
-- **No timing decision.** A single-use Trump per match would make *when* the
-  question, which is what people remember.
-- **No lasting consequence.** Nothing carries between rounds except dice and
-  Energy. Ship damage, or the Assassin's Scar, would give a round a memory.
-
----
-
-## The shape of a good round, as it stands
-
-1. Look at the shipyard. Buy, scrap, or upgrade a panel. *(decisions 1–6)*
-2. Roll eight dice and the flagship.
-3. Read the roll: is there a straight, or the makings of one? *(9)*
-4. Spend Energy nudging — toward the straight, toward a bigger number, or down
-   toward Energy. *(7, 8)*
-5. Decide how to cash the straight. *(10)*
-6. Decide whether to fire the flagship. *(11)*
-7. Submit, and find out later.
-
-Six or seven genuine decisions a round, none of which need a rulebook open. That's
-a good density for a game people play on their phones across a week.
-
-The gap is that all seven are about you. Adding one that reaches across the table
-is the next real step.
+A normal round should ask for one shipyard commitment, several quick keep/reroll
+judgments, an occasional straight choice, and sometimes one painful brace choice.
+That is the intended weight: more consequential than a luck-only dice roller,
+lighter and faster to parse than a tactical miniatures game.

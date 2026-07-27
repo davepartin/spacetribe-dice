@@ -1,7 +1,15 @@
 import { JSDOM } from "jsdom"; import fs from "fs";
-const base=fs.readFileSync("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html","utf8");
+const base=fs.readFileSync(new URL("simple.html", import.meta.url),"utf8");
+const CURRENT_DIRECT=`function directOf(n){
+  if (n === 2) return K("twoDirect");
+  return { 6:1, 8:2, 10:3 }[n] || 0;
+}`;
+const CURRENT_HEAL=`function healOf(n){
+  if (n === 3) return K("healThree");
+  return { 5:1, 7:2, 9:3 }[n] || 0;
+}`;
 const VARIANTS={
- "A · v78 as it stands": null,
+ "A · v78 as it stood": {heal:"", dir:""},
  "B · your idea: 5 repairs 1, 6 fires 1 Direct":
    {heal:"if (n === 5) return 1;", dir:"if (n === 6) return 1;"},
  "C · B plus 8 fires 1, 9 repairs 1":
@@ -13,12 +21,12 @@ const VARIANTS={
 };
 for(const [label,v] of Object.entries(VARIANTS)){
   let src=base;
-  if(v){
-    src=src.replace('function directOf(n){ return n === 2 ? K("twoDirect") : 0; }',
-      'function directOf(n){ if (n === 2) return K("twoDirect"); '+v.dir+' return 0; }');
-    src=src.replace('function healOf(n){ return n === 3 ? K("healThree") : 0; }',
-      'function healOf(n){ if (n === 3) return K("healThree"); '+v.heal+' return 0; }');
-  }
+  if(!src.includes(CURRENT_DIRECT)||!src.includes(CURRENT_HEAL))
+    throw new Error("face helpers changed; update this historical comparison");
+  src=src.replace(CURRENT_DIRECT,
+    'function directOf(n){ if (n === 2) return K("twoDirect"); '+v.dir+' return 0; }');
+  src=src.replace(CURRENT_HEAL,
+    'function healOf(n){ if (n === 3) return K("healThree"); '+v.heal+' return 0; }');
   const dom=new JSDOM(src,{runScripts:"dangerously",pretendToBeVisual:true});
   await new Promise(r=>setTimeout(r,120));
   const w=dom.window; const rows=[];

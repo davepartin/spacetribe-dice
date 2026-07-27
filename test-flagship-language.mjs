@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom"; import fs from "fs";
-const src=fs.readFileSync("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html","utf8");
+const src=fs.readFileSync(new URL("simple.html", import.meta.url),"utf8");
 const dom=new JSDOM(src,{runScripts:"dangerously",pretendToBeVisual:true});
 const errs=[]; dom.virtualConsole.on("jsdomError",e=>errs.push(String(e).split("\n")[0]));
 dom.window.onerror=x=>errs.push("onerror: "+x);
@@ -19,7 +19,7 @@ d.querySelector("[data-flagup]").click();
 console.log("\n after upgrading, ladder:", [...d.querySelectorAll(".lvl")].map(x=>
   flat(x.querySelector(".ln").textContent)+(x.classList.contains("now")?"◀":"")).join(" "));
 w.G.you.flag.lvl=3; w.render();
-const c3=[...d.querySelectorAll(".card")].find(c=>/level 3/.test(c.textContent));
+const c3=[...d.querySelectorAll(".card")].find(c=>/Upgrade your flagship/.test(c.textContent));
 console.log(" at the ceiling:", flat(c3.textContent));
 
 w.G.phase="help"; w.render();

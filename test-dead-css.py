@@ -1,5 +1,6 @@
 import re
-s=open("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html").read()
+from pathlib import Path
+s=Path(__file__).with_name("simple.html").read_text()
 style=re.search(r"<style>(.*?)</style>",s,re.S).group(1)
 body=s.replace(style,"")
 # every class token that actually gets applied: inside class="..." strings

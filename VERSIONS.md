@@ -42,7 +42,61 @@ The two most worth playing with first:
 
 ## Versions
 
-### 79 — the difficulty dial was a coin flip (current)
+### 80 — grow the fleet, or widen it (current)
+
+This version makes the two changes that most directly attack the solved economy
+and add recurring decisions to the shipyard.
+
+**Ships grow in place.** A d4 becomes a d6 for 2 Energy, a d6 becomes a d8 for 3,
+and a d8 becomes a d10 for 4 — exactly the difference in their purchase prices.
+The ship keeps its slot. A Damaged ship cannot grow until it returns. The old
+scrap-and-rebuy route remains available, but is no longer the only path to a
+capital ship.
+
+**Fleet width now has a price.** You begin with four open slots rather than all
+eight. Slots 5–8 cost 6 / 10 / 15 / 20 Energy. This turns “another die forever”
+from an automatic purchase into a strategic commitment: spend on formation,
+grow the ships already rolling, or invest in the flagship.
+
+Growth needed an actual reward beyond a larger number. New faces therefore carry
+escalating printed marks:
+
+| Face | Additional effect |
+| ---: | --- |
+| 5 / 7 / 9 | repair 1 / 2 / 3 |
+| 6 / 8 / 10 | Direct 1 / 2 / 3 |
+
+Every printed mark still pays automatically. The d6 remains the tightest straight
+fleet, while larger hulls now gain repair and Direct instead of steadily losing
+both outputs. Measured over 4,000 rounds per homogeneous fleet:
+
+| Fleet | Attack | Shields | Repair | Direct | Straight% |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 8 × d4 | 14.8 | 11.1 | 9.5 | 2.76 | 15% |
+| 8 × d6 | 24.9 | 15.1 | 5.5 | 4.37 | 63% |
+| 8 × d8 | 30.1 | 17.8 | 6.2 | 5.78 | 48% |
+| 8 × d10 | 34.2 | 22.3 | 7.8 | 7.55 | 39% |
+
+The latest 50-match real-build strategy pass against the pace-1 opponent came
+back at 22% for formation-first, 34% for a capital-hull policy, 48% for balanced
+growth, 26% for flagship-first, and 32% for fill-then-grow. Fifty matches still
+means roughly ±14 points at 95% confidence, so this is not a final balance claim.
+It is a large improvement over the old fill-first policy's 100%.
+
+One serious existing bug surfaced during measurement: `themGrow()` ran inside
+the shop renderer, so re-rendering the shop could grow the opponent repeatedly
+in one round. It now runs once in the round transition. The default difficulty
+returns to pace 1 because v79's 1.75 was compensating for the old economy and the
+render-triggered growth made any comparison unreliable.
+
+The shop, reference pages, help, symbols, and ledger now explain all of this. A
+top-tier straight also says when its free ship requires an open slot. The test
+harnesses now find `simple.html` relative to themselves, so they run from this
+repository instead of a machine-specific path.
+
+---
+
+### 79 — the difficulty dial was a coin flip
 
 v78 left the player winning **81%**, so the first job was to strengthen the
 opponent. There was no way to do it: **`botPace` did nothing above 1.**

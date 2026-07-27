@@ -3,7 +3,7 @@
 This is the single entry point for anyone new to the project, human or AI.
 Everything you need to be useful is either here or pointed at from here.
 
-**Current version: v79.** Open `simple.html`.
+**Current version: v80.** Open `simple.html`.
 
 ---
 
@@ -37,7 +37,7 @@ Copy everything between the lines.
 > 4. **Numbers are mine, rules are ours.** Anything numeric lives in the `C`
 >    object and is editable live in the Tune panel, so I can feel a change without
 >    a rebuild. If I tell you a setting felt right, make it the default.
-> 5. **Test in the real build, not just in a model.** There are 27 `test-*` scripts
+> 5. **Test in the real build, not just in a model.** There are 28 `test-*` scripts
 >    in this folder. Run them. They boot the actual file, play real matches and
 >    read what the screen says.
 > 6. **Assert before you write.** A find-and-replace that matches nothing reports
@@ -68,12 +68,12 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v79)
+## The rules as they stand (v80)
 
 ### Every ship die
 
 **Even hits, odd blocks** — that covers every face on every ship, the 1 included.
-On top of that, the four lowest faces each do a second job:
+Some faces also carry printed marks. Every mark pays:
 
 | Face | Fights | Also, always |
 | ---: | --- | --- |
@@ -81,7 +81,12 @@ On top of that, the four lowest faces each do a second job:
 | **2** | hits for 2 | **two violet chevrons** — 2 **Direct**, unblockable |
 | **3** | blocks for 3 | **three green crosses** — repairs 3 |
 | **4** | hits for 4 | **one yellow bolt** — 1 Energy |
-| **5 and up** | odd blocks, even hits | nothing — a big face is just its number |
+| **5** | blocks for 5 | repairs 1 |
+| **6** | hits for 6 | 1 Direct |
+| **7** | blocks for 7 | repairs 2 |
+| **8** | hits for 8 | 2 Direct |
+| **9** | blocks for 9 | repairs 3 |
+| **10** | hits for 10 | 3 Direct |
 
 **Direct moved to the 2 in v78, and Energy to the 4.** On a d4 the 4 is the top
 face, so it was collecting the biggest attack *and* the unblockable damage at
@@ -92,6 +97,10 @@ Direct now pull against each other, which is a real decision.
 
 **Every printed symbol always pays.** The flagship boosts them; it never switches
 them on.
+
+The upper marks arrive only when a hull grows large enough to own that face. They
+make growth a genuine path: bigger ships still roll higher, and now their new
+faces add a rising repair/Direct ladder rather than being plain numbers.
 
 ### The flagship — a normal d6
 
@@ -121,7 +130,8 @@ separate times; if a total looks high, check this first.
 
 ### A round
 
-1. **Between rounds.** Scrap a ship, buy a ship, upgrade the flagship's level.
+1. **Between rounds.** Grow a ship one size, scrap it, buy a new ship, unlock a
+   fleet slot, or upgrade the flagship's level.
 2. **Roll.** Three rolls. Tap the dice you want to change, then Reroll. After the
    free rolls it costs 1 Energy a die. Whatever you send back gambles the attack
    it was already showing.
@@ -169,7 +179,9 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 | Straight multiplier | 1 | scales the whole prize table |
 | Ship prices — d4/d6/d8/d10 | 4 / 6 / 9 / 13 | priced by measured value, not by size |
 | Scrap value | 50% | |
-| Fleet slots | 8 | plus the flagship. You start with 4 d4s and 0 Energy |
+| Fleet slots | 4 open of 8 | plus the flagship. You start with 4 d4s and 0 Energy |
+| Unlock slots 5 / 6 / 7 / 8 | 6 / 10 / 15 / 20⚡ | width is an investment |
+| Grow d4→d6 / d6→d8 / d8→d10 | 2 / 3 / 4⚡ | the difference between ship prices |
 | Rolls a round | 3 | then 1 Energy a die |
 | A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
 | Ships you may feed a round | **1** | at 2, careless play loses far too hard |
@@ -177,7 +189,7 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 | Flagship upgrades | 16⚡ then 26⚡ | one purchase raises all six faces |
 | Reactor cap / overflow | 6 / 2⚡ | once base is capped it pays Energy instead |
 | War escalates after round | 8, by 2 a round | |
-| **How fast they grow** | **1.75** | a rate, not a chance — see below |
+| **How fast they grow** | **1** | a rate, not a chance |
 
 **The straight ladder**, with `runMin` at 5:
 
@@ -192,45 +204,43 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 
 ## Where the game stands — read this before changing anything
 
-**There is one dominant strategy and it is not fixed.** Five plans played through
-full matches:
+v80 attacks the previously solved slot economy in two connected ways. You start
+with four open slots and must buy width; or you can spend small amounts growing
+the four ships already in formation. The player now has the same in-place growth
+language as the opponent, although the opponent's schedule remains a difficulty
+abstraction and does not spend Energy.
 
-| Plan | v77 | v78 | |
-| --- | ---: | ---: | --- |
-| **Fill all 8 slots with d4s, then trade up** | 100% | **100%** | unsolved |
-| Flagship levels first | 43% | 83% | |
-| Buy the biggest hull affordable | 21% | 75% | |
-| Hoard for d10s only | 7% | 58% | |
-| Only ever buy d4s | 57% | 43% | |
+This is a **first balance pass, not proof of balance**. Five automated policies
+played the real game against the pace-1 opponent:
 
-The v78 face swap inverted the order — **d4-forever is now the worst plan** — but
-*fill the slots then trade up* still wins every match. That is the **slot
-economy**, not the faces: slots are nearly free, every slot rolls every round, and
-no change to a die face can touch it. `IDEAS.md` has the three candidate fixes.
+| Plan | Preliminary win rate |
+| --- | ---: |
+| Unlock slots and add d4s | 22% |
+| Build a fifth d6, then grow the largest hull | 34% |
+| Build toward six ships, then grow the smallest | 48% |
+| Flagship levels first, then balanced growth | 26% |
+| Unlock every slot with d4s, then grow | 32% |
 
-**The opponent grows a hull in place, for free, and you cannot.** `themGrow` does
-`d4 → d6 → d8 → d10` at no cost; you must scrap at 50% and rebuy. This is a real
-unfairness that has been running the whole time, and fixing it — pay the price
-difference to grow a hull where it sits — is the recommended next move. It is also
-the mechanic the original brief asked for.
+No plan swept the field; the old fill-first plan had won **100%**. These policies
+are deliberately simple and this is a 50-match sample per plan, still only about
+±14 points at 95% confidence. Pairwise human play,
+especially intelligent straight-tier choices and better flagship timing, is the
+next evidence that matters.
 
 **What eight ships of one size actually produce a round** (three rolls, the
 opponent's own hold logic, 4,000 rounds each):
 
 | Fleet | Cost | Attack | Shields | Repair | Direct | Straight% |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 8 × d4 | 32⚡ | 15.0 | 10.9 | **9.3** | 2.77 | 14% |
-| 8 × d6 | 48⚡ | 25.0 | 15.0 | 3.5 | 2.43 | **64%** |
-| 8 × d8 | 72⚡ | 30.0 | 17.8 | 2.8 | 1.91 | 50% |
-| 8 × d10 | 104⚡ | 34.4 | 22.2 | 2.4 | 1.50 | 40% |
+| 8 × d4 | 32⚡ | 14.8 | 11.1 | 9.5 | 2.76 | 15% |
+| 8 × d6 | 48⚡ | 24.9 | 15.1 | 5.5 | 4.37 | **63%** |
+| 8 × d8 | 72⚡ | 30.1 | 17.8 | 6.2 | 5.78 | 48% |
+| 8 × d10 | 104⚡ | 34.2 | 22.3 | 7.8 | 7.55 | 39% |
 
-Two things fall out of that table that nothing on screen tells you. **A d6 is the
-best straight fleet by a distance** — a d6 covers 1–6 tightly while a d10 spreads
-across ten numbers and keeps missing the middle. And **small hulls still out-repair
-big ones four to one**, because a 3 is a quarter of a d4's faces and a tenth of a
-d10's. That is the open question behind Dave's "give the bigger dice some nuance"
-idea; `IDEAS.md` has four measured variants of it, and the honest finding is that
-only the escalating one (marks on 5/7/9 and 6/8/10) produces a real ladder.
+**A d6 remains the best straight fleet** — it covers 1–6 tightly while a d10
+spreads across ten numbers. But the escalating upper marks now give every growth
+step a visible output gain: d10s no longer lose repair and Direct merely because
+their faces are larger.
 
 ---
 
@@ -239,7 +249,7 @@ only the escalating one (marks on 5/7/9 and 6/8/10) produces a real ladder.
 | File | What it is |
 | --- | --- |
 | **`simple.html`** | The game. One file, no dependencies, opens by double-click. Always newest. |
-| **`simple01.html` … `simple79.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
+| **`simple01.html` … `simple80.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
 | **`HANDOFF.md`** | This file. The entry point. |
 | **`IDEAS.md`** | Where the game stands now, what the playtests found, and five things worth building. Read after this. |
 | **`VERSIONS.md`** | Every version, newest first, with the measurements that justified it. |
@@ -247,7 +257,7 @@ only the escalating one (marks on 5/7/9 and 6/8/10) produces a real ladder.
 | **`DIRECTIONS.md`** | Paths to victory, bluffing, Secret Directives, Trumps, the 2v2 layer. |
 | **`DECISIONS.md`** | Every decision a player makes, marked strong or thin. |
 | **`PANELS.md`** | The old flagship-panel catalogue. **Historical** — that store was removed in v72. Do not rebuild from it without reading VERSIONS.md v72 first. |
-| **`test-*.mjs` / `test-*.py`** | 27 scripts. See below. |
+| **`test-*.mjs` / `test-*.py`** | 28 scripts. See below. |
 
 `README.md` is accurate and describes this project.
 
@@ -281,7 +291,7 @@ w.newGame();
 while (w.G.phase !== "over") { /* drive the phases */ }
 ```
 
-**The 26 test scripts, and what each is for:**
+**The 28 test scripts, and what each is for:**
 
 | Script | Checks |
 | --- | --- |
@@ -295,7 +305,8 @@ while (w.G.phase !== "over") { /* drive the phases */ }
 | `test-shop.mjs`, `test-shop-actions.mjs` | every buy and scrap button, at 0 / 7 / 40 Energy, full fleet, damaged ship |
 | `test-prices-page.mjs`, `test-reference-pages.mjs`, `test-reference-nav.mjs` | the two reference screens open and return from every phase |
 | `test-dump-roll.mjs`, `test-dump-round.mjs`, `test-dump-pages.mjs` | print every screen as plain text — read these when reviewing copy |
-| `test-strategies.mjs` | the five-plan win-rate table above |
+| `test-v80-economy.mjs` | the current five-policy growth/slot win-rate table |
+| `test-strategies.mjs` | historical pre-v80 economy comparison |
 | `test-fleet-output.mjs`, `test-fleet-value.mjs` | what a fleet of one size produces a round |
 | `test-head-to-head.mjs` | frozen fleets against each other |
 | `test-face-ladder.mjs`, `test-face-ladder-topplain.mjs` | the four variants of the bigger-dice idea |
@@ -358,11 +369,6 @@ because of a bug in the harness, not the game.
 
 ## What is designed but not built
 
-- **In-place hull growth** — pay the price difference to grow a ship where it
-  sits. Recommended next. `IDEAS.md` §1.
-- **Marks on the bigger dice** — four variants measured. `IDEAS.md` and
-  `test-face-ladder.mjs`. Only the escalating version makes a real ladder.
-- **Pricing the slots** — start with 4 open, unlock the rest. `IDEAS.md` §3.
 - **A decision attached to the flagship** — holding it deliberately, or spending
   its number once a match as a wild. `IDEAS.md` §4.
 - **A shareable round** — the report screen as an image you can send. `IDEAS.md`
@@ -381,10 +387,8 @@ because of a bug in the harness, not the game.
 - **An Energy carry cap.** Careful: a cap is a price ceiling. The average bank
   sits at 13–15 and a d10 costs 13, so under 15 quietly deletes d10s and over 20
   never binds.
-- **Does repair need to scale with the hull?** A 3 repairs 3 on every die, which
-  hands a d4 fleet four times a d10 fleet's healing. Fixing it would break the
-  rule that a face means the same thing everywhere, which is the rule that keeps
-  the game playable with real dice. Currently unresolved and deliberately so.
+- **Do the upper-face marks overshoot?** They fixed the inverted repair/Direct
+  ladder, but they need human play to establish whether d10s now do too many jobs.
 - **`TARGETING.md` predates several rule changes.** It still says a cheap wide
   fleet cannot win because eight d4s cap at a straight of four — that stopped
   being true when the flagship joined the line and `runMin` went to 5. Treat its

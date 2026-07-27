@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom"; import fs from "fs";
-const src=fs.readFileSync("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html","utf8");
+const src=fs.readFileSync(new URL("simple.html", import.meta.url),"utf8");
 
 // Strategies a real person might actually adopt.
 const BUY={

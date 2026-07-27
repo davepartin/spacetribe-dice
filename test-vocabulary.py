@@ -1,5 +1,6 @@
 import re, collections, sys
-s=open("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html").read()
+from pathlib import Path
+s=Path(__file__).with_name("simple.html").read_text()
 js=s[s.index("<script>"):]
 js=re.sub(r"^\s*//[^\n]*$","",js,flags=re.M)          # drop comment lines
 # player-facing strings: any quoted run containing a lowercase word of 3+ letters

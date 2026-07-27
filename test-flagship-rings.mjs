@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom"; import fs from "fs";
-const src=fs.readFileSync("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/simple.html","utf8");
+const src=fs.readFileSync(new URL("simple.html", import.meta.url),"utf8");
 const dom=new JSDOM(src,{runScripts:"dangerously",pretendToBeVisual:true});
 const errs=[]; dom.virtualConsole.on("jsdomError",e=>errs.push(String(e).split("\n")[0]));
 await new Promise(r=>setTimeout(r,200));
@@ -7,11 +7,11 @@ const w=dom.window,d=dom.window.document;
 w.newGame();
 // one ship of every size, values forced, so we can see exactly who gets a ring
 const PANEL={atkEach:"#6 Attack",defEach:"#5 Shields",repair:"#3 Repair",
-             energy2:"#2 Energy",direct:"#4 Direct",reactor:"#1 Reactor"};
+             energy2:"#4 Energy",direct:"#2 Direct",reactor:"#1 Reactor"};
 const bad=[];
 for(const [id,label] of Object.entries(PANEL)){
-  // point the flagship at this panel
-  const face=w.G.you.flag.panels.indexOf(id);
+  // point the flagship at this face
+  const face=w.G.you.flag.faces.indexOf(id);
   if(face<0){ console.log("!! no face carries",id); continue; }
   w.G.you.flag.face=face;
   w.startRound();

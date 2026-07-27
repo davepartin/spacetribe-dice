@@ -4,9 +4,9 @@ A dice-building battle game. Every die is a ship — a **d4**, **d6**, **d8** or
 **d10** — and in the middle of your fleet sits your **flagship**, a normal d6 with
 hit points. The match ends when someone's flagship is destroyed.
 
-**Even hits, odd blocks.** The low faces carry everything else: a **1** and a **4**
-pay Energy, a **3** repairs your flagship, and a **2** punches straight through
-shields. Five or more numbers in a row is a **straight**, and your flagship's
+**Even hits, odd blocks.** Marked faces also pay Energy, repair, or Direct damage.
+Grow a ship from d4 through d10, unlock more fleet slots, or invest in the
+flagship. Five or more numbers in a row is a **straight**, and your flagship's
 number can complete the line.
 
 ## Play it
@@ -33,7 +33,7 @@ assistant.
 | [DIRECTIONS.md](DIRECTIONS.md) | Paths to victory, bluffing, and the team layer |
 | [DECISIONS.md](DECISIONS.md) | Every decision a player makes, marked strong or thin |
 
-`simple01.html` through `simple77.html` are frozen snapshots. They never change,
+`simple01.html` through `simple80.html` are frozen snapshots. They never change,
 so if an idea makes the game worse we open the previous number and we're back
 where we were. Nothing is ever lost by trying something.
 

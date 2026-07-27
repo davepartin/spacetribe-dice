@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom"; import fs from "fs";
 const file=process.argv[2], pace=process.argv[3], N=+process.argv[4];
-const src=fs.readFileSync("/sessions/lucid-amazing-edison/mnt/spacetribe-dice/"+file,"utf8");
+const src=fs.readFileSync(new URL(file, import.meta.url),"utf8");
 let wins=0,done=0,rd=0,theirBig=0,yourBig=0;
 for(let m=0;m<N;m++){
   const dom=new JSDOM(src,{runScripts:"dangerously",pretendToBeVisual:true});
