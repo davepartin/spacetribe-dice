@@ -4,6 +4,17 @@ import fs from "fs";
 const src = fs.readFileSync(new URL("simple.html", import.meta.url), "utf8");
 const sizes = [4, 6, 8, 10];
 
+function useBestToken(w, side){
+  if (!side.flag.token) return false;
+  const face = side.flag.face;
+  const now = w.tokenTallyScore(side, face);
+  const down = w.tokenTallyScore(side, (face + 5) % 6);
+  const up = w.tokenTallyScore(side, (face + 1) % 6);
+  const best = Math.max(down, up), threshold = w.G.round >= 8 ? 2 : 6;
+  if (best < now + threshold) return false;
+  return w.useFlagToken(side, up >= down ? 1 : -1);
+}
+
 function growFirst(w, order = "small"){
   const candidates = w.G.you.dice
     .map((d, i) => ({ d, i, cost: w.growCost(d.s) }))
@@ -78,6 +89,8 @@ async function run(name, matches, pace, escalationPer){
           for (let i = 0; i < w.G.you.values.length; i++)
             if (!keep[i]) w.G.you.values[i].value = w.roll(w.G.you.values[i].sides);
         }
+        w.G.you.rolls = w.K("rollsPerRound");
+        useBestToken(w, w.G.you);
         w.submit();
       } else if (w.G.phase === "brace"){
         while (w.G.you.hp -

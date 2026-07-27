@@ -1,17 +1,17 @@
-# Every decision a player makes — v81
+# Every decision a player makes — v82
 
 This list is deliberately strict. A button is not a decision unless two sensible
 players could choose differently in the same situation.
 
 ## Between rounds — the shipyard
 
-**Grow a ship, open a slot, buy a ship, or improve the flagship? — Strong.**
-These now compete for the same Energy. Growth improves a die already rolling;
+**Upgrade a ship, open a slot, buy a ship, or improve the flagship? — Strong.**
+These now compete for the same Energy. An upgrade improves a die already rolling;
 width adds another roll forever but requires both a slot and a ship; the flagship
 raises the value of matching results across the fleet.
 
-**Which ship grows? — Strong, if the face ladder holds up.** Growing a d4 cheaply
-adds 5 and 6, growing a d8 completes the powerful 9 and 10 marks, and a mixed
+**Which ship upgrades? — Strong, if the face ladder holds up.** Upgrading a d4 cheaply
+adds 5 and 6, upgrading a d8 completes the powerful 9 and 10 marks, and a mixed
 fleet covers straights differently from a uniform fleet. Human play must confirm
 that “always finish the biggest ship” is not secretly the answer.
 
@@ -26,9 +26,9 @@ destination instead of being vague hoarding.
 
 **Do I upgrade the flagship? — Good.** One purchase strengthens all six faces.
 At 10 and 16 Energy it now competes directly with a ship, a slot, or several
-growth steps instead of asking the player to skip most of the economy.
+ship upgrades instead of asking the player to skip most of the economy.
 
-**Do I scrap? — Situational.** Growth removes most forced scrapping. Scrap now
+**Do I scrap? — Situational.** In-place upgrades remove most forced scrapping. Scrap now
 means deliberately changing the fleet's shape or freeing an open slot, which is
 rarer but more meaningful than the old replacement tax.
 
@@ -41,6 +41,11 @@ straight. The best raw number and the best tactical result often disagree.
 **Do I reroll the flagship? — Strong when the board gives evidence.** Its number
 can bridge a straight and boosts matching ship results. Keeping it is safer;
 rerolling can turn several existing dice into a much larger payout.
+
+**Do I spend my Flagship Token now, and which way do I turn it? — Strong.**
+After the final free roll, one step can complete a straight, activate a more
+valuable face, or do both. It can happen only once per match, so every use gives
+up all later opportunities.
 
 **Do I buy another reroll after the free rolls? — Good.** It costs 1 Energy per
 die, directly competing with permanent fleet growth. The decision is clearest
@@ -63,7 +68,7 @@ the same volley as one valuable large ship. Direct bypasses this choice.
 ## Across the match
 
 **Wide formation, tall capital fleet, flagship command, or a hybrid? — Promising,
-not yet proven.** The latest v81 policies landed from 32% to 48% against the bot
+not yet proven.** The latest v82 policies landed from 34% to 46% against the bot
 instead of the old dominant policy's 100%. That is enough to justify playtesting,
 not enough to declare four balanced archetypes.
 
@@ -88,6 +93,7 @@ stance.
 ## Decision-density target
 
 A normal round should ask for one shipyard commitment, several quick keep/reroll
-judgments, an occasional straight choice, and sometimes one painful brace choice.
+judgments, an occasional straight choice, one Flagship Token decision across the
+whole match, and sometimes one painful brace choice.
 That is the intended weight: more consequential than a luck-only dice roller,
 lighter and faster to parse than a tactical miniatures game.

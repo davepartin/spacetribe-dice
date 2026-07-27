@@ -15,19 +15,10 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
-  margin:0;min-height:100%;min-height:100svh;padding-bottom:calc(108px + env(safe-area-inset-bottom, 0px));color:var(--ink);
+  margin:0;min-height:100vh;padding-bottom:96px;color:var(--ink);
   background:radial-gradient(900px 600px at 25% -8%,#1a2a5533,transparent 65%),
              radial-gradient(700px 500px at 85% 8%,#3a1f5a33,transparent 60%),var(--bg);
   font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  touch-action:pan-y;
-  -webkit-overflow-scrolling:touch;
-}
-html{
-  height:100%;
-  overflow-y:auto;
-  overscroll-behavior-y:contain;
-  touch-action:pan-y;
-  -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:540px;margin:0 auto;padding:10px 14px 0}
 header{display:flex;align-items:baseline;justify-content:space-between;padding:2px 2px 9px}
@@ -90,9 +81,7 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .die.flag .chg{font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;
   color:var(--nrg);font-weight:800;margin-top:4px}
 .die{width:78px;border:1px solid var(--line);border-radius:15px;padding:6px 5px 5px;cursor:pointer;
-  background:linear-gradient(180deg,var(--panel),#0d1425);transition:transform .1s,border-color .1s,box-shadow .1s;user-select:none;
-  touch-action:pan-y}
-.grid,.slot,.board,.wrap{touch-action:pan-y}
+  background:linear-gradient(180deg,var(--panel),#0d1425);transition:transform .1s,border-color .1s,box-shadow .1s;user-select:none}
 /* The hull silhouette carries the ship's size, so no caption is needed. */
 .hull{display:block;width:100%;height:auto;max-height:104px}
 .hull polygon{transition:fill-opacity .15s}
@@ -352,9 +341,6 @@ button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
   text-transform:uppercase;font-weight:800;padding:7px 9px;color:var(--dim)}
 .resetpage{flex:none;font-size:8.5px;line-height:1.15;letter-spacing:.03em;
   text-transform:uppercase;font-weight:800;padding:7px 8px;color:var(--faint)}
-.footreset{margin:16px 2px 4px;padding-top:12px;border-top:1px solid var(--line)}
-.footreset .resetpage{width:100%;padding:11px 12px;border-radius:12px;font-size:11px;
-  letter-spacing:.06em}
 .die.ready .kind{color:var(--faint)}
 @media (max-width:430px){
   .met > div:nth-child(3){display:none}
@@ -492,7 +478,7 @@ button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
 
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;border-top:1px solid var(--line);
   background:linear-gradient(180deg,rgba(10,15,28,.88),rgba(8,12,24,.99));backdrop-filter:blur(14px);
-  padding:12px 16px calc(16px + env(safe-area-inset-bottom, 0px))}
+  padding:11px 16px calc(11px + env(safe-area-inset-bottom))}
 .dockin{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:12px}
 .met{display:flex;gap:18px;flex:1;align-items:center}
 .met .big .n{font-size:27px}
@@ -503,7 +489,7 @@ button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
 .met .n .soon{font-size:12px;font-weight:700;color:var(--faint);margin-left:5px;letter-spacing:.02em}
 .met .l{font-size:9px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--faint);line-height:1.35;margin-top:2px}
-.toast{position:fixed;left:50%;bottom:calc(108px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--panel2);
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--panel2);
   border:1px solid var(--gold);padding:10px 16px;border-radius:999px;font-size:14px;z-index:40;
   box-shadow:0 10px 34px -10px #000}
 .tune{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid #1a2440}
@@ -554,7 +540,7 @@ button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
 <script>
 "use strict";
 
-var VERSION = "83";   // bump this when saving a new simpleNN.html
+var VERSION = "82";   // bump this when saving a new simpleNN.html
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -939,7 +925,7 @@ var pending = null;          // the round, resolved but waiting on your brace ch
 var flagInLine = false;      // is the flagship's number part of your straight?
 var lastTally = null;        // what the current roll is worth, for the bottom bar
 var pageCheckpoint = null;   // lets a player reset only the choices on this page
-var GUIDE_KEY = "fleet-dice-guided-v83";
+var GUIDE_KEY = "fleet-dice-guided-v82";
 // The flagship is a d6 with a number on it, and it does BOTH: its boost fires AND
 // its number joins your straight. It used to be a choice between the two, and
 // making you pick was the wrong call - the moment worth building toward is your
@@ -2350,11 +2336,7 @@ function shopView(){
       'and <b class="dir">6 / 8 / 10 fire 1 / 2 / 3 Direct</b>.</div>' +
     '<div class="ships">' + [4,6,8,10].map(buyCardHtml).join("") + '</div></div>' +
 
-    flagshipSectionHtml() +
-
-    '<div class="footreset">' +
-      '<button class="tiny resetpage" id="page-reset">Reset choices on this page</button>' +
-    '</div>';
+    flagshipSectionHtml();
 }
 // ── the two reference screens ────────────────────────────────────────────────
 // Energy was the one number on the board with no explanation anywhere. You could
@@ -2646,6 +2628,8 @@ function render(){
       G.phase === "help" || G.phase === "brace" ? "" :
       '<div class="dock"><div class="dockin"><div class="met">' + dockMetrics() +
       '</div><button class="tiny howto" id="help">How<br>to play</button>' +
+      (G.phase === "shop" || (G.phase === "roll" && G.you.rolls > 0)
+        ? '<button class="tiny resetpage" id="page-reset">Reset choices<br>on this page</button>' : '') +
       '<button class="go" id="next"' +
         (G.phase === "roll" && G.you.rolls === 0 ? ' disabled' : '') +
         '>' + label + '</button></div></div>');

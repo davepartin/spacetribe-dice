@@ -1,9 +1,10 @@
 # Five ideas — after a full review of v77
 
-> **v81 status:** ideas 1 (grow ships in place), 2 (escalating marks on new
+> **v82 status:** ideas 1 (upgrade ships in place), 2 (escalating marks on new
 > faces), and 3 (buy fleet slots) are now built and under playtest. The analysis
 > below is preserved because it explains why those changes were chosen; its
-> “current game” numbers describe v77, not v81.
+> “current game” numbers describe v77, not v82. v82 also adds the guided first
+> match and the once-per-game Flagship Token for both fleets.
 
 Dave, I went through every screen, every process, pulled out the dead code, and
 ran playtests. Most of it was tidying. But the playtests turned up something that

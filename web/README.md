@@ -14,7 +14,7 @@ After Pages is enabled, the public site is:
 | Route | What it does |
 | --- | --- |
 | `/` | Choose Solo, create Versus, or enter a four-digit code |
-| `/solo/` | Complete v82 solo game |
+| `/solo/` | Complete v83 solo game |
 | `/versus/` | Create a private two-player room |
 | `/join/?id=…` | Accept an invite link |
 | `/match/?id=…` | Play a synchronized match |

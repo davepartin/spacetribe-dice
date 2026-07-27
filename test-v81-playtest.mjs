@@ -25,8 +25,7 @@ const paidFlag = d.querySelector("#reroll");
 check(!paidFlag.disabled && paidFlag.textContent.includes("1⚡"), "flagship-only Energy reroll is unavailable");
 paidFlag.click();
 check(w.G.you.energy === 4, "flagship-only Energy reroll did not cost 1 Energy");
-d.querySelector("#page-reset").click();
-check(w.G.you.rolls === 0 && w.G.you.energy === 0, "roll reset did not return to Ready");
+check(!d.querySelector("#page-reset"), "roll page still shows Reset choices");
 
 d.querySelector("#costs").click();
 check(w.G.phase === "costs", "Upgrade costs did not open");
@@ -80,7 +79,7 @@ check(d.querySelectorAll(".healthcard").length === 2, "report lacks two flagship
 check(w.G.report.youHpAfter === w.G.report.youHpBefore + w.G.report.you.heal - w.G.report.themDealt,
   "your health-change card does not reconcile");
 check(w.G.report.themHpAfter === w.G.report.themHpBefore + w.G.report.them.heal - w.G.report.youDealt,
-  "their health-change card does not reconcile");
+  "Enemy health-change card does not reconcile");
 
 console.log("v81 playtest requests:", bad.length ? bad : "all verified");
 console.log("errors:", errs.length ? errs : "none");

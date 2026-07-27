@@ -15,7 +15,7 @@ for(let m=0;m<30;m++){
     if(w.G.phase==="report"){
       seen++;
       const rep=w.G.report, rows=[...d.querySelectorAll(".rr")];
-      [["You",rep.you.run,rep.youDice],["Them",rep.them.run,rep.themDice]].forEach(([lbl,run,dice],ri)=>{
+      [["You",rep.you.run,rep.youDice],["Enemy",rep.them.run,rep.themDice]].forEach(([lbl,run,dice],ri)=>{
         const row=rows[ri];
         const chips=[...row.querySelectorAll(".chip")].map(c=>+c.textContent);
         const want=dice.map(x=>x.value).sort((a,b)=>a-b);

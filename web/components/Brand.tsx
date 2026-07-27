@@ -12,16 +12,30 @@ export function Brand({ compact = false }: { compact?: boolean }) {
 export function SiteHeader({
   round,
   code,
+  onInstructions,
+  onCosts,
 }: {
   round?: number;
   code?: string;
+  onInstructions?: () => void;
+  onCosts?: () => void;
 }) {
   return (
-    <header className="site-header">
+    <header className="site-header site-header-match">
       <Brand compact />
       <div className="header-pills">
-        {code ? <span className="quiet-pill">CODE {code}</span> : null}
+        {onCosts ? (
+          <button className="header-ref-btn header-ref-costs" onClick={onCosts} type="button">
+            Upgrade costs
+          </button>
+        ) : null}
+        {onInstructions ? (
+          <button className="header-ref-btn" onClick={onInstructions} type="button">
+            Instructions
+          </button>
+        ) : null}
         {round ? <span className="quiet-pill">ROUND {round}</span> : null}
+        {code ? <span className="quiet-pill header-code-pill">CODE {code}</span> : null}
       </div>
     </header>
   );

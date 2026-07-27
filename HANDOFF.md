@@ -3,7 +3,7 @@
 This is the single entry point for anyone new to the project, human or AI.
 Everything you need to be useful is either here or pointed at from here.
 
-**Current version: v81.** Open `simple.html`.
+**Current version: v83.** Open `simple.html`.
 
 ---
 
@@ -37,7 +37,7 @@ Copy everything between the lines.
 > 4. **Numbers are mine, rules are ours.** Anything numeric lives in the `C`
 >    object and is editable live in the Tune panel, so I can feel a change without
 >    a rebuild. If I tell you a setting felt right, make it the default.
-> 5. **Test in the real build, not just in a model.** There are 29 `test-*` scripts
+> 5. **Test in the real build, not just in a model.** There are 30 `test-*` scripts
 >    in this folder. Run them. They boot the actual file, play real matches and
 >    read what the screen says.
 > 6. **Assert before you write.** A find-and-replace that matches nothing reports
@@ -68,7 +68,7 @@ faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
 ---
 
-## The rules as they stand (v81)
+## The rules as they stand (v82)
 
 ### Every ship die
 
@@ -98,8 +98,8 @@ Direct now pull against each other, which is a real decision.
 **Every printed symbol always pays.** The flagship boosts them; it never switches
 them on.
 
-The upper marks arrive only when a ship grows large enough to own that face. They
-make growth a genuine path: bigger ships still roll higher, and now their new
+The upper marks arrive only when a ship upgrades far enough to own that face. They
+make upgrading a genuine path: bigger ships still roll higher, and now their new
 faces add a rising repair/Direct ladder rather than being plain numbers.
 
 ### The flagship — a normal d6
@@ -128,14 +128,21 @@ exception — it has no matching die, so it rings nothing.
 flagship on 6 is not a red die for "+2 per attack". This has been got wrong three
 separate times; if a total looks high, check this first.
 
+**Each fleet has one Flagship Token per match.** After the third free roll, its
+owner may rotate the flagship one number up or down; 1 and 6 wrap. The token is
+spent permanently, and turning the flagship immediately changes both its face
+bonus and the straight it may complete. The opponent evaluates and spends its
+own token by the same rule.
+
 ### A round
 
-1. **Between rounds.** Grow a ship one size, scrap it, buy a new ship, unlock a
+1. **Between rounds.** Upgrade a ship one size, scrap it, buy a new ship, unlock a
    fleet slot, or upgrade the flagship's level.
 2. **Roll.** The page begins with every available die Ready. Roll 1 rolls
    everything. Before rolls 2 and 3, tap only the dice you want to change.
-   Afterward an extra reroll costs 1 Energy per selected die, including the
-   flagship. Whatever you send back gambles the attack it was already showing.
+   Afterward use the once-per-match Flagship Token, or buy an extra reroll for
+   1 Energy per selected die, including the flagship. Whatever you send back
+   gambles the attack it was already showing.
 3. **Straights.** Five or more consecutive numbers across the fleet, and the
    flagship's number counts toward the line. **Length** decides what kind of prize;
    the **biggest ship in the line** decides how big. A long straight may be cashed
@@ -183,12 +190,13 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 | Scrap value | 50% | |
 | Fleet slots | 4 open of 8 | plus the flagship. You start with 4 d4s and 0 Energy |
 | Unlock slots 5 / 6 / 7 / 8 | 7 / 8 / 9 / 10⚡ | always 2 more than the slot number |
-| Grow d4→d6 / d6→d8 / d8→d10 | 2 / 3 / 4⚡ | the difference between ship prices |
+| Upgrade d4→d6 / d6→d8 / d8→d10 | 2 / 3 / 4⚡ | the difference between ship prices |
 | Rolls a round | 3 | then 1 Energy a die |
 | A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
 | Ships you may feed a round | **as many as you want** | each misses the next round |
 | Flagship level | 1 of 3 | the bonus is 2, then 3, then 4 |
 | Flagship upgrades | 10⚡ then 16⚡ | one purchase raises all six faces |
+| Flagship Tokens | one per fleet, once per match | after roll 3, rotate the flagship ±1 |
 | Reactor cap / overflow | 6 / 2⚡ | once base is capped it pays Energy instead |
 | War escalates after round | 8, by 4 a round | |
 | **How fast they grow** | **1** | a rate, not a chance |
@@ -206,10 +214,10 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 
 ## Where the game stands — read this before changing anything
 
-v81 keeps v80's growth and slot economy, then revises the game from Dave's first
-phone playtest. You start with four open slots and must buy width; or you can
-spend small amounts growing
-the four ships already in formation. The player now has the same in-place growth
+v82 keeps v81's economy and multi-ship defense, then adds a guided first match
+and one Flagship Token to each fleet. You start with four open slots and must buy
+width; or you can spend small amounts upgrading
+the four ships already in formation. The player now has the same in-place upgrade
 language as the opponent, although the opponent's schedule remains a difficulty
 abstraction and does not spend Energy.
 
@@ -218,13 +226,14 @@ played the real game against the pace-1 opponent:
 
 | Plan | Preliminary win rate |
 | --- | ---: |
-| Unlock slots and add d4s | 42% |
-| Build a fifth d6, then grow the largest ship | 36% |
-| Build toward six ships, then grow the smallest | 48% |
-| Flagship levels first, then balanced growth | 32% |
-| Unlock every slot with d4s, then grow | 44% |
+| Unlock slots and add d4s | 34% |
+| Build a fifth d6, then upgrade the largest ship | 42% |
+| Build toward six ships, then upgrade the smallest | 34% |
+| Flagship levels first, then balanced upgrades | 38% |
+| Unlock every slot with d4s, then upgrade | 46% |
 
-No plan swept the field; the old fill-first plan had won **100%**. These policies
+No plan swept the field; the old fill-first plan had won **100%**. With both
+Flagship Tokens in play, these matches averaged 13.3 rounds. These policies
 are deliberately simple and this is a 50-match sample per plan, still only about
 ±14 points at 95% confidence. Pairwise human play,
 especially intelligent straight-tier choices and better flagship timing, is the
@@ -252,7 +261,7 @@ their faces are larger.
 | File | What it is |
 | --- | --- |
 | **`simple.html`** | The game. One file, no dependencies, opens by double-click. Always newest. |
-| **`simple01.html` … `simple81.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
+| **`simple01.html` … `simple82.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
 | **`HANDOFF.md`** | This file. The entry point. |
 | **`IDEAS.md`** | Where the game stands now, what the playtests found, and five things worth building. Read after this. |
 | **`VERSIONS.md`** | Every version, newest first, with the measurements that justified it. |
@@ -294,7 +303,7 @@ w.newGame();
 while (w.G.phase !== "over") { /* drive the phases */ }
 ```
 
-**The 29 test scripts, and what each is for:**
+**The 30 test scripts, and what each is for:**
 
 | Script | Checks |
 | --- | --- |
@@ -308,8 +317,9 @@ while (w.G.phase !== "over") { /* drive the phases */ }
 | `test-shop.mjs`, `test-shop-actions.mjs` | every buy and scrap button, at 0 / 7 / 40 Energy, full fleet, damaged ship |
 | `test-prices-page.mjs`, `test-reference-pages.mjs`, `test-reference-nav.mjs` | the two reference screens open and return from every phase |
 | `test-dump-roll.mjs`, `test-dump-round.mjs`, `test-dump-pages.mjs` | print every screen as plain text — read these when reviewing copy |
-| `test-v81-economy.mjs` | the current five-policy growth/slot/flagship win-rate table |
+| `test-v82-economy.mjs` | the current five-policy upgrade/slot/flagship win-rate table, with both tokens |
 | `test-v81-playtest.mjs` | every request from the first v80 phone playtest |
+| `test-v82-guidance.mjs` | guided match, upgrade jumps, both Flagship Tokens, and all six visual flagship faces |
 | `test-strategies.mjs` | historical pre-v80 economy comparison |
 | `test-fleet-output.mjs`, `test-fleet-value.mjs` | what a fleet of one size produces a round |
 | `test-head-to-head.mjs` | frozen fleets against each other |

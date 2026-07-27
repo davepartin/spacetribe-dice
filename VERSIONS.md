@@ -41,7 +41,77 @@ The three most useful settings for the current game:
 
 ## Versions
 
-### 81 — the first phone playtest (current)
+### 83 — rolls stay put (current)
+
+**Reset choices on this page** no longer appears on the rolling screen. A roll is
+a committed move: once the dice have been rolled, you cannot undo that roll (or
+a whole string of them) with a page reset. The button remains on the shipyard
+for undoing buys and upgrades, and the brace screen still has its own reset for
+which ships you put in the way of damage.
+
+No combat numbers changed. This is a clarity / commitment rule for the roll
+page only.
+
+### 82 — teach the depth, then give each flagship one command
+
+Dave's second phone-playtest response was not that the game lacked decisions. It
+was that the best one — building a straight — was easy to forget while learning
+the symbols and combat. v82 adds a guided first match that teaches each decision
+on the screen where it first appears. The roll lesson explicitly explains that a
+d4's narrow 1–4 range makes it excellent at anchoring the low end of a straight.
+The guide does not alter any roll and may be skipped; after the first shipyard it
+gets out of the way.
+
+The Upgrade Costs page now opens with six jump buttons: Buy ships, Upgrade ships,
+Open slots, Flagship, Rerolls, and Earn Energy. They move directly to the named
+section. Player-facing shipyard and upgrade-page language now says **upgrade**,
+not grow.
+
+**Both fleets now receive one Flagship Token per match.** After the third free
+roll, its owner may turn the flagship one number down or up; 1 and 6 wrap. That
+single turn can change the face bonus, complete or break a straight, and alter
+which straight tier is available. The opponent scores the same two adjacent
+faces against its current fleet and saves the token unless the improvement is
+meaningful.
+
+Fifty matches per existing fleet policy, with both sides using the same token
+threshold:
+
+| Plan | Win rate | Average rounds |
+| --- | ---: | ---: |
+| Formation first | 34% | 13.3 |
+| Capital ship | 42% | 13.4 |
+| Balanced upgrades | 34% | 13.3 |
+| Flagship first | 38% | 13.6 |
+| Fill then upgrade | 46% | 12.9 |
+
+The range tightened to 34–46% and the average stayed at 13.3 rounds. That is a
+safe first signal: the token adds control without making the flagship-first path
+automatic. It is still a policy simulation, not proof of human balance.
+
+How to play now draws all six actual flagship faces, with each number, colour,
+name and complete effect. It also explains the Flagship Token beside those faces
+instead of leaving the new rule in a separate reference.
+
+The round report now distinguishes the sides before the labels are read. The
+entire **You** story — health, roll, incoming damage and notes — stays in one
+light-silver column with dark ink. The entire **Enemy** story stays in a
+near-black column with a red accent. Attack is red, Shields blue, Repair green,
+Direct purple and Energy yellow on both the words and their numbers, so the
+combat result can be scanned by color. Each health card ends its damage and
+repair summary with the large signed total change — for example **+4** — while
+retaining the previous-health → current-health story above it. Every large
+flagship-health total is green throughout the board and report, so that color
+always means flagship health. The flagship chip in each report roll now reuses
+the exact solid face color from the flagship die itself — yellow Reactor/Energy,
+green Repair, purple Direct, blue Shields or red Attack — with its original dark
+ink and gold ring. The compact health bar at the top now carries the same side
+language as the report: Your score sits on light silver, the center stays
+neutral, and Enemy remains near-black with red labeling. The game now calls the
+opposing fleet **Enemy** instead of Them or Their in every player-facing combat,
+shop, instruction and game-over label.
+
+### 81 — the first phone playtest
 
 Dave played v80 on his phone and reported the things that only appear when a
 human thumb meets the game.
