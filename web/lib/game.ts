@@ -641,18 +641,18 @@ function spend(player: PlayerState, amount: number) {
   player.energy -= amount;
 }
 
-function energyOf(value: number): number {
+export function energyOf(value: number): number {
   if (value === 1) return 2;
   if (value === 4) return 1;
   return 0;
 }
 
-function repairOf(value: number): number {
+export function repairOf(value: number): number {
   if (value === 3) return 3;
   return ({ 5: 1, 7: 2, 9: 3 } as Record<number, number>)[value] ?? 0;
 }
 
-function directOf(value: number): number {
+export function directOf(value: number): number {
   if (value === 2) return 2;
   return ({ 6: 1, 8: 2, 10: 3 } as Record<number, number>)[value] ?? 0;
 }

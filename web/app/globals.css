@@ -1067,93 +1067,112 @@ input:focus {
   justify-content: center;
   min-width: 0;
   min-height: 132px;
-  padding: 12px 7px 9px;
+  padding: 8px 6px 7px;
   color: var(--ink);
-  background: linear-gradient(#18243d, #0e1628);
+  background: linear-gradient(180deg, var(--panel), #0d1425);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 15px;
   cursor: pointer;
   user-select: none;
 }
 
-.fleet-die > strong {
-  font-size: clamp(30px, 5.3vw, 48px);
-  line-height: 1;
+.fleet-die .hull {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 104px;
 }
 
-.fleet-die > span:last-child {
-  margin-top: 12px;
+.fleet-die .hull polygon {
+  transition: fill-opacity .15s;
+}
+
+.fleet-die:hover .hull polygon {
+  fill-opacity: .22;
+}
+
+.fleet-die .hull path.mk {
+  filter: drop-shadow(0 0 5px var(--energy));
+}
+
+.fleet-die .hull path.cr {
+  filter: drop-shadow(0 0 1px var(--repair));
+}
+
+.fleet-die .hull path.ch {
+  filter: drop-shadow(0 0 2px var(--direct));
+}
+
+.fleet-die .die-caption {
+  margin-top: 3px;
   color: var(--dim);
-  font-size: 8px;
-  font-weight: 850;
-  letter-spacing: .07em;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
   text-align: center;
+}
+
+.fleet-die.attack-die .die-caption {
+  color: var(--red);
+}
+
+.fleet-die.shield-die .die-caption {
+  color: var(--blue);
 }
 
 .fleet-die.selected {
   border-color: #fff;
-  box-shadow: 0 0 0 1px #fff, 0 0 28px #ffffff24;
-  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px #fff, 0 0 24px -8px #fff;
+  transform: translateY(-2px);
 }
 
 .reroll-mark {
   position: absolute;
-  top: 6px;
-  right: 7px;
+  top: 5px;
+  right: 6px;
   color: #fff !important;
-  font-size: 7px !important;
-  letter-spacing: .1em !important;
+  font-size: 8px !important;
+  letter-spacing: .08em !important;
+  font-weight: 800;
 }
 
 .fleet-die.flag {
-  color: #08131e;
   border-color: var(--gold);
-  box-shadow: 0 0 24px #ffd75e24;
+  background: linear-gradient(180deg, var(--panel), #0d1425);
+  box-shadow: 0 0 26px -12px var(--gold);
 }
 
-.fleet-die.flag > span:last-child {
-  color: #08131ebd;
+.fleet-die.flag .die-caption {
+  color: var(--energy);
 }
-
-.fleet-die.flag-face-1 { background: var(--energy); }
-.fleet-die.flag-face-2 { background: var(--direct); }
-.fleet-die.flag-face-3 { background: var(--repair); }
-.fleet-die.flag-face-4 { background: var(--energy); }
-.fleet-die.flag-face-5 { background: var(--blue); }
-.fleet-die.flag-face-6 { background: var(--red); }
 
 .fleet-die.ready-die {
   cursor: default;
 }
 
-.fleet-die.ready-die > strong {
+.fleet-die.ready-die .die-caption {
   color: var(--faint);
-  font-size: 31px;
 }
 
-.fleet-die.ready-die.flag {
-  color: var(--gold);
-  background: linear-gradient(#18243d, #0e1628);
-}
-
-.fleet-die.ready-die.flag > span:last-child {
+.fleet-die.ready-die.flag .die-caption {
   color: var(--gold);
 }
 
 .fleet-die.static {
-  min-height: 58px;
-  padding: 6px;
+  min-height: 72px;
+  padding: 4px;
   cursor: default;
   opacity: 1;
 }
 
-.fleet-die.static > strong {
-  font-size: 23px;
+.fleet-die.static .hull {
+  max-height: 58px;
 }
 
-.fleet-die.static > span:last-child {
-  margin-top: 5px;
-  font-size: 6px;
+.fleet-die.static .die-caption {
+  margin-top: 2px;
+  font-size: 7px;
 }
 
 .live-tally {
@@ -1786,10 +1805,6 @@ input:focus {
 
   .fleet-die {
     min-height: 112px;
-  }
-
-  .fleet-die > strong {
-    font-size: 36px;
   }
 
   .live-tally {

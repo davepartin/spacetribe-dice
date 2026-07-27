@@ -25,8 +25,7 @@ import {
   watchLiveMatch,
   type LiveMatch,
 } from "@/lib/firebase-match";
-
-const FLAG_NAMES = ["", "Reactor", "Direct", "Repair", "Energy", "Shields", "Attack"];
+import { FlagHull, ShipHull, flagFaceLabel } from "./DieArt";
 
 function friendlyFirebaseError(reason: unknown): string {
   const message = reason instanceof Error ? reason.message : String(reason || "The match did not load.");
@@ -744,17 +743,27 @@ function FleetDie({
   onClick?: () => void;
   staticDie?: boolean;
 }) {
-  const effect = die.flag ? FLAG_NAMES[die.value] : die.value % 2 === 0 ? "Attack" : "Shields";
+  const effect = die.flag
+    ? flagFaceLabel(die.value)
+    : die.value % 2 === 0
+      ? "Attack"
+      : "Shields";
   return (
     <button
-      className={`fleet-die die-size-${die.sides} ${die.flag ? `flag flag-face-${die.value}` : ""} ${selected ? "selected" : ""} ${staticDie ? "static" : ""}`}
+      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
       disabled={staticDie}
       onClick={onClick}
       type="button"
     >
       {selected ? <span className="reroll-mark">REROLL</span> : null}
-      <strong>{die.value}</strong>
-      <span>{die.flag ? `FLAGSHIP · ${effect}` : `d${die.sides} · ${effect}`}</span>
+      {die.flag ? (
+        <FlagHull value={die.value} />
+      ) : (
+        <ShipHull sides={die.sides as DieSize} value={die.value} />
+      )}
+      <span className="die-caption">
+        {die.flag ? `FLAGSHIP · ${effect}` : effect}
+      </span>
     </button>
   );
 }
@@ -762,8 +771,8 @@ function FleetDie({
 function ReadyDie({ sides, flag = false }: { sides?: DieSize; flag?: boolean }) {
   return (
     <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`}`}>
-      <strong>◆</strong>
-      <span>{flag ? "FLAGSHIP · READY" : `d${sides} · READY`}</span>
+      {flag ? <FlagHull value={1} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
+      <span className="die-caption">{flag ? "FLAGSHIP · READY" : "Ready"}</span>
     </div>
   );
 }
