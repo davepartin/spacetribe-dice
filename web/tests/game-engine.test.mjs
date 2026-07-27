@@ -23,6 +23,15 @@ test("a match joins without an account profile and gives both fleets a ready fir
   assert.equal(state.players.guest?.ships.length, 4);
 });
 
+test("waiting host can view the room before a guest joins", () => {
+  const state = newMatch("match-wait", "1234", "secret", "host-uid", "Ada");
+  assert.equal(state.status, "waiting");
+  assert.equal(state.players.guest, undefined);
+  const hostView = publicMatchView(state, "host");
+  assert.equal(hostView.players.host.name, "Ada");
+  assert.equal(hostView.players.guest, undefined);
+});
+
 test("opponent dice remain hidden until the round is revealed", () => {
   const state = activeMatch();
   applyAction(state, "host", { type: "roll", dice: [] });

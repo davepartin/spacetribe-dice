@@ -253,8 +253,10 @@ export function opponentOf(side: SideId): SideId {
 export function publicMatchView(state: MatchState, viewer: SideId) {
   const copy = structuredClone(state);
   delete (copy as Partial<MatchState>).inviteToken;
-  const opponent = getPlayer(copy, opponentOf(viewer));
+  // Waiting rooms have no guest yet — do not require an opponent.
+  const opponent = copy.players[opponentOf(viewer)];
   if (
+    opponent &&
     state.status === "active" &&
     !["report", "over"].includes(opponent.phase)
   ) {

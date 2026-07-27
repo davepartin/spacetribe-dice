@@ -54,7 +54,7 @@ export function MatchGame() {
       if (!stopped) {
         setError((current) =>
           current ||
-            "Still opening the battlefield. If this stays stuck, Firebase Auth may be blocked in this browser — try Safari/Chrome outside an embedded preview.",
+            "Still opening the battlefield. Check your connection, then return home and create or join the room again.",
         );
       }
     }, 15000);

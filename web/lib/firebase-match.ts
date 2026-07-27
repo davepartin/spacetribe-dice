@@ -176,28 +176,32 @@ export async function watchLiveMatch(
   return onSnapshot(
     doc(db, "matches", matchId),
     (snapshot) => {
-      if (!snapshot.exists()) {
-        onError(new Error("That match no longer exists."));
-        return;
+      try {
+        if (!snapshot.exists()) {
+          onError(new Error("That match no longer exists."));
+          return;
+        }
+        const data = snapshot.data() as MatchDocument;
+        const side = roleFor(data.state, user.uid);
+        if (!side) {
+          onError(
+            new Error(
+              data.status === "waiting"
+                ? "Open the invite link and tap Join match before entering the battlefield."
+                : "You are not a commander in this match. Use the invite link from the host.",
+            ),
+          );
+          return;
+        }
+        onMatch({
+          id: matchId,
+          side,
+          state: publicMatchView(data.state, side),
+          version: data.version,
+        });
+      } catch (reason) {
+        onError(reason instanceof Error ? reason : new Error(String(reason)));
       }
-      const data = snapshot.data() as MatchDocument;
-      const side = roleFor(data.state, user.uid);
-      if (!side) {
-        onError(
-          new Error(
-            data.status === "waiting"
-              ? "Open the invite link and tap Join match before entering the battlefield."
-              : "You are not a commander in this match. Use the invite link from the host.",
-          ),
-        );
-        return;
-      }
-      onMatch({
-        id: matchId,
-        side,
-        state: publicMatchView(data.state, side),
-        version: data.version,
-      });
     },
     (error) => {
       const code = "code" in error ? String(error.code) : "";
