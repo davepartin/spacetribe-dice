@@ -438,37 +438,48 @@ function Shipyard({
             <h2>Upgrade or scrap ships</h2>
             <span>{you.ships.length} / {you.slots} slots</span>
           </div>
-          <div className="ship-grid">
-            {you.ships.map((ship, index) => {
+          <FleetFormation
+            ships={you.ships}
+            slots={you.slots}
+            renderFlag={() => (
+              <div className="fleet-die flag shop-flag static">
+                <div className="brace-flag-label">Flagship</div>
+                <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
+                <span className="shop-flag-level">level {you.flag.level}</span>
+              </div>
+            )}
+            renderShip={(index) => {
+              const ship = you.ships[index];
               const next = ship.sides === 4 ? 6 : ship.sides === 6 ? 8 : ship.sides === 8 ? 10 : null;
               const cost = next ? priceOf(next as DieSize) - priceOf(ship.sides) : null;
               const damaged = ship.disabledRound === round;
               return (
-                <article className={`ship-card die-size-${ship.sides} ${damaged ? "damaged" : ""}`} key={ship.id}>
-                  <span className="slot-label">SLOT {index + 1}</span>
+                <div className={`fleet-die shop-ship ${damaged ? "hurt" : ""}`} key={ship.id}>
+                  <span className="slot-badge">{index + 1}</span>
+                  {next ? (
+                    <button
+                      className="ship-act ship-act-top"
+                      disabled={busy || damaged || (cost ?? 0) > you.energy}
+                      onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
+                      type="button"
+                    >
+                      {damaged ? "Damaged" : `Upgrade to d${next} · ${cost}⚡`}
+                    </button>
+                  ) : null}
                   <ShipHull ready sides={ship.sides} value={0} />
-                  <strong>d{ship.sides}</strong>
-                  {damaged ? <small>DAMAGED THIS ROUND</small> : null}
+                  <span className="die-caption">d{ship.sides}</span>
                   <button
-                    className="ship-upgrade"
-                    disabled={busy || damaged || !next || (cost ?? 0) > you.energy}
-                    onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
-                    type="button"
-                  >
-                    {next ? `Upgrade to d${next} · ${cost}⚡` : "Max d10"}
-                  </button>
-                  <button
-                    className="ship-scrap"
-                    disabled={busy || damaged}
+                    className="ship-act ship-act-bottom"
+                    disabled={busy || damaged || you.ships.length <= 1}
                     onClick={() => play({ type: "shop", operation: "scrap", shipId: ship.id })}
                     type="button"
                   >
-                    Scrap · +{Math.floor(priceOf(ship.sides) / 2)}⚡
+                    {damaged ? "Damaged" : `Scrap · +${Math.floor(priceOf(ship.sides) / 2)}⚡`}
                   </button>
-                </article>
+                </div>
               );
-            })}
-          </div>
+            }}
+          />
         </section>
 
         <section className="upgrade-section" id="buy-ships">
@@ -629,6 +640,7 @@ function RollFleet({
 
         <FleetFormation
           ships={you.ships}
+          slots={you.slots}
           renderFlag={() => {
             if (you.phase === "ready") return <ReadyDie flag face={you.flag.face} />;
             const flag = you.dice.find((die) => die.flag);
@@ -730,13 +742,16 @@ function RollFleet({
 
 function FleetFormation({
   ships,
+  slots,
   renderShip,
   renderFlag,
 }: {
   ships: { id: string }[];
+  slots?: number;
   renderShip: (index: number) => ReactNode;
   renderFlag: () => ReactNode;
 }) {
+  const openSlots = slots ?? Math.max(ships.length, 8);
   const cells = [];
   for (let i = 0; i < 9; i += 1) {
     if (i === 4) {
@@ -752,9 +767,15 @@ function FleetFormation({
       <div className="fleet-cell" key={`slot-${index}`}>
         {index < ships.length ? (
           renderShip(index)
-        ) : (
-          <div className="empty-slot" aria-hidden="true">
+        ) : index < openSlots ? (
+          <div className="empty-slot free-slot" aria-hidden="true">
             <span>{index + 1}</span>
+            <small>slot free</small>
+          </div>
+        ) : (
+          <div className="empty-slot locked-slot" aria-hidden="true">
+            <span>{index + 1}</span>
+            <small>locked</small>
           </div>
         )}
       </div>,
@@ -812,6 +833,7 @@ function BraceFleet({
 
         <FleetFormation
           ships={you.ships}
+          slots={you.slots}
           renderFlag={() => (
             <div className="fleet-die flag brace-flag static">
               <div className="brace-flag-label">Flagship</div>
