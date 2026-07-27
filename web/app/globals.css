@@ -143,6 +143,48 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
+.site-header-match {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.site-header-match .brand {
+  justify-self: start;
+}
+
+.site-header-match .header-pills {
+  justify-self: end;
+  justify-content: flex-end;
+}
+
+.game-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.game-title-label {
+  color: var(--faint);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.game-title-code {
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+
 .nav-link {
   color: var(--dim);
   font-size: 13px;
@@ -1742,6 +1784,13 @@ input:focus {
   color: var(--energy);
 }
 
+.fleet-die.flag .flag-caption {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
 .fleet-die.ready-die {
   cursor: default;
 }
@@ -1751,7 +1800,7 @@ input:focus {
 }
 
 .fleet-die.ready-die.flag .die-caption {
-  color: var(--gold);
+  color: var(--faint);
 }
 
 .fleet-die.static {
@@ -2457,6 +2506,16 @@ input:focus {
 
   .header-pills .header-code-pill {
     display: none;
+  }
+
+  .game-title-code {
+    font-size: 18px;
+    letter-spacing: 0.14em;
+  }
+
+  .site-header-match .header-ref-btn {
+    padding: 0 9px;
+    font-size: 9px;
   }
 
   .room-code span {

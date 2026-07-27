@@ -26,7 +26,7 @@ import {
   watchLiveMatch,
   type LiveMatch,
 } from "@/lib/firebase-match";
-import { FlagHull, ShipHull, flagFaceLabel } from "./DieArt";
+import { FlagHull, ShipHull, flagFaceDetail } from "./DieArt";
 
 function friendlyFirebaseError(reason: unknown): string {
   const message = reason instanceof Error ? reason.message : String(reason || "The match did not load.");
@@ -634,12 +634,13 @@ function RollFleet({
         <FleetFormation
           ships={you.ships}
           renderFlag={() => {
-            if (you.phase === "ready") return <ReadyDie flag />;
+            if (you.phase === "ready") return <ReadyDie flag face={you.flag.face} />;
             const flag = you.dice.find((die) => die.flag);
             if (!flag) return null;
             return (
               <FleetDie
                 die={flag}
+                flagLevel={you.flag.level}
                 onClick={() => toggleDie(flag.id)}
                 selected={selected.includes(flag.id)}
               />
@@ -921,9 +922,21 @@ function RoundResult({
           <h1>{title}</h1>
         </div>
         <div className="report-grid">
-          {you.report ? <ReportSide kind="you" label="YOUR FLAGSHIP" report={you.report} /> : null}
+          {you.report ? (
+            <ReportSide
+              flagLevel={you.flag.level}
+              kind="you"
+              label="YOUR FLAGSHIP"
+              report={you.report}
+            />
+          ) : null}
           {enemy.report ? (
-            <ReportSide kind="enemy" label="ENEMY FLAGSHIP" report={enemy.report} />
+            <ReportSide
+              flagLevel={enemy.flag.level}
+              kind="enemy"
+              label="ENEMY FLAGSHIP"
+              report={enemy.report}
+            />
           ) : enemy.dice.length ? (
             <article className="report-side enemy">
               <h2>ENEMY FLAGSHIP</h2>
@@ -934,7 +947,12 @@ function RoundResult({
               </p>
               <div className="report-dice">
                 {enemy.dice.map((die) => (
-                  <FleetDie die={die} key={die.id} staticDie />
+                  <FleetDie
+                    die={die}
+                    flagLevel={enemy.flag.level}
+                    key={die.id}
+                    staticDie
+                  />
                 ))}
               </div>
               {enemy.tally ? (
@@ -979,10 +997,12 @@ function ReportSide({
   report,
   label,
   kind,
+  flagLevel = 1,
 }: {
   report: RoundReport;
   label: string;
   kind: "you" | "enemy";
+  flagLevel?: number;
 }) {
   const change = report.hpAfter - report.hpBefore;
   return (
@@ -1002,7 +1022,9 @@ function ReportSide({
         </strong>
       </div>
       <div className="report-dice">
-        {report.dice.map((die) => <FleetDie die={die} key={die.id} staticDie />)}
+        {report.dice.map((die) => (
+          <FleetDie die={die} flagLevel={flagLevel} key={die.id} staticDie />
+        ))}
       </div>
       <div className="result-lines">
         <p><span>ATTACK</span><b className="damage-text">{report.tally.attack}</b></p>
@@ -1022,18 +1044,21 @@ function FleetDie({
   onClick,
   staticDie = false,
   slot,
+  flagLevel = 1,
 }: {
   die: DieValue;
   selected?: boolean;
   onClick?: () => void;
   staticDie?: boolean;
   slot?: number;
+  flagLevel?: number;
 }) {
-  const effect = die.flag
-    ? flagFaceLabel(die.value)
+  const flag = die.flag ? flagFaceDetail(die.value, flagLevel) : null;
+  const effect = flag
+    ? flag.short
     : die.value % 2 === 0
       ? "Attack"
-      : "Shields";
+      : "Shield";
   return (
     <button
       className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
@@ -1048,8 +1073,11 @@ function FleetDie({
       ) : (
         <ShipHull sides={die.sides as DieSize} value={die.value} />
       )}
-      <span className="die-caption">
-        {die.flag ? `FLAGSHIP · ${effect}` : effect}
+      <span
+        className={`die-caption ${die.flag ? "flag-caption" : ""}`}
+        style={flag ? { color: flag.fill } : undefined}
+      >
+        {effect}
       </span>
     </button>
   );
@@ -1058,20 +1086,22 @@ function FleetDie({
 function ReadyDie({
   sides,
   flag = false,
+  face = 1,
   damaged = false,
   slot,
 }: {
   sides?: DieSize;
   flag?: boolean;
+  face?: number;
   damaged?: boolean;
   slot?: number;
 }) {
   return (
     <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`} ${damaged ? "hurt" : ""}`}>
       {slot ? <span className="slot-badge">{slot}</span> : null}
-      {flag ? <FlagHull value={1} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
-      <span className="die-caption">
-        {flag ? "FLAGSHIP · READY" : damaged ? "Damaged" : "Ready"}
+      {flag ? <FlagHull value={face} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
+      <span className={`die-caption ${flag ? "flag-caption" : ""}`}>
+        {flag ? "Ready" : damaged ? "Damaged" : "Ready"}
       </span>
     </div>
   );

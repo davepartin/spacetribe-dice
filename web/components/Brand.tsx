@@ -20,9 +20,16 @@ export function SiteHeader({
   onInstructions?: () => void;
   onCosts?: () => void;
 }) {
+  const matchChrome = Boolean(code);
   return (
-    <header className="site-header site-header-match">
+    <header className={`site-header ${matchChrome ? "site-header-match" : ""}`}>
       <Brand compact />
+      {code ? (
+        <div className="game-title" aria-label={`Game ${code}`}>
+          <span className="game-title-label">Game</span>
+          <strong className="game-title-code">{code}</strong>
+        </div>
+      ) : null}
       <div className="header-pills">
         {onCosts ? (
           <button className="header-ref-btn header-ref-costs" onClick={onCosts} type="button">
@@ -35,7 +42,6 @@ export function SiteHeader({
           </button>
         ) : null}
         {round ? <span className="quiet-pill">ROUND {round}</span> : null}
-        {code ? <span className="quiet-pill header-code-pill">CODE {code}</span> : null}
       </div>
     </header>
   );

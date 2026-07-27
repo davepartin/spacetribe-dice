@@ -17,13 +17,46 @@ const BOLT = "M0,-6 L-3.4,1 L-0.6,1 L-2.4,6 L3.4,-1.4 L0.6,-1.4 Z";
 const CROSS = "M-2,-6 L2,-6 L2,-2 L6,-2 L6,2 L2,2 L2,6 L-2,6 L-2,2 L-6,2 L-6,-2 L-2,-2 Z";
 const CHEV = "M-4,-6 L1.2,0 L-4,6 L-1.2,6 L4,0 L-1.2,-6 Z";
 
-const FLAG_FACE: Record<number, { fill: string; ink: string; label: string }> = {
-  1: { fill: "var(--energy)", ink: "#211a02", label: "Reactor" },
-  2: { fill: "var(--direct)", ink: "#1e1233", label: "Direct" },
-  3: { fill: "var(--repair)", ink: "#06291b", label: "Repair" },
-  4: { fill: "var(--energy)", ink: "#211a02", label: "Energy" },
-  5: { fill: "var(--blue)", ink: "#062a47", label: "Shields" },
-  6: { fill: "var(--red)", ink: "#3d0812", label: "Attack" },
+const FLAG_FACE: Record<
+  number,
+  { fill: string; ink: string; label: string; short: (mul: number) => string }
+> = {
+  1: {
+    fill: "var(--energy)",
+    ink: "#211a02",
+    label: "Reactor",
+    short: (mul) => `Base Energy +${mul}`,
+  },
+  2: {
+    fill: "var(--direct)",
+    ink: "#1e1233",
+    label: "Direct",
+    short: (mul) => `+${mul} Direct per #2`,
+  },
+  3: {
+    fill: "var(--repair)",
+    ink: "#06291b",
+    label: "Repair",
+    short: (mul) => `+${mul} repair per #3`,
+  },
+  4: {
+    fill: "var(--energy)",
+    ink: "#211a02",
+    label: "Energy",
+    short: (mul) => `+${mul} Energy per #4`,
+  },
+  5: {
+    fill: "var(--blue)",
+    ink: "#062a47",
+    label: "Shields",
+    short: (mul) => `+${mul} per shield`,
+  },
+  6: {
+    fill: "var(--red)",
+    ink: "#3d0812",
+    label: "Attack",
+    short: (mul) => `+${mul} per attack`,
+  },
 };
 
 function marks(
@@ -113,7 +146,7 @@ export function ShipHull({
 }
 
 export function FlagHull({ value, ready = false }: { value: number; ready?: boolean }) {
-  const face = FLAG_FACE[value] || { fill: "#f2f5ff", ink: "#101828", label: "Flagship" };
+  const face = FLAG_FACE[value] || { fill: "#f2f5ff", ink: "#101828", label: "Flagship", short: () => "Flagship" };
   return (
     <svg className="hull" viewBox="0 0 100 100" aria-hidden="true">
       <rect
@@ -122,7 +155,7 @@ export function FlagHull({ value, ready = false }: { value: number; ready?: bool
         width="78"
         height="78"
         rx="17"
-        fill={ready ? "#18243d" : face.fill}
+        fill={face.fill}
         stroke="#f2f5ff"
         strokeWidth="2.6"
       />
@@ -133,7 +166,7 @@ export function FlagHull({ value, ready = false }: { value: number; ready?: bool
         height="62"
         rx="11"
         fill="none"
-        stroke={ready ? "var(--gold)" : face.ink}
+        stroke={face.ink}
         strokeOpacity={0.22}
         strokeWidth="1"
       />
@@ -141,7 +174,7 @@ export function FlagHull({ value, ready = false }: { value: number; ready?: bool
         x="50"
         y="63"
         textAnchor="middle"
-        fill={ready ? "var(--gold)" : face.ink}
+        fill={face.ink}
         fontSize={ready ? 28 : 36.8}
         fontWeight={800}
         style={{ fontVariantNumeric: "tabular-nums" }}
@@ -154,4 +187,20 @@ export function FlagHull({ value, ready = false }: { value: number; ready?: bool
 
 export function flagFaceLabel(value: number): string {
   return FLAG_FACE[value]?.label || "Flagship";
+}
+
+export function flagFaceDetail(value: number, flagLevel = 1) {
+  const face = FLAG_FACE[value] || {
+    fill: "#f2f5ff",
+    ink: "#101828",
+    label: "Flagship",
+    short: () => "Flagship",
+  };
+  const mul = Math.min(4, flagLevel + 1);
+  return {
+    fill: face.fill,
+    ink: face.ink,
+    label: face.label,
+    short: face.short(mul),
+  };
 }
