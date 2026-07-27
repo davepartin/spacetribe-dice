@@ -74,6 +74,8 @@ export type PlayerState = {
     face: number;
     token: boolean;
   };
+  /** Combat round this commander is currently playing. */
+  round: number;
   phase: PlayerPhase;
   rolls: number;
   dice: DieValue[];
@@ -130,6 +132,7 @@ export function newPlayer(email: string, name: string, phase: PlayerPhase): Play
       disabledRound: null,
     })),
     flag: { level: 1, face: 1, token: true },
+    round: 1,
     phase,
     rolls: 0,
     dice: [],
@@ -188,6 +191,7 @@ export function applyAction(
   action: MatchAction,
 ): MatchState {
   if (state.status === "finished") throw new Error("This match is finished.");
+  ensurePlayerRounds(state);
   const player = getPlayer(state, side);
 
   switch (action.type) {
@@ -210,11 +214,9 @@ export function applyAction(
       break;
     case "brace":
       handleBrace(state, player, action.ships);
-      finalizeIfReady(state);
       break;
     case "continue":
       handleContinue(state, player);
-      advanceIfReady(state);
       break;
   }
 
@@ -255,17 +257,32 @@ export function opponentOf(side: SideId): SideId {
 export function publicMatchView(state: MatchState, viewer: SideId) {
   const copy = structuredClone(state);
   delete (copy as Partial<MatchState>).inviteToken;
+  ensurePlayerRounds(copy);
   // Waiting rooms have no guest yet — do not require an opponent.
+  const viewerPlayer = copy.players[viewer];
   const opponent = copy.players[opponentOf(viewer)];
+  // Hide their roll until you have locked and both sides resolve — while you are
+  // still ready/rolling/submitted you should not see their dice.
   if (
     opponent &&
+    viewerPlayer &&
     state.status === "active" &&
-    !["report", "over"].includes(opponent.phase)
+    ["waiting", "ready", "rolling", "submitted"].includes(viewerPlayer.phase)
   ) {
     opponent.dice = [];
     opponent.tally = null;
   }
   return copy;
+}
+
+function ensurePlayerRounds(state: MatchState) {
+  const fallback = state.round || 1;
+  if (typeof state.players.host.round !== "number") {
+    state.players.host.round = fallback;
+  }
+  if (state.players.guest && typeof state.players.guest.round !== "number") {
+    state.players.guest.round = fallback;
+  }
 }
 
 function handleShop(
@@ -317,9 +334,9 @@ function handleShop(
   ship.sides = next;
 }
 
-function handleRoll(state: MatchState, player: PlayerState, chosen: string[]) {
+function handleRoll(_state: MatchState, player: PlayerState, chosen: string[]) {
   if (player.phase === "ready") {
-    player.dice = activeShips(player, state.round).map((ship) => ({
+    player.dice = activeShips(player, player.round).map((ship) => ({
       id: ship.id,
       sides: ship.sides,
       value: roll(ship.sides),
@@ -382,7 +399,12 @@ function resolveSubmissions(state: MatchState) {
   if (!guest) return;
   const host = state.players.host;
   if (host.phase !== "submitted" || guest.phase !== "submitted") return;
-  const escalation = state.round > 8 ? (state.round - 8) * 4 : 0;
+  // Fast player may already be on the next combat round while the other is still
+  // bracing/shopping — only resolve when both locked the same round.
+  if (host.round !== guest.round) return;
+
+  const combatRound = host.round;
+  const escalation = combatRound > 8 ? (combatRound - 8) * 4 : 0;
 
   host.incoming = Math.max(
     0,
@@ -397,50 +419,34 @@ function resolveSubmissions(state: MatchState) {
 
   for (const player of [host, guest]) {
     player.braceShips = [];
-    player.phase =
-      player.incoming > 0 && activeShips(player, state.round).length > 0
-        ? "brace"
-        : "submitted";
+    if (player.incoming > 0 && activeShips(player, player.round).length > 0) {
+      player.phase = "brace";
+    } else {
+      settlePlayer(state, player);
+    }
   }
-  finalizeIfReady(state);
+  finishIfNeeded(state);
 }
 
 function handleBrace(state: MatchState, player: PlayerState, selected: string[]) {
   if (player.phase !== "brace") throw new Error("There is no volley to brace against.");
   const choices = [...new Set(selected)];
-  const available = new Set(activeShips(player, state.round).map((ship) => ship.id));
+  const available = new Set(activeShips(player, player.round).map((ship) => ship.id));
   if (choices.some((id) => !available.has(id))) {
     throw new Error("One of those ships cannot take the hit.");
   }
   player.braceShips = choices;
-  player.phase = "submitted";
+  settlePlayer(state, player);
+  finishIfNeeded(state);
 }
 
-function finalizeIfReady(state: MatchState) {
-  const guest = state.players.guest;
-  if (!guest) return;
-  const host = state.players.host;
-  if (host.phase !== "submitted" || guest.phase !== "submitted") return;
-  if (!host.tally || !guest.tally) return;
-
-  settlePlayer(state, host);
-  settlePlayer(state, guest);
-  state.status = host.hp <= 0 || guest.hp <= 0 ? "finished" : "active";
-  if (state.status === "finished") {
-    if (host.hp <= 0 && guest.hp <= 0) state.winner = "draw";
-    else state.winner = host.hp > 0 ? "host" : "guest";
-    host.phase = "over";
-    guest.phase = "over";
-  }
-}
-
-function settlePlayer(state: MatchState, player: PlayerState) {
+function settlePlayer(_state: MatchState, player: PlayerState) {
   const before = player.hp;
   let soaked = 0;
   for (const ship of player.ships) {
     if (!player.braceShips.includes(ship.id)) continue;
     soaked += ship.sides;
-    ship.disabledRound = state.round + 1;
+    ship.disabledRound = player.round + 1;
   }
   const damage = Math.max(0, player.incoming - soaked) + player.directIncoming;
   const repair = player.tally?.heal ?? 0;
@@ -479,36 +485,51 @@ function settlePlayer(state: MatchState, player: PlayerState) {
   player.acknowledged = false;
 }
 
-function handleContinue(state: MatchState, player: PlayerState) {
-  if (player.phase !== "report" && player.phase !== "over") {
-    throw new Error("Finish the current round first.");
-  }
-  player.acknowledged = true;
-}
-
-function advanceIfReady(state: MatchState) {
+function finishIfNeeded(state: MatchState) {
   const guest = state.players.guest;
   if (!guest) return;
   const host = state.players.host;
-  if (!host.acknowledged || !guest.acknowledged) return;
-  if (state.status === "finished") {
-    host.phase = "over";
-    guest.phase = "over";
+  // Let the other commander finish bracing so mutual kills can resolve.
+  if (host.phase === "brace" || guest.phase === "brace") return;
+  if (host.hp > 0 && guest.hp > 0) return;
+
+  state.status = "finished";
+  if (host.hp <= 0 && guest.hp <= 0) state.winner = "draw";
+  else state.winner = host.hp > 0 ? "host" : "guest";
+  host.phase = "over";
+  guest.phase = "over";
+}
+
+function handleContinue(state: MatchState, player: PlayerState) {
+  if (player.phase === "over" || state.status === "finished" || player.hp <= 0) {
+    player.phase = "over";
+    player.acknowledged = true;
+    finishIfNeeded(state);
     return;
   }
-
-  state.round += 1;
-  for (const player of [host, guest]) {
-    player.phase = "shop";
-    player.rolls = 0;
-    player.dice = [];
-    player.tally = null;
-    player.incoming = 0;
-    player.directIncoming = 0;
-    player.braceShips = [];
-    player.report = null;
-    player.acknowledged = false;
+  if (player.phase !== "report") {
+    throw new Error("Finish the current round first.");
   }
+
+  player.round += 1;
+  player.phase = "shop";
+  player.rolls = 0;
+  player.dice = [];
+  player.tally = null;
+  player.incoming = 0;
+  player.directIncoming = 0;
+  player.braceShips = [];
+  player.report = null;
+  player.acknowledged = false;
+  syncMatchRound(state);
+  finishIfNeeded(state);
+}
+
+function syncMatchRound(state: MatchState) {
+  const guest = state.players.guest;
+  state.round = guest
+    ? Math.min(state.players.host.round, guest.round)
+    : state.players.host.round;
 }
 
 function prepareRound(player: PlayerState) {

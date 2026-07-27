@@ -19,6 +19,8 @@ test("a match joins without an account profile and gives both fleets a ready fir
   assert.equal(state.status, "active");
   assert.equal(state.players.host.phase, "ready");
   assert.equal(state.players.guest?.phase, "ready");
+  assert.equal(state.players.host.round, 1);
+  assert.equal(state.players.guest?.round, 1);
   assert.equal(state.players.host.ships.length, 4);
   assert.equal(state.players.guest?.ships.length, 4);
 });
@@ -32,7 +34,7 @@ test("waiting host can view the room before a guest joins", () => {
   assert.equal(hostView.players.guest, null);
 });
 
-test("opponent dice remain hidden until the round is revealed", () => {
+test("opponent dice remain hidden until you leave the lock-and-wait window", () => {
   const state = activeMatch();
   applyAction(state, "host", { type: "roll", dice: [] });
   applyAction(state, "guest", { type: "roll", dice: [] });
@@ -40,6 +42,15 @@ test("opponent dice remain hidden until the round is revealed", () => {
   assert.equal(hostView.players.host.dice.length, 5);
   assert.equal(hostView.players.guest?.dice.length, 0);
   assert.equal("inviteToken" in hostView, false);
+
+  for (const player of [state.players.host, state.players.guest]) {
+    player.dice = player.dice.map((die) => ({ ...die, value: die.flag ? 1 : 1 }));
+  }
+  applyAction(state, "host", { type: "submit" });
+  applyAction(state, "guest", { type: "submit" });
+  const revealed = publicMatchView(state, "host");
+  assert.ok(["brace", "report"].includes(revealed.players.host.phase));
+  assert.ok((revealed.players.guest?.dice.length ?? 0) > 0);
 });
 
 test("flagship token rotates once after roll three and immediately changes the face", () => {
@@ -59,7 +70,7 @@ test("flagship token rotates once after roll three and immediately changes the f
   );
 });
 
-test("multiple ships can absorb a volley and are damaged for the next round", () => {
+test("a player can finish brace and settle without waiting for the opponent", () => {
   const state = activeMatch();
   const host = state.players.host;
   const guest = state.players.guest;
@@ -87,22 +98,22 @@ test("multiple ships can absorb a volley and are damaged for the next round", ()
   applyAction(state, "host", { type: "submit" });
   applyAction(state, "guest", { type: "submit" });
   assert.equal(guest.phase, "brace");
+  // Host took no volley, so they settle immediately without bracing.
+  assert.equal(host.phase, "report");
 
   applyAction(state, "guest", {
     type: "brace",
     ships: [guest.ships[0].id, guest.ships[1].id],
   });
-  if (host.phase === "brace") {
-    applyAction(state, "host", { type: "brace", ships: [] });
-  }
 
   assert.equal(guest.report?.soaked, 8);
   assert.equal(guest.ships[0].disabledRound, 2);
   assert.equal(guest.ships[1].disabledRound, 2);
   assert.equal(guest.phase, "report");
+  assert.equal(host.phase, "report");
 });
 
-test("both commanders continue before round two upgrades open", () => {
+test("a commander continues to upgrades alone without waiting on the enemy", () => {
   const state = activeMatch();
   const host = state.players.host;
   const guest = state.players.guest;
@@ -119,9 +130,14 @@ test("both commanders continue before round two upgrades open", () => {
   assert.equal(guest.phase, "report");
 
   applyAction(state, "host", { type: "continue" });
-  assert.equal(state.round, 1);
-  applyAction(state, "guest", { type: "continue" });
-  assert.equal(state.round, 2);
   assert.equal(host.phase, "shop");
+  assert.equal(host.round, 2);
+  assert.equal(guest.phase, "report");
+  assert.equal(guest.round, 1);
+  assert.equal(state.round, 1);
+
+  applyAction(state, "guest", { type: "continue" });
   assert.equal(guest.phase, "shop");
+  assert.equal(guest.round, 2);
+  assert.equal(state.round, 2);
 });

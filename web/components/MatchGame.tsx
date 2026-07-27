@@ -145,7 +145,7 @@ export function MatchGame() {
 
   return (
     <main className="match-shell">
-      <SiteHeader code={match.state.code} round={match.state.round} />
+      <SiteHeader code={match.state.code} round={you.round} />
       {cancelled ? (
         <section className="waiting-card">
           <p className="eyebrow">MATCH CANCELLED</p>
@@ -274,13 +274,13 @@ function MatchStage({
   busy: boolean;
 }) {
   if (you.phase === "shop") {
-    return <Shipyard busy={busy} play={play} round={match.state.round} you={you} />;
+    return <Shipyard busy={busy} play={play} round={you.round} you={you} />;
   }
   if (you.phase === "ready" || you.phase === "rolling") {
-    return <RollFleet busy={busy} play={play} round={match.state.round} you={you} />;
+    return <RollFleet busy={busy} play={play} round={you.round} you={you} />;
   }
   if (you.phase === "brace") {
-    return <BraceFleet busy={busy} play={play} round={match.state.round} you={you} />;
+    return <BraceFleet busy={busy} play={play} round={you.round} you={you} />;
   }
   if (you.phase === "report" || you.phase === "over") {
     return (
@@ -752,7 +752,7 @@ function RoundResult({
       : won
         ? "Enemy flagship destroyed."
         : "Your flagship is destroyed."
-    : `Round ${match.state.round} result`;
+    : `Round ${you.round} result`;
   return (
     <section className="stage report-stage">
       <div className="report-title">
@@ -761,23 +761,42 @@ function RoundResult({
       </div>
       <div className="report-grid">
         {you.report ? <ReportSide kind="you" label="YOUR FLAGSHIP" report={you.report} /> : null}
-        {enemy.report ? <ReportSide kind="enemy" label="ENEMY FLAGSHIP" report={enemy.report} /> : null}
+        {enemy.report ? (
+          <ReportSide kind="enemy" label="ENEMY FLAGSHIP" report={enemy.report} />
+        ) : enemy.dice.length ? (
+          <article className="report-side enemy">
+            <h2>ENEMY FLAGSHIP</h2>
+            <p className="pending-enemy">
+              {enemy.phase === "brace"
+                ? `${enemy.name} is still assigning the hit.`
+                : `${enemy.name} is still resolving this round.`}
+            </p>
+            <div className="report-dice">
+              {enemy.dice.map((die) => (
+                <FleetDie die={die} key={die.id} staticDie />
+              ))}
+            </div>
+            {enemy.tally ? (
+              <div className="result-lines">
+                <p><span>ATTACK</span><b className="damage-text">{enemy.tally.attack}</b></p>
+                <p><span>SHIELDS</span><b className="shield-text">{enemy.tally.defense}</b></p>
+                <p><span>DIRECT</span><b className="direct-text">{enemy.tally.direct}</b></p>
+              </div>
+            ) : null}
+          </article>
+        ) : null}
       </div>
       {finished ? (
         <div className="end-actions">
           <Link className="action-button light-action" href="/">Return home</Link>
           <Link className="action-button red-action" href="/versus">New match</Link>
         </div>
-      ) : you.acknowledged ? (
-        <section className="waiting-card compact-wait">
-          <div className="loader" />
-          <h2>Waiting for {enemy.name}.</h2>
-        </section>
       ) : (
         <button
           className="action-button blue-action full-action"
           disabled={busy}
           onClick={() => play({ type: "continue" })}
+          type="button"
         >
           Continue to upgrades
         </button>
