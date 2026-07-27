@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteHeader } from "@/components/Brand";
 import { withBasePath } from "@/lib/paths";
 
 export const metadata: Metadata = {
@@ -10,16 +9,17 @@ export const metadata: Metadata = {
 export default function SoloPage() {
   return (
     <main className="solo-shell">
-      <div className="solo-header">
-        <SiteHeader />
-        <Link className="quiet-pill" href="/">
-          EXIT SOLO
+      <div className="solo-topbar">
+        <Link className="solo-exit" href="/">
+          ← Exit solo
         </Link>
+        <span className="solo-topbar-label">Solo Command</span>
       </div>
       <iframe
         className="solo-game"
-        src={withBasePath("/fleet-dice-v82.html")}
+        src={withBasePath("/fleet-dice-v83.html")}
         title="Fleet Dice solo game"
+        allow="fullscreen"
       />
     </main>
   );
