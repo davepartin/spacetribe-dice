@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    match /codes/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.hostUid == request.auth.uid;
+      allow update: if false;
+      allow delete: if signedIn()
+        && resource.data.hostUid == request.auth.uid;
+    }
+
+    match /matches/{matchId} {
+      function participant() {
+        return signedIn()
+          && (resource.data.hostUid == request.auth.uid
+            || resource.data.guestUid == request.auth.uid);
+      }
+
+      // Guest claims the open seat. The host player map MAY change (phase
+      // waiting → ready) — only the host identity must stay put.
+      function joiningOpenSeat() {
+        return signedIn()
+          && resource.data.status == "waiting"
+          && resource.data.guestUid == null
+          && request.resource.data.hostUid == resource.data.hostUid
+          && request.resource.data.guestUid == request.auth.uid
+          && request.resource.data.status == "active"
+          && request.resource.data.code == resource.data.code
+          && request.resource.data.state.players.host.email
+            == resource.data.state.players.host.email
+          && request.resource.data.state.players.guest.email == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["guestUid", "status", "state", "version", "updatedAt"]);
+      }
+
+      allow create: if signedIn()
+        && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.guestUid == null
+        && request.resource.data.state.players.host.email == request.auth.uid;
+
+      allow get: if participant()
+        || (signedIn() && resource.data.status == "waiting");
+      allow list: if false;
+
+      allow update: if joiningOpenSeat()
+        || (participant()
+          && request.resource.data.hostUid == resource.data.hostUid
+          && request.resource.data.guestUid == resource.data.guestUid);
+
+      allow delete: if signedIn()
+        && resource.data.hostUid == request.auth.uid;
+    }
+  }
+}

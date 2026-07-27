@@ -5,14 +5,19 @@ A dice-building battle game. Every die is a ship — a **d4**, **d6**, **d8** or
 hit points. The match ends when someone's flagship is destroyed.
 
 **Even hits, odd blocks.** Marked faces also pay Energy, repair, or Direct damage.
-Grow a ship from d4 through d10, unlock more fleet slots, or invest in the
+Upgrade a ship from d4 through d10, unlock more fleet slots, or invest in the
 flagship. Five or more numbers in a row is a **straight**, and your flagship's
-number can complete the line.
+number can complete the line. Each fleet also has one **Flagship Token** that can
+turn the flagship one number up or down after the final free roll.
 
 ## Play it
 
-Open **`simple.html`**. Double-click it — no server, no build step, no
-dependencies. The version number sits next to the title.
+**Online (solo + versus):** [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/)  
+No OpenAI/ChatGPT sign-in. Versus rooms use a private invite link or four-digit
+code. Details live in [`web/README.md`](web/README.md).
+
+**Offline / design:** open **`simple.html`**. Double-click it — no server, no
+build step, no dependencies. The version number sits next to the title.
 
 Every number in the game is editable live in the **Tune** panel, top right.
 Change one, start a fresh match, and feel the difference.
@@ -33,7 +38,7 @@ assistant.
 | [DIRECTIONS.md](DIRECTIONS.md) | Paths to victory, bluffing, and the team layer |
 | [DECISIONS.md](DECISIONS.md) | Every decision a player makes, marked strong or thin |
 
-`simple01.html` through `simple81.html` are frozen snapshots. They never change,
+`simple01.html` through `simple82.html` are frozen snapshots. They never change,
 so if an idea makes the game worse we open the previous number and we're back
 where we were. Nothing is ever lost by trying something.
 

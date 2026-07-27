@@ -1,0 +1,2803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#080c18">
+<title>Fleet Dice</title>
+<style>
+:root{
+  --bg:#080c18; --panel:#111a2e; --panel2:#16223c; --line:#26334f;
+  --ink:#eaf0ff; --dim:#93a3c4; --faint:#61729a;
+  --red:#ff5566; --blue:#45b6ff; --gold:#ffd75e; --nrg:#ffe81f; --hp:#7cf0a8;
+  --orange:#ff9438; --direct:#b98bff; --slot:#4ecdc4;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;min-height:100vh;padding-bottom:96px;color:var(--ink);
+  background:radial-gradient(900px 600px at 25% -8%,#1a2a5533,transparent 65%),
+             radial-gradient(700px 500px at 85% 8%,#3a1f5a33,transparent 60%),var(--bg);
+  font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+.wrap{max-width:540px;margin:0 auto;padding:10px 14px 0}
+header{display:flex;align-items:baseline;justify-content:space-between;padding:2px 2px 9px}
+h1{margin:0;font-size:21px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;
+   background:linear-gradient(90deg,var(--blue),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tiny{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:transparent}
+.ver{font-size:11px;letter-spacing:.1em;-webkit-text-fill-color:var(--faint);color:var(--faint);font-weight:600}
+.pill{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+
+/* The health board is context, not the game. It shrank so the 3x3 grid could
+   have the screen - that grid is the thing you are actually looking at. */
+.board{display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center;
+  background:linear-gradient(180deg,var(--panel),#0d1425);
+  border:1px solid var(--line);border-radius:13px;padding:0;gap:0;overflow:hidden;
+  margin-bottom:8px}
+.board .score{align-self:stretch;padding:7px 13px;display:flex;flex-direction:column;
+  justify-content:center}
+.board .you-score{background:#dbe1ea}
+.board .you-score .who{color:#40506b}
+.board .you-score .val{color:#08744e}
+.board .enemy-score{background:#05070d;border-left:1px solid #2c1620}
+.board .enemy-score .who{color:#ff6076}
+.board .enemy-score .val{color:var(--hp)}
+.board .who{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.board .val{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.board .mid{align-self:stretch;font-size:9px;letter-spacing:.1em;color:var(--faint);
+  text-align:center;line-height:1.3;display:flex;align-items:center;justify-content:center}
+.board .r{text-align:right}
+/* The reroll button, sitting between the two scores. */
+.mid-btn{width:100%;padding:8px 6px;line-height:1.15;font-size:14px;font-weight:800;
+  border-radius:11px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.board > .mid-btn{width:auto;margin:5px 7px}
+.mid-btn small{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.75}
+.mid-btn[disabled]{opacity:.4}
+
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 2px 9px;font-weight:700}
+.say{font-size:15px;color:var(--dim);margin:0 2px 12px}
+.say b{color:var(--ink)}
+.say .red{color:var(--red);font-weight:700}
+.say .blue{color:var(--blue);font-weight:700}
+.say .nrg{color:var(--nrg);font-weight:700}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.grid .die{width:auto}
+.slot{position:relative;border:1px dashed var(--line);border-radius:15px;min-height:128px;opacity:.55}
+/* The slot number. Quiet enough to ignore, there when you need to name a ship. */
+.slotno{position:absolute;top:6px;left:8px;font-size:10px;font-weight:800;
+  letter-spacing:.06em;color:var(--slot);opacity:.55;font-variant-numeric:tabular-nums;
+  pointer-events:none}
+.die .slotno{opacity:.45}
+/* The flagship card sits on the SAME dark blue-grey as every ship card. It used
+   to be gold-brown, which meant the tint was being tinted: red over brown came
+   out maroon, green over brown came out olive. A card should not colour the
+   thing sitting on it. The gold ring is what still says "flagship". */
+.die.flag{border-color:var(--gold);background:linear-gradient(180deg,var(--panel),#0d1425);
+  box-shadow:0 0 26px -12px var(--gold)}
+.die.flag .fcap{font-size:11px;font-weight:800;text-align:center;
+  line-height:1.2;margin-top:3px;letter-spacing:.01em}
+.die.flag .chg{font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;
+  color:var(--nrg);font-weight:800;margin-top:4px}
+.die{width:78px;border:1px solid var(--line);border-radius:15px;padding:6px 5px 5px;cursor:pointer;
+  background:linear-gradient(180deg,var(--panel),#0d1425);transition:transform .1s,border-color .1s,box-shadow .1s;user-select:none}
+/* The hull silhouette carries the ship's size, so no caption is needed. */
+.hull{display:block;width:100%;height:auto;max-height:104px}
+.hull polygon{transition:fill-opacity .15s}
+.die:hover .hull polygon{fill-opacity:.22}
+.die:active{transform:scale(.96)}
+@keyframes tumble{
+  0%{transform:rotate(0) scale(1)}
+  30%{transform:rotate(-14deg) scale(.9)}
+  60%{transform:rotate(11deg) scale(1.06)}
+  100%{transform:rotate(0) scale(1)}
+}
+.die.rolled{animation:tumble .32s ease}
+/* White is a thing you did: you tapped this die to reroll it.
+   Gold is a thing the game did: this die is part of your straight.
+   Keeping those two apart matters, because a straight lights up several dice at
+   once and you could no longer tell which ones you had selected. */
+/* Ringed = this die is feeding the flagship's face this round. */
+.die.feeds{border-color:var(--line)}
+.die.fr{border-color:var(--red);box-shadow:0 0 0 1px var(--red),0 0 22px -8px var(--red)}
+.die.fb{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue),0 0 22px -8px var(--blue)}
+.die.fh{border-color:var(--hp);box-shadow:0 0 0 1px var(--hp),0 0 22px -8px var(--hp)}
+.die.fe{border-color:var(--nrg);box-shadow:0 0 0 1px var(--nrg),0 0 22px -8px var(--nrg)}
+.die.fd{border-color:var(--direct);box-shadow:0 0 0 1px var(--direct),0 0 22px -8px var(--direct)}
+.die.sel{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 24px -8px #fff}
+.die.sel::after{content:"REROLL";position:absolute;top:5px;right:6px;font-size:8px;
+  letter-spacing:.08em;font-weight:800;color:#fff}
+.die{position:relative}
+.die .kind{font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;font-weight:800;margin-top:-2px}
+.die.r .kind{color:var(--red)}
+.die.b .kind{color:var(--blue)}
+.hull path{filter:drop-shadow(0 0 5px var(--nrg))}
+/* A 5px glow is wider than the space between three crosses, so it welded them
+   into one bar. Theirs is tight enough to leave the gap visible. */
+.hull path.cr{filter:drop-shadow(0 0 1px var(--hp))}
+.hull path.ch{filter:drop-shadow(0 0 2px var(--direct))}
+.die.noPick{cursor:default}
+.die.brace-flag{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:default;min-height:110px}
+.die.brace-flag .fcap{font-size:26px;font-weight:800;line-height:1;margin-top:4px}
+.tot .dir .n{color:var(--direct)}
+.die.hurt{opacity:.42}
+.die.hurt .kind{color:var(--faint);letter-spacing:.1em}
+.die.hurt .kind{color:var(--faint)}
+/* Orange, not gold. Gold is the flagship's colour and it was doing two jobs at
+   once - now the bar along the bottom means one thing only: this ship is in your
+   straight. */
+.die.inrun{border-color:#5a3410}
+.die.inrun::before{content:"";position:absolute;left:12px;right:12px;bottom:0;height:4px;
+  border-radius:3px 3px 0 0;background:var(--orange);box-shadow:0 0 10px -1px var(--orange)}
+.die.inrun.sel::before{left:8px;right:8px}
+
+.rolls{padding:11px 12px 9px}
+.rr{display:flex;align-items:center;gap:9px}
+.rl{width:42px;flex:none;font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.chip{min-width:31px;height:34px;padding:0 6px;display:flex;align-items:center;
+  justify-content:center;border-radius:8px;font-size:20px;font-weight:800;
+  font-variant-numeric:tabular-nums;background:#131c30;border:1px solid #22304e}
+.chip.red{color:var(--red)} .chip.blue{color:var(--blue)} .chip.nrg{color:var(--nrg)}
+.chip.fl{color:#fff;background:#1b2540;border-color:var(--gold);
+  box-shadow:inset 0 0 0 2px rgba(214,178,74,.30)}
+.runbox{display:flex;gap:4px;padding:3px;margin:-3px;border-radius:11px;
+  border:1px solid var(--gold);background:rgba(214,178,74,.11)}
+.verd{font-size:13px;color:var(--dim);margin:7px 0 11px 51px}
+.verd b{color:var(--gold);font-weight:700}
+.verd .no{color:var(--faint)}
+.rr + .verd + .rr{border-top:1px solid #1a2440;padding-top:11px}
+.leg{font-size:11px;color:var(--faint);line-height:1.5;border-top:1px solid #1a2440;
+  padding-top:9px;margin-top:-2px}
+.report-sides{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:stretch;
+  margin-bottom:11px}
+.reportside{border:1px solid;border-radius:15px;overflow:hidden;min-width:0;
+  display:flex;flex-direction:column}
+.reportside.you{background:#dbe1ea;border-color:#f2f5fa;color:#101827}
+.reportside.enemy{background:#05070d;border-color:#4a1d28;color:var(--ink)}
+.reportside .healthcard{border:0;border-radius:0;background:transparent}
+.reportside .sideblock,.reportside .sidenotes{border-top:1px solid;padding:11px}
+.reportside.you .sideblock,.reportside.you .sidenotes{border-color:#b9c3d1}
+.reportside.enemy .sideblock,.reportside.enemy .sidenotes{border-color:#2c1620}
+.reportside .rolls{padding:11px}
+.reportside .rr{align-items:flex-start;gap:6px}
+.reportside .rl{width:39px}
+.reportside .chips{gap:3px}
+.reportside .chip{min-width:27px;height:31px;padding:0 5px;font-size:18px}
+.reportside .verd{margin:6px 0 3px 45px;font-size:11.5px}
+.reportside.you .rl,.reportside.you .verd{color:#65718a}
+.reportside.you .verd b{color:#8a5b00}
+.reportside.you .chip{background:#f3f5f8;border-color:#aeb9c8}
+.reportside.you .chip.fl{color:#fff;background:#1b2540;border-color:var(--gold)}
+.reportside.you .runbox{background:rgba(214,178,74,.18)}
+.reportside .led{padding:0}
+.reportside .ledh{border-bottom:1px solid;padding:9px 11px}
+.reportside.you .ledh{background:#c8d0dc;border-color:#aeb9c8;color:#40506b}
+.reportside.enemy .ledh{background:#03050a;border-color:#2c1620;color:#ff6076}
+.reportside .lr{padding:7px 11px;font-size:12.5px}
+.reportside.you .lr{color:#40506b}
+.reportside.you .lr b{color:#101827}
+.reportside.you .lr.tone-red span,.reportside.you .lr b.red{color:#b51f3b}
+.reportside.you .lr.tone-blue span,.reportside.you .lr b.blue{color:#0872ae}
+.reportside.you .lr.tone-dir span,.reportside.you .lr b.dir{color:#7a35c9}
+.reportside.you .lr.tone-hp span,.reportside.you .lr b.hp{color:#08744e}
+.reportside.you .lr.tone-nrg span,.reportside.you .lr b.nrg{color:#8a5b00}
+.reportside.you .lr.sub{border-color:#b9c3d1;color:#101827}
+.reportside.you .lr.end{border-color:#9aa8bb;color:#101827}
+.reportside.enemy .lr.sub{border-color:#2c1620}
+.reportside.enemy .lr.end{border-color:#4a1d28}
+.reportside .sidenotes{font-size:13px;line-height:1.45}
+.reportside .sidenotes .line{padding:7px 0;border-bottom:1px solid}
+.reportside .sidenotes .line:last-child{border-bottom:0}
+.reportside.you .sidenotes .line{border-color:#c0c8d4;color:#29364b}
+.reportside.enemy .sidenotes .line{border-color:#21131b;color:#d7dceb}
+.reportside .sidenotes{flex:1}
+.reportside.you .sidenotes b:not(.red):not(.blue):not(.hp):not(.dir):not(.nrg){
+  color:#101827}
+.reportside.enemy .sidenotes b:not(.red):not(.blue):not(.hp):not(.dir):not(.nrg){
+  color:#f5f7ff}
+.reportside.you .sidenotes b.red{color:#b51f3b}
+.reportside.you .sidenotes b.blue{color:#0872ae}
+.reportside.you .sidenotes b.hp{color:#08744e}
+.reportside.you .sidenotes b.dir{color:#7a35c9}
+.reportside.you .sidenotes b.nrg{color:#8a5b00}
+.reportleg{margin:-2px 2px 12px;padding-top:8px}
+.led{padding:0;overflow:hidden}
+.ledh{display:flex;justify-content:space-between;align-items:baseline;padding:9px 14px;
+  border-bottom:1px solid #1a2440;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);background:#0c1322}
+.ledh b{font-size:17px;letter-spacing:0;text-transform:none;font-weight:800;
+  font-variant-numeric:tabular-nums}
+.lr{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding:7px 14px;font-size:14px;color:var(--dim)}
+.lr b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lr .dir{color:var(--direct)} .lr .red{color:var(--red)} .lr .blue{color:var(--blue)}
+.lr.tone-red span{color:var(--red)}
+.lr.tone-blue span{color:var(--blue)}
+.lr.tone-dir span{color:var(--direct)}
+.lr.tone-hp span{color:var(--hp)}
+.lr.tone-nrg span{color:var(--nrg)}
+.lr.sub{border-top:1px solid #1a2440;color:var(--ink)}
+.lr.end{border-top:2px solid #23304f;color:var(--ink);font-weight:700;padding:9px 14px 11px}
+.lr.end b{font-size:18px}
+.rep .hp{color:var(--hp)} .rep .dir{color:var(--direct)}
+.tot{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:9px}
+.tot.three{grid-template-columns:repeat(3,1fr)}
+.tot > div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center}
+.tot .n{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.tot .l{font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.tot .a .n{color:var(--red)} .tot .d .n{color:var(--blue)} .tot .e .n{color:var(--nrg)}
+.tot .h .n{color:var(--hp)}
+.tot .dir .n{color:var(--direct)}
+.dir{color:var(--direct)}
+b.dir{color:var(--direct);font-weight:800}
+.hp{color:var(--hp)}
+b.hp{color:var(--hp);font-weight:800}
+b.red{color:var(--red);font-weight:800}
+b.blue{color:var(--blue);font-weight:800}
+b.nrg{color:var(--nrg);font-weight:800}
+.healthcard{border:1px solid var(--line);border-radius:12px;padding:10px 11px}
+.healthcard .side{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);font-weight:800;margin-bottom:7px}
+.healthcard.you{background:#dbe1ea;border-color:#f2f5fa}
+.healthcard.you .side{color:#40506b}
+.healthcard.you .healthpoint b{color:#08744e}
+.healthcard.you .healthpoint small{color:#65718a}
+.healthcard.you .healtharrow{color:#087d7c}
+.healthcard.you .healthmoves{border-color:#b9c3d1;color:#40506b}
+.healthcard.you .healthmoves .hurt{color:#b51f3b}
+.healthcard.you .healthmoves .repair{color:#08744e}
+.healthcard.you .healthnet{border-color:#b9c3d1}
+.healthcard.you .healthnet.up b{color:#08744e}
+.healthcard.you .healthnet.down b{color:#b51f3b}
+.healthcard.you .healthnet.even b{color:#40506b}
+.healthcard.enemy{background:#05070d;border-color:#4a1d28}
+.healthcard.enemy .side{color:#ff6076}
+.healthcard.enemy .healthpoint b{color:var(--hp)}
+.healthcard.enemy .healthpoint small{color:#8d97ac}
+.healthcard.enemy .healtharrow{color:#ff6076}
+.healthcard.enemy .healthmoves{border-color:#2c1620}
+.healthcard.enemy .healthnet{border-color:#2c1620}
+.healthline{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px}
+.healthpoint{text-align:center}
+.healthpoint b{display:block;font-size:25px;color:var(--hp);line-height:1}
+.healthpoint small{display:block;font-size:9px;color:var(--faint);margin-top:3px}
+.healtharrow{color:var(--slot);font-weight:800}
+.healthmoves{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;gap:8px;
+  border-top:1px solid #1a2440;margin-top:8px;padding-top:7px;font-size:11px;
+  color:var(--dim);text-align:center}
+.healthmoves .hurt{color:var(--red);font-weight:800}
+.healthmoves .repair{color:var(--hp);font-weight:800}
+.healthnet{min-width:55px;border-left:1px solid #1a2440;padding-left:8px;
+  display:flex;flex-direction:column;align-items:center}
+.healthnet b{font-size:23px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums}
+.healthnet small{font-size:7px;line-height:1.15;letter-spacing:.08em;text-transform:uppercase;
+  margin-top:3px;color:var(--faint)}
+.healthnet.up b{color:var(--hp)}
+.healthnet.down b{color:var(--red)}
+.healthnet.even b{color:var(--dim)}
+
+/* The straight. Orange, because that is already the colour of the underline
+   under the dice that made the line. */
+.strk{border:1px solid var(--orange);background:#241405;border-radius:12px;
+  padding:9px 11px 10px;margin-bottom:10px}
+.strkh{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.stag{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;
+  background:var(--orange);color:#1a0d02;border-radius:5px;padding:3px 8px;white-space:nowrap}
+.st{font-size:12.5px;color:var(--dim)}
+.st b{color:var(--ink)}
+.strkp{font-size:14px;color:var(--dim);margin-top:7px}
+.strkp b{color:var(--orange);font-weight:800}
+.picks{display:grid;gap:6px}
+.pick{position:relative;text-align:left;padding:9px 66px 9px 11px;background:#0c1424;
+  border:1px solid var(--line);border-radius:10px;width:100%}
+.pick b{display:block;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);font-weight:800}
+.pick span{font-size:15px;color:var(--ink);font-weight:600}
+.pick i{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-style:normal;
+  font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;
+  padding:5px 9px;border-radius:999px;border:1px solid var(--line);color:var(--faint)}
+.pick.on{border-color:var(--orange);background:#231404}
+.pick.on b{color:var(--orange)}
+.pick.on i{background:var(--orange);border-color:var(--orange);color:#1a0d02}
+.choose{font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;
+  color:var(--orange);margin:0 2px 7px}
+.choose em{font-style:normal;color:var(--faint);letter-spacing:.06em;font-weight:600}
+
+button{font:inherit;cursor:pointer;border-radius:12px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--ink);padding:11px 16px;transition:filter .1s,transform .07s}
+button:hover:not(:disabled){filter:brightness(1.28)}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{opacity:.32;cursor:not-allowed}
+button.go{background:linear-gradient(180deg,#3573ff,#1c46c6);border-color:#5182ff;font-weight:700}
+.row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+
+.card{background:linear-gradient(180deg,var(--panel),#0d1425);border:1px solid var(--line);
+  border-radius:15px;padding:14px;margin-bottom:11px}
+.card h3{margin:0 0 3px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}
+.card p{margin:0 0 11px;font-size:14px;color:var(--dim)}
+/* ── the shop ───────────────────────────────────────────────────────────── */
+/* ── shop headings: a colour and a verb, not a place name ────────────────── */
+/* Reference screens: what a thing costs, and why you would want it. */
+.ctab{border-top:1px solid #1a2440;margin-top:9px}
+.cr{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:9px 0;
+  border-bottom:1px solid #1a2440}
+.cr:last-child{border-bottom:0}
+.cw{font-size:14.5px;color:var(--ink)}
+.cp{font-size:15px;font-weight:800;color:var(--nrg);font-variant-numeric:tabular-nums;
+  white-space:nowrap;text-align:right}
+.cy{grid-column:1/-1;font-size:12.5px;color:var(--faint);line-height:1.5}
+.cw .ok{font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--hp);font-weight:800;margin-left:5px;white-space:nowrap}
+.shead.nrg{border-left-color:var(--nrg)} .shead.nrg h3{color:var(--nrg)}
+button.tiny.nrg{color:var(--nrg);border-color:#4a3d10}
+button.ver{background:none;border:0;padding:0 0 0 4px;font-size:12px;font-weight:800;
+  letter-spacing:.08em;color:var(--slot);cursor:pointer}
+button.ver:hover{color:var(--gold)}
+button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
+  text-transform:uppercase;font-weight:800;padding:7px 9px;color:var(--dim)}
+.resetpage{flex:none;font-size:8.5px;line-height:1.15;letter-spacing:.03em;
+  text-transform:uppercase;font-weight:800;padding:7px 8px;color:var(--faint)}
+.die.ready .kind{color:var(--faint)}
+@media (max-width:430px){
+  .met > div:nth-child(3){display:none}
+  .jumpnav{grid-template-columns:repeat(2,1fr)}
+  .flagfaces{grid-template-columns:repeat(2,1fr)}
+  .report-sides{gap:6px}
+  .reportside .healthcard{padding:9px 7px}
+  .healthmoves{gap:4px;font-size:9.5px}
+  .healthnet{min-width:42px;padding-left:4px}
+  .healthnet b{font-size:20px}
+  .healthnet small{font-size:6px}
+  .reportside .sideblock,.reportside .sidenotes{padding:8px 7px}
+  .reportside .rolls{padding:8px 7px}
+  .reportside .rl{width:30px;font-size:8.5px}
+  .reportside .chip{min-width:24px;height:28px;padding:0 4px;font-size:16px}
+  .reportside .verd{margin-left:36px;font-size:10.5px}
+  .reportside .ledh{padding:8px 7px;font-size:8.5px}
+  .reportside .ledh b{font-size:15px}
+  .reportside .lr{padding:6px 7px;font-size:10.5px;gap:5px}
+  .reportside .lr.end b{font-size:15px}
+  .reportside .sidenotes{font-size:11.5px}
+}
+.shead{border-left:3px solid var(--line);padding:1px 0 1px 10px;margin:0 0 9px}
+.shead h3{margin:0;font-size:17px;font-weight:800;letter-spacing:.01em;
+  text-transform:none;color:var(--ink)}
+.shead .ssub{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--faint);margin-top:2px;font-weight:700}
+.shead.red{border-left-color:var(--red)}   .shead.red h3{color:var(--red)}
+.shead.blue{border-left-color:var(--blue)} .shead.blue h3{color:var(--blue)}
+.shead.gold{border-left-color:var(--gold)} .shead.gold h3{color:var(--gold)}
+
+/* The price is what you came here to read, so it never dims. */
+.sbuy{width:100%;margin-top:6px;padding:7px 4px;border-radius:9px;border:1px solid #2a4068;
+  display:flex;flex-direction:column;align-items:center;gap:1px}
+.sbuy b{font-size:15px;font-weight:800;color:var(--nrg);letter-spacing:.01em}
+.sbuy i{font-size:9.5px;font-style:normal;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);font-weight:700}
+.sbuy:disabled{opacity:1;border-color:#1c2740;background:#0a1120}
+.ship.cant .hull,.ship.cant .sname,.ship.cant .sfaces,.ship.cant .sline{opacity:.38}
+
+/* The whole flagship ladder at once, so a level is somewhere you can see. */
+.lvlbar{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.lvl{border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;
+  background:#0b1322}
+.lvl .ln{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+  font-weight:800}
+.lvl .lp{font-size:11px;color:var(--faint);margin-top:3px;line-height:1.3}
+.lvl .lp b{font-size:14px;color:var(--dim)}
+.lvl.past{opacity:.5}
+.lvl.now{border-color:var(--gold);background:#171307}
+.lvl.now .ln{color:var(--gold)} .lvl.now .lp b{color:var(--gold)}
+.faceref{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:5px;
+  margin-bottom:10px}
+.fref{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--line);
+  border-radius:8px;background:#0b1322;font-size:11.5px}
+.fref b{color:#fff;font-size:13px;font-weight:800}
+.fref span{color:var(--dim)}
+.fref span strong{display:block;color:var(--ink);font-size:11.5px}
+.fref span small{display:block;color:var(--faint);font-size:10px;line-height:1.3;margin-top:1px}
+.flagfaces{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.flagface{border:1px solid var(--line);border-radius:11px;background:#0b1322;
+  padding:7px;text-align:center}
+.flagface .hull{display:block;width:56px;height:56px;margin:0 auto 4px}
+.flagface strong{display:block;font-size:11px;color:var(--ink)}
+.flagface small{display:block;font-size:9.5px;line-height:1.3;color:var(--faint);margin-top:2px}
+.jumpnav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0 13px}
+.jumpnav button{padding:8px 5px;border-radius:9px;font-size:10px;line-height:1.2;
+  font-weight:800;color:var(--dim);background:#0b1322}
+.jumpnav button:hover{color:var(--ink);border-color:var(--blue)}
+.jumpmark{scroll-margin-top:12px}
+.coach{border:1px solid var(--gold);background:linear-gradient(180deg,#201b0b,#121509);
+  border-radius:13px;padding:11px 12px;margin:0 0 11px}
+.coachhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.coachhead b{color:var(--gold);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.coach p{font-size:13.5px;line-height:1.45;color:var(--dim);margin:6px 0 0}
+.coach p b{color:var(--ink)}
+.coach button{padding:5px 8px;border-radius:8px;font-size:9px;color:var(--faint)}
+.flagtoken{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid var(--gold);background:#171307;border-radius:12px;padding:9px 10px;
+  margin:9px 0}
+.flagtoken .tokencopy b{display:block;color:var(--gold);font-size:12px}
+.flagtoken .tokencopy small{display:block;color:var(--faint);font-size:10px;line-height:1.35;margin-top:2px}
+.flagtoken .turns{display:flex;gap:5px;flex:none}
+.flagtoken .turns button{min-width:43px;padding:8px 9px;color:var(--gold);font-weight:900}
+.flagtoken.spent{border-color:var(--line);background:#0b1322;opacity:.72}
+.flagtoken.spent .tokencopy b{color:var(--faint)}
+.purse{margin-bottom:10px}
+.purse .e .n{color:var(--nrg)}
+.purse .n .sub{font-size:12px;color:var(--faint);font-weight:700}
+.ships{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:9px;margin-top:11px}
+.ship{border:1px solid var(--line);border-radius:14px;padding:9px 8px 8px;text-align:center;
+  background:linear-gradient(180deg,var(--panel),#0d1425)}
+.ship.cant{opacity:.44}
+.ship.can{border-color:#24406b}
+.ship .hull{max-height:74px;margin:0 auto 2px}
+.sname{font-size:17px;font-weight:800;letter-spacing:.02em}
+.sfaces{font-size:12px;color:var(--dim);margin-top:2px}
+.sfaces b{font-weight:800}
+.sfaces.avg{color:var(--faint);font-size:11px;margin-top:1px}
+.sfaces.avg b{color:var(--dim)}
+.samefaces{font-size:12.5px;color:var(--dim);line-height:1.75;margin-top:9px;
+  padding:9px 11px;border:1px solid var(--line);border-radius:11px;background:#0b1322}
+.samefaces .gly{width:13px;height:13px;vertical-align:-2px;margin-right:1px}
+.samefaces b{font-weight:800;margin-right:5px}
+.sline{font-size:10.5px;color:var(--faint);line-height:1.35;min-height:28px}
+.sline b{color:var(--dim)}
+.scrapb{width:100%;margin-top:5px;padding:5px 2px;border-radius:8px;font-size:10px;
+  font-weight:800;letter-spacing:.02em}
+.shipacts{display:grid;grid-template-columns:1fr;gap:4px;margin-top:5px}
+.shipacts.top{margin:0 0 5px}
+.shipacts button{width:100%;padding:5px 2px;border-radius:8px;font-size:9.5px;
+  font-weight:800;letter-spacing:.01em}
+.growb{border-color:#3d641e;color:#a8df70;background:#101c0b}
+.slot.locked{opacity:.38;background:#080d18}
+.slot.locked .free{color:var(--faint)}
+.slotoffer{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px;border:1px solid var(--line);border-radius:11px;background:#0b1322}
+.slotoffer .i b{display:block;font-size:14px}
+.slotoffer .i small{display:block;color:var(--faint);font-size:12px;line-height:1.35;margin-top:2px}
+.slotoffer button{flex:none;color:var(--nrg);font-weight:800}
+.die.shopflag{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:default;min-height:128px}
+.die.shopflag .fcap{font-size:25px;font-weight:800;line-height:1;margin-top:2px}
+.slot .free{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--slot);opacity:.6}
+.buy{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;
+  border:1px solid var(--line);border-radius:11px;background:#0b1322;margin-bottom:8px}
+.buy:last-child{margin-bottom:0}
+.buy .i b{display:block;font-size:14px}
+.buy .i small{color:var(--faint);font-size:12px}
+
+.rep b{color:var(--ink)}
+.rep .red{color:var(--red)} .rep .blue{color:var(--blue)} .rep .nrg{color:var(--nrg)}
+
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(10,15,28,.88),rgba(8,12,24,.99));backdrop-filter:blur(14px);
+  padding:11px 16px calc(11px + env(safe-area-inset-bottom))}
+.dockin{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.met{display:flex;gap:18px;flex:1;align-items:center}
+.met .big .n{font-size:27px}
+.met .big .l{color:var(--nrg);opacity:.85}
+.met .l br{display:block}
+.met .n{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.met .n.p{color:var(--nrg)}
+.met .n .soon{font-size:12px;font-weight:700;color:var(--faint);margin-left:5px;letter-spacing:.02em}
+.met .l{font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);line-height:1.35;margin-top:2px}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--panel2);
+  border:1px solid var(--gold);padding:10px 16px;border-radius:999px;font-size:14px;z-index:40;
+  box-shadow:0 10px 34px -10px #000}
+.tune{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid #1a2440}
+.tune:last-child{border-bottom:0}
+.tune .i b{display:block;font-size:14px}
+.tune .i small{color:var(--faint);font-size:12px}
+.tune input{width:78px;font:inherit;text-align:center;padding:7px;border-radius:9px;
+  border:1px solid var(--line);background:#0b1322;color:var(--ink)}
+.stab{width:100%;border-collapse:collapse;font-size:12px;margin:0 0 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.stab th,.stab td{padding:6px 4px;text-align:center;color:var(--dim)}
+.stab th{color:var(--faint);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.stab td:first-child,.stab th:first-child{text-align:left;padding-left:11px;color:var(--faint)}
+.stab tr+tr{border-top:1px solid #1a2440}
+.stab td:not(:first-child){color:var(--red);font-weight:700;font-variant-numeric:tabular-nums}
+.stab td.na{color:#33405e;font-weight:600}
+.hint{font-size:13px;color:var(--faint);margin:0 2px 14px}
+/* The symbol key. Each glyph is the real path from the dice, so the two can
+   never drift apart. */
+.tot{margin-top:0}
+/* Reference, not action. Set apart and quiet, at the foot of the screen. */
+.foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}
+.foot .say{margin-bottom:6px}
+.ktitle{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  margin:0 2px 6px;font-weight:800}
+.ktab{margin:0 0 12px}
+.krow{display:grid;grid-template-columns:26px 52px 1fr;align-items:center;gap:8px;
+  padding:6px 8px;border-radius:9px;font-size:13px;color:var(--dim)}
+.krow:nth-child(odd){background:rgba(255,255,255,.025)}
+.krow > b{font-size:17px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.kmark{display:flex;align-items:center;gap:2px}
+.kmark .gly{width:13px;height:13px;display:block;flex:none}
+.kdoes b{color:var(--ink)}
+.kdoes b.nrg{color:var(--nrg)} .kdoes b.hp{color:var(--hp)} .kdoes b.dir{color:var(--direct)}
+.facebooks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px}
+.facebook{border:1px solid var(--line);border-radius:11px;background:#0b1322;padding:9px}
+.facebook h4{margin:0 0 6px;color:var(--ink);font-size:15px}
+.faceentry{display:grid;grid-template-columns:24px 42px 1fr;align-items:center;gap:6px;
+  padding:5px 2px;border-top:1px solid #18233a;font-size:11.5px;color:var(--dim)}
+.faceentry > b{font-size:15px;text-align:center}
+.faceentry .marks{display:flex;gap:1px;align-items:center}
+.faceentry .marks .gly{width:11px;height:11px}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+
+var VERSION = "82";   // bump this when saving a new simpleNN.html
+
+// ── ONE OPEN QUESTION ────────────────────────────────────────────────────
+// AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
+// so nobody banks a war chest. Careful: A CAP IS A PRICE CEILING. Nothing can
+// cost more than the cap or it can never be bought. The average bank sits at
+// 13-15 all match and a d10 costs 13, so a cap under 15 quietly deletes d10s
+// and a cap over 20 never binds. Narrow window; measure before building.
+//
+// The panel store and the Rocket were BUILT, measured, and removed in v72 at
+// Dave's instruction - the game is the dice and the flagship faces, nothing
+// bolted on. VERSIONS.md v72 has the numbers if that decision ever needs
+// revisiting. Do not rebuild them from the notes in FACES.md without reading it.
+// ─────────────────────────────────────────────────────────────────────────
+
+// ── rules ────────────────────────────────────────────────────────────────
+// Every die: EVEN faces are red and hit, ODD faces are blue and block - the 1
+// included, it blocks for 1. On top of that the four lowest faces each do a
+// second job: a 1 and a 2 pay Energy, a 3 repairs, a 4 fires Direct.
+
+// Every number worth arguing about lives here, and the Tune panel edits it
+// live. Nothing about the rules is buried in the code below.
+var C = {
+  startHP:      { v:60, min:15, max:200,label:"Flagship health", step:5,
+                  note:"The length dial. Measured in the real build: 40 gives an 8-round match, 50 gives 10, 60 gives 11." },
+  healThree:    { v:3,  min:0,  max:6,  label:"Repair a 3 gives" },
+  twoDirect:    { v:2,  min:0,  max:6,  label:"Direct a 2 gives",
+                  note:"Always, on every ship. Matched to Repair on the 3 so the two pull against each other instead of healing winning by default." },
+  // Every face is now a plain multiplier: so much per matching die, nothing flat.
+  // The faces are deliberately NOT equal - a 1-in-6 roll that sometimes gives you
+  // the face you wanted and sometimes doesn't is the point.
+  flagUp2:      { v:10, min:1,  max:60, label:"Flagship level 2 costs",
+                  note:"The bonus on every face rises from +2 to +3." },
+  flagUp3:      { v:16, min:1,  max:80, label:"Flagship level 3 costs",
+                  note:"The bonus rises to +4. Level 3 is the ceiling." },
+  reactorNow:   { v:2,  min:0,  max:12, label:"Reactor: Energy once your base is capped" },
+  reactorCap:   { v:6,  min:0,  max:12, label:"Reactor: most it can raise your base",
+                  note:"Effectively no cap. Measured at 1, 3 and uncapped it plays the same - you rarely roll the 2 twice, and a late +1 has no time to pay for itself." },
+  soakMax:      { v:8,  min:0,  max:8,  label:"Ships you may damage in a round",
+                  note:"Choose as many as you want. Each blocks its own size and sits out the next round." },
+  escFrom:      { v:8,  min:0,  max:20, label:"The war escalates after round",
+                  note:"0 turns it off. Stops a match dragging into a fourth week." },
+  escPer:       { v:4,  min:0,  max:6,  label:"Extra damage per round after that" },
+  rounds:       { v:40, min:3,  max:60, label:"Longest a match may run",
+                  note:"A safety net, not the ending. Matches end when a flagship dies." },
+  startDice:    { v:4,  min:1,  max:8,  label:"Ships you start with" },
+  startSlots:   { v:4,  min:1,  max:8,  label:"Fleet slots open at the start",
+                  note:"The rest may be opened between rounds. Width now competes with upgrading the ships you already own." },
+  maxDice:      { v:8,  min:3,  max:8,  label:"Fleet slots",
+                  note:"Eight around the flagship, which holds the ninth." },
+  slot5Cost:    { v:7,  min:0,  max:30, label:"Open slot 5 costs" },
+  slot6Cost:    { v:8,  min:0,  max:40, label:"Open slot 6 costs" },
+  slot7Cost:    { v:9,  min:0,  max:50, label:"Open slot 7 costs" },
+  slot8Cost:    { v:10, min:0,  max:60, label:"Open slot 8 costs",
+                  note:"Opening a slot is permanent. A ship still has to be bought for it." },
+  rollsPerRound:{ v:3,  min:1,  max:5,  label:"Rolls each round",
+                  note:"Hold the dice you want, reroll the rest." },
+  rerollCost:   { v:1,  min:1,  max:4,  label:"Energy per extra reroll",
+                  note:"Per die, once your free rolls are gone." },
+  oneEnergy:    { v:2,  min:0,  max:4,  label:"Energy a 1 also pays" },
+  fourEnergy:   { v:1,  min:0,  max:4,  label:"Energy a 4 also pays",
+                  note:"Both still fight. Energy is on top." },
+  runMin:       { v:5,  min:3,  max:8,  label:"Dice needed for a straight",
+                  note:"Prizes step up by length; see the table on the roll screen." },
+  runMult:      { v:1,  min:0,  max:3,  label:"Straight bonus multiplier", step:0.25,
+                  note:"Scales the whole straight table." },
+  priceD4:      { v:4,  min:1,  max:20, label:"Price of a d4" },
+  priceD6:      { v:6,  min:1,  max:20, label:"Price of a d6" },
+  priceD8:      { v:9,  min:1,  max:30, label:"Price of a d8" },
+  priceD10:     { v:13, min:1,  max:40, label:"Price of a d10" },
+  sellBack:     { v:50, min:0,  max:100,label:"Scrap value, % of price", step:5 },
+  botPace:      { v:1, min:0, max:3, label:"How fast Enemy upgrades", step:0.25,
+                  note:"A rate, not a chance. Pace 1 is the default after paid slots and player ship upgrades changed the economy." }
+};
+function K(name){ return C[name].v; }
+
+var DEFAULTS = {};
+Object.keys(C).forEach(function(k){ DEFAULTS[k] = C[k].v; });
+
+// Priced by what a die is actually worth, not by how many sides it has. At the
+// old prices two d4s beat one d6 for the same money, so saving up was
+// mathematically wrong and "buy the cheapest thing" always won.
+function priceOf(sides){
+  return { 4:K("priceD4"), 6:K("priceD6"), 8:K("priceD8"), 10:K("priceD10") }[sides];
+}
+function sellValue(sides){
+  return Math.floor(priceOf(sides) * K("sellBack") / 100);
+}
+function nextSize(sides){ return { 4:6, 6:8, 8:10 }[sides] || 0; }
+function growCost(sides){
+  var next = nextSize(sides);
+  return next ? Math.max(0, priceOf(next) - priceOf(sides)) : 0;
+}
+function slotCost(slot){
+  return { 5:K("slot5Cost"), 6:K("slot6Cost"),
+           7:K("slot7Cost"), 8:K("slot8Cost") }[slot] || 0;
+}
+function openSlots(side){
+  return Math.min(K("maxDice"), side.slots === undefined ? K("maxDice") : side.slots);
+}
+
+// A 1 blocks for 1 and pays the most Energy. A 2 hits for only 2 but carries the
+// Direct - so the smallest attack face on the die is the one nothing can block,
+// which is what makes a low roll worth keeping instead of a dud.
+// ── the flagship ─────────────────────────────────────────────────────────
+// A normal d6 that never fights. It rolls with the fleet, its number joins your
+// straight, and whichever face it lands on ADDS A BONUS to every ship showing
+// that same number. You do not design it: the six faces are fixed, one per
+// number, and the only purchase is a LEVEL that raises the bonus on all six.
+//
+// Nothing multiplies. A x2 face tested 40% ahead of a flat one early and 69%
+// ahead by mid-game, because a multiplier grows with everything you build. A
+// per-matching-die bonus grows too, but it stops at your slot count, so it
+// stays proportionate. That is why every face is "+N per match" and nothing in
+// this game is ever a multiplier.
+//
+// The faces are deliberately NOT equally useful in a given round - a 1-in-6 that
+// sometimes gives you the face you wanted is the point. Two measured facts still
+// worth knowing:
+//
+// SURPLUS ATTACK COUNTS, SURPLUS SHIELDS DO NOT. Red and blue faces come up
+// almost equally often (4.09 against 3.91 on a mid fleet), but at equal rates
+// attack beat shields 57/43, because overkill still lands and over-shielding is
+// thrown away. Worth remembering if the #5 face ever needs a thumb on the scale.
+//
+// REPAIR FADES AS YOUR FLEET GROWS. Threes per round: 1.21 on the starting four
+// d4s, 1.53 mid-game, 1.08 late, 0.69 on eight d10s. So the #3 face is at its
+// best early and is the weakest face in a capital fleet. That is a real arc, not
+// a flaw - the face you want in round two is not the one you want in round nine.
+var FACES = {
+  // match / even / odd is the single source of truth: applyFace pays on it and
+  // feedsFlag draws the ring from it, so the bonus and the ring it promises can
+  // never disagree. That pairing has been a bug twice.
+  atkEach:  { name:"Attack",  starter:true, even:true, gives:"attack", ring:"fr",
+              desc:"Every red die hits for more." , shortF:function(m){ return "+" + m + " per attack"; } },
+  defEach:  { name:"Shields", starter:true, odd:true,  gives:"defense", ring:"fb",
+              desc:"Every blue die holds for more." , shortF:function(m){ return "+" + m + " per shield"; } },
+  repair:   { name:"Repair",  starter:true, match:3, gives:"heal", ring:"fh",
+              desc:"Every 3 you roll repairs more." , shortF:function(m){ return "+" + m + " repair per #3"; } },
+  direct:   { name:"Direct",  starter:true, match:2, gives:"direct", ring:"fd",
+              desc:"Every 2 you roll fires more Direct." , shortF:function(m){ return "+" + m + " Direct per #2"; } },
+  energy2:  { name:"Energy",  starter:true, match:4, gives:"energy", ring:"fe",
+              desc:"Every 4 you roll pays more Energy." , shortF:function(m){ return "+" + m + " Energy per #4"; } },
+  // The one face that changes your future rather than your round. No menu attached:
+  // a face does one thing, automatically. The choosing in this game lives in which
+  // dice you reroll, which is why the whole thing still works with real dice.
+  reactor:  { name:"Reactor",    starter:true,
+              desc:"Your base Energy rises, for the rest of the match." , shortF:function(m){ return "Base Energy +" + m; } },
+
+};
+// THE FLAGSHIP IS A NORMAL d6, and its faces mean what the same numbers mean on
+// every other ship. That is the whole trick: you already know what a 3 does, so
+// you already know what the flagship's 3 does.
+//
+//   1  the Reactor      - a 1 pays the MOST Energy on a ship, so the permanent
+//                        Energy engine belongs on the flagship's 1
+//   2  boosts Direct    - a 2 is the Direct face on a ship
+//   3  boosts Repair    - a 3 repairs on a ship
+//   4  boosts Energy    - a 4 pays Energy on a ship
+//   5  boosts Shields   - 5 is odd, and odd blocks
+//   6  boosts Attack    - 6 is even, and even hits
+//
+// Nothing to memorise and nothing to look up, which is also why the whole game
+// still works with physical dice on a table.
+function starterFaces(){
+  return ["reactor", "direct", "repair", "energy2", "defEach", "atkEach"];
+}
+
+// Applied after the fleet is totalled, so the flagship face can see every die.
+function faceMatches(f, value){
+  if (!f) return false;
+  if (f.even) return value % 2 === 0;
+  if (f.odd)  return value % 2 === 1;
+  return f.match !== undefined && value === f.match;
+}
+
+function applyFace(id, t, dice, mul){
+  var f = FACES[id], n = 0, i;
+  if (!f || !f.gives) { t.rerolls = 0; return t; }   // the Reactor pays no die
+  for (i = 0; i < dice.length; i++){
+    // The flagship lends its number to a straight and NOTHING else. Skipping it
+    // here matters: without this, a flagship showing a 6 counted itself as a
+    // fourth red die and its own "+2 per attack" paid it for existing.
+    if (dice[i].flag) continue;
+    if (faceMatches(f, dice[i].value)) n++;
+  }
+  // One multiplier for the whole flagship: level 1 adds 2 a match, level 2 adds 3,
+  // level 3 adds 4. Direct is tracked on its own because nothing can block it.
+  t[f.gives] += n * mul;
+  t.rerolls = 0;
+  return t;
+}
+
+// One rule for every face: odd numbers block, even numbers hit, and the two
+// lowest also pay Energy on top. Nothing sits out the fight.
+//
+// That gives the die a shape worth holding. Valuing an Energy at about two
+// attack, the faces of a d6 are worth 5, 4, 3, 4, 5, 6 - so the 1 is your best
+// low roll, the middle is the dead zone you reroll, and the top is the top. Both
+// ends of the die are good for opposite reasons.
+//
+// Energy has one job: it is what you spend - extra rerolls, ships, flagship
+// levels. It is never a bill you owe.
+function kindOf(n){ return n % 2 === 0 ? "attack" : "defense"; }
+function energyOf(n){
+  if (n === 1) return K("oneEnergy");
+  if (n === 4) return K("fourEnergy");
+  return 0;
+}
+// Direct rides on the 2, then returns on the even faces a hull gains as it grows:
+// 6 fires 1, 8 fires 2, 10 fires 3. Repair climbs beside it on 5 / 7 / 9.
+// Every printed mark ALWAYS pays.
+//
+// It moved off the 4 in v78. On a d4 the 4 is the top face, so it was collecting
+// the biggest attack AND the unblockable damage at once - the best face on the
+// smallest die. Direct on the 2 puts the unblockable damage on a weak attack face
+// instead, so the two things pull against each other.
+function directOf(n){
+  if (n === 2) return K("twoDirect");
+  return { 6:1, 8:2, 10:3 }[n] || 0;
+}
+// Repair rides on the 3, the way Energy rides on the 1 and the 4 - and the 3 is
+// a BLUE face, so it blocks and heals at once. That is what finally makes a
+// defensive round pay for itself, which has been the game's biggest hole since
+// v07. Every die has a 3, so no ship is left out of the rule.
+function healOf(n){
+  if (n === 3) return K("healThree");
+  return { 5:1, 7:2, 9:3 }[n] || 0;
+}
+function roll(sides){ return 1 + Math.floor(Math.random() * sides); }
+
+// A straight is runMin or more numbers in a row (5 today). Its strength comes from the
+// biggest SHIP taking part, not the highest number - so a d10 rolling a 3 still
+// lifts a low straight, which is what makes the ships feel like they combine.
+// The flagship lends its NUMBER to the line and nothing else - it does not score
+// as attack or shields, and it must not inflate the prize either. So a value it
+// supplies counts for LENGTH but not for "biggest ship".
+//
+// That is what makes an all-d4 fleet work: four d4s show 1-2-3-4, the flagship
+// shows a 5, and you have five in a row paying at the d4 rate. Before this the
+// flagship quietly counted as a d6 and paid 9 Energy instead of 6 - the flagship
+// was doing a third job nobody asked it to do.
+function bestRun(dice){
+  var bySize = {}, i, v;
+  for (i = 0; i < dice.length; i++){
+    v = dice[i].value;
+    if (!(v in bySize)) bySize[v] = 0;                    // present, size unknown
+    if (!dice[i].flag && dice[i].sides > bySize[v]) bySize[v] = dice[i].sides;
+  }
+  var best = null;
+  for (var start = 1; start <= 10; start++){
+    var len = 0;
+    while ((start + len) in bySize) len++;
+    if (len >= K("runMin")){
+      var top = start + len - 1, biggest = 0;
+      for (v = start; v <= top; v++) if (bySize[v] > biggest) biggest = bySize[v];
+      if (!biggest) continue;                              // flagship alone is not a line
+      var pay = straightBonus(len, biggest);
+      // LONGEST first, value only as a tiebreak. Ranking by value looked right
+      // and quietly stole options: rolling 1-2-3-4-5-6 on d4s and d8s was
+      // reported as "5 in a row", because the five-tier's 12 Energy scores higher
+      // than the six-tier's 16 attack - and since you may only cash a straight at
+      // its own length or shorter, the attack tier became unreachable. Find the
+      // longest run and let the player decide what it is worth.
+      if (!best || len > best.length || (len === best.length && pay > best.bonus)){
+        best = { start: start, top: top, length: len, biggest: biggest, bonus: pay };
+      }
+    }
+  }
+  if (best) best.name = "d" + best.biggest + " straight of " + best.length;
+  return best;
+}
+
+// Priced by how hard each straight actually is to roll, which turned out to be
+// the opposite of the obvious guess. A d10 straight is not rarer than a d4 one -
+// it is far MORE common, because once you own big ships they join almost every
+// straight and quietly upgrade its tier. In an all-sizes fleet a d6 straight of
+// three lands under 1% of rounds while a d10 straight of three lands 23%.
+// (Those figures predate runMin 5, so read them as the SHAPE of the effect
+// rather than today's odds: size does not make a straight rarer, it makes the
+// prize bigger.)
+//
+// LENGTH decides what KIND of prize you get; the biggest ship in the line decides
+// HOW BIG it is. The ladder as it stands, with runMin at 5:
+//
+//   5 in a row -> Energy        6 or 7 -> attack        8 -> a free ship, and attack
+//
+// Paying attack at every length made straights 49% of all damage in a match,
+// which was too much of the game. Spreading the reward across Energy, damage and
+// a hull lands near 29%.
+//
+// Tiers stepped up two lengths in v12, because three rolls a round makes a
+// straight about two lengths easier to reach. Measured on a full eight-ship fleet
+// with three rolls: 6 in a row lands 40% of rounds, 7 lands 16%, 8 lands 3.7% -
+// almost exactly the odds 4, 5 and 6 had on a single roll.
+function straightReward(length, biggest){
+  var m = K("runMult"), r;
+  if (length >= 8) r = { kind:"ship", ship: biggest, attack: Math.round(biggest * 2 * m),
+                         label: "a free d" + biggest + " and " + Math.round(biggest * 2 * m) + " attack" };
+  else if (length >= 7) r = { kind:"attack", attack: Math.round(biggest * 3 * m),
+                         label: Math.round(biggest * 3 * m) + " attack" };
+  else if (length >= 6) r = { kind:"attack", attack: Math.round(biggest * 2 * m),
+                         label: Math.round(biggest * 2 * m) + " attack" };
+  // The bottom rung pays 1.5x the biggest ship rather than half of it. At half, a
+  // straight on a d4 fleet paid 2 Energy - exactly what one die showing a 2 pays,
+  // for something enormously harder to roll.
+  else if (length >= 5) r = { kind:"energy", energy: Math.round(biggest * 1.5 * m),
+                         label: Math.round(biggest * 1.5 * m) + " Energy" };
+  else r = { kind:"energy", energy: Math.round(biggest * m),
+             label: Math.round(biggest * m) + " Energy" };
+  return r;
+}
+
+// Ranked so the engine can pick the straight that is worth most.
+function straightBonus(length, biggest){
+  var r = straightReward(length, biggest);
+  return (r.attack || 0) + (r.energy || 0) * 2 + (r.ship ? priceOf(r.ship) : 0);
+}
+
+// A longer straight may always be scored as a shorter one - take the Energy
+// instead of the hit when you would rather build than fight.
+
+function tally(dice, flagFace, mul, pick){
+  var t = { attack: 0, defense: 0, energy: 0, heal: 0, direct: 0, rerolls: 0, face: flagFace || null };
+  for (var i = 0; i < dice.length; i++){
+    // The flagship lends its NUMBER to the straight and nothing else. Letting it
+    // also score as a die would be gaining two things for one choice.
+    if (dice[i].flag) continue;
+    var n = dice[i].value;
+    t.energy += energyOf(n);
+    t.heal   += healOf(n);
+    t.direct += directOf(n);
+    if (n % 2 === 0) t.attack += n; else t.defense += n;
+  }
+  var r = bestRun(dice);
+  t.run = r;
+  if (r){
+    // pick is undefined for the bot, which always cashes at full length.
+    var take = (pick !== null && pick !== undefined && pick <= r.length) ? pick : r.length;
+    r.taken = take;
+    r.reward = straightReward(take, r.biggest);
+    t.attack += r.reward.attack || 0;
+    t.energy += r.reward.energy || 0;
+    t.shipPrize = r.reward.ship || 0;
+  }
+  if (flagFace) applyFace(flagFace, t, dice, mul || 2);
+  return t;
+}
+
+// Upkeep, fuel and "docked" were all removed in v11 - price was already doing
+// that job. Named here only because those words kept turning up on screens for
+// several versions afterwards, which is the standing warning in HANDOFF.md.
+
+function newShip(sides){ return { s: sides, out: 0 }; }
+// A ship blocks its own size. A d10 blocks 10. Nothing to halve, nothing to
+// round - the number printed on the die IS the block.
+//
+// Measured against the alternatives, this is the only setting where both ends
+// are survivable: feeding a ship every round wins 42.9% (a mistake you can come
+// back from) and feeding one only when the hit might kill you wins 57.4% (a real
+// edge). Half the die with a cap of two was 5.6% for the careless player, which
+// is a trap rather than a skill test.
+function soakOf(sides){ return sides; }
+function isDamaged(ship){ return ship.out >= G.round; }
+function startingDice(){
+  var a = [], i;
+  for (i = 0; i < K("startDice"); i++) a.push(newShip(4));
+  return a;
+}
+// A damaged ship does not roll at all. It sits in its slot, greyed out, and is
+// back the round after - the Star Realms outpost that goes into the discard and
+// comes round again.
+function rollFace(ship){ return isDamaged(ship) ? 0 : roll(ship.s); }
+
+// ── state ────────────────────────────────────────────────────────────────
+var G, sel;
+var straightPick = null;      // which tier of your straight you are cashing in
+// Which dice should tumble on the NEXT render, and only that one. render()
+// rebuilds every die element from scratch, so a flag left set on the die itself
+// replays the animation every time anything re-renders - including a tap.
+var animate = {};
+var pending = null;          // the round, resolved but waiting on your brace choice
+var flagInLine = false;      // is the flagship's number part of your straight?
+var lastTally = null;        // what the current roll is worth, for the bottom bar
+var pageCheckpoint = null;   // lets a player reset only the choices on this page
+var GUIDE_KEY = "fleet-dice-guided-v82";
+// The flagship is a d6 with a number on it, and it does BOTH: its boost fires AND
+// its number joins your straight. It used to be a choice between the two, and
+// making you pick was the wrong call - the moment worth building toward is your
+// whole fleet lining up, flagship included.
+//
+// It costs nothing to give it away, because raising the minimum from four to five
+// already paid for the ninth die: a mid fleet used to land a straight in 82% of
+// rounds and now lands one in 59%, which is still less often than before.
+//
+// It lends its NUMBER only. It never scores as attack or shields, or the flagship
+// would be doing three jobs off one roll.
+
+function guideWasSeen(){
+  try { return window.localStorage.getItem(GUIDE_KEY) === "1"; }
+  catch (e) { return false; }
+}
+function rememberGuide(){
+  try { window.localStorage.setItem(GUIDE_KEY, "1"); }
+  catch (e) {}
+}
+
+function newGame(guided){
+  var startingSlots = Math.min(K("maxDice"), Math.max(K("startSlots"), K("startDice")));
+  var useGuide = guided === true || (guided !== false && !guideWasSeen());
+  pending = null;
+  pageCheckpoint = null;
+  animate = {};
+  flagInLine = false;
+  lastTally = null;
+  G = {
+    round: 1,
+    phase: "roll",
+    guide: useGuide,
+    you:  { dice: startingDice(), values: [], slots: startingSlots, energy: 0, damage: 0, rolls: 0,
+            hp: K("startHP"), base: 0,
+            flag: { faces: starterFaces(), face: 0, lvl: 1, token: true, tokenMove: null } },
+    them: { dice: startingDice(), values: [], slots: startingSlots, energy: 0, damage: 0,
+            hp: K("startHP"), base: 0,
+            flag: { faces: starterFaces(), face: 0, lvl: 1, token: true, tokenMove: null } },
+    report: null
+  };
+  sel = {};
+  straightPick = null;
+  readyRoll(G.you);
+  savePageCheckpoint("roll");
+  render();
+}
+
+function copyState(value){ return JSON.parse(JSON.stringify(value)); }
+function savePageCheckpoint(phase){
+  pageCheckpoint = { phase:phase, you:copyState(G.you) };
+}
+function resetPageChoices(){
+  if (!pageCheckpoint || pageCheckpoint.phase !== G.phase) return;
+  G.you = copyState(pageCheckpoint.you);
+  sel = {};
+  straightPick = null;
+  animate = {};
+  lastTally = null;
+  render();
+}
+
+function readyRoll(side){
+  side.values = side.dice.map(function(d){
+    return { sides:d.s, value:0, ship:d, dead:isDamaged(d) };
+  });
+}
+
+function rollAll(side){
+  side.values = side.dice.map(function(d){
+    return { sides: d.s, value: rollFace(d), ship: d, dead: isDamaged(d) };
+  });
+  if (side === G.you){
+    animate = { flag: true };
+    for (var i = 0; i < side.values.length; i++) animate[i] = true;
+  }
+  side.flag.face = Math.floor(Math.random() * 6);
+}
+// The flagship upgrades as a whole ship rather than face by face. Its level IS
+// the number on every face: level 1 pays 2, level 2 pays 3, level 3 pays 4.
+// One number to learn, one thing to buy, and the whole flagship gets better.
+function flagMul(side){ return (side.flag.lvl || 1) + 1; }
+function flagLvlCost(lvl){ return K("flagUp" + lvl); }
+function flagFace(side){ return side.flag.faces[side.flag.face]; }
+function flagNumber(side){ return side.flag.face + 1; }
+// Your roll, plus the flagship if you have sent it into the line.
+function runDice(side){
+  return liveDice(side).concat([{
+    sides: 6,
+    value: flagNumber(side),
+    flag: true,
+    face: flagFace(side)
+  }]);
+}
+function rollFlag(side){ side.flag.face = Math.floor(Math.random() * 6); }
+function useFlagToken(side, direction){
+  if (!side.flag.token || (direction !== -1 && direction !== 1)) return false;
+  var from = flagNumber(side);
+  side.flag.face = (side.flag.face + direction + 6) % 6;
+  side.flag.token = false;
+  side.flag.tokenMove = { round:G.round, from:from, to:flagNumber(side) };
+  return true;
+}
+
+function tokenTallyScore(side, face){
+  var old = side.flag.face;
+  side.flag.face = face;
+  var t = tally(runDice(side), flagFace(side), flagMul(side), null);
+  side.flag.face = old;
+  return t.attack + t.defense * 0.7 + t.direct * 1.8 + t.heal * 0.7 +
+    t.energy * 1.2 + (t.shipPrize ? priceOf(t.shipPrize) : 0);
+}
+
+// The opponent owns the same once-per-match decision. It spends the token only
+// when turning one face produces a meaningful jump, with a lower threshold late
+// in the match when saving it has little value left.
+function useTheirFlagToken(){
+  if (!G.them.flag.token) return;
+  var face = G.them.flag.face;
+  var now = tokenTallyScore(G.them, face);
+  var down = tokenTallyScore(G.them, (face + 5) % 6);
+  var up = tokenTallyScore(G.them, (face + 1) % 6);
+  var best = Math.max(down, up), threshold = G.round >= 8 ? 2 : 6;
+  if (best < now + threshold) return;
+  useFlagToken(G.them, up >= down ? 1 : -1);
+}
+
+function liveDice(side){
+  return side.values.filter(function(v){ return !v.dead; });
+}
+
+// You tap the dice you want to CHANGE, always - whether the roll is free or paid.
+// Three free rolls a round, then 1 Energy per die after that.
+//
+// The decision has teeth because the dice you send back to chase a longer
+// straight are dice whose attack you are gambling: reroll an 8 and a 10 hunting
+// one more number and you have staked 18 attack on it.
+// A damaged ship is not on the board this round, so it can never be picked -
+// which is what stops it being rerolled. Belt and braces: the card
+// carries no data-die either, so there is nothing to tap.
+function pickedDice(){
+  var out = [], i;
+  for (i = 0; i < G.you.values.length; i++)
+    if (sel[i] && !G.you.values[i].dead) out.push(i);
+  return out;
+}
+function doReroll(){
+  if (G.you.rolls === 0){
+    rollAll(G.you);
+    G.you.rolls = 1;
+    sel = {};
+    straightPick = null;
+    return render();
+  }
+  var picked = pickedDice(), free = G.you.rolls < K("rollsPerRound");
+  if (!picked.length && !sel.flag) return toast("Tap the dice you want to reroll");
+  if (!free){
+    var cost = (picked.length + (sel.flag ? 1 : 0)) * K("rerollCost");
+    if (G.you.energy < cost) return toast("That costs " + cost + " Energy");
+    G.you.energy -= cost;
+  } else {
+    G.you.rolls++;
+  }
+  animate = {};
+  picked.forEach(function(i){
+    G.you.values[i].value = roll(G.you.values[i].sides);
+    animate[i] = true;                       // only the dice that actually moved
+  });
+  if (sel.flag){ rollFlag(G.you); animate.flag = true; }
+  sel = {};
+  // A prize chosen for the OLD roll must not silently apply to the new one - you
+  // could pick 5, reroll into 7, and quietly cash the short tier.
+  straightPick = null;
+  render();
+}
+
+// They hold whatever helps their longest straight, then top up on high numbers,
+// and they get the same number of rolls you do.
+function playThem(){
+  rollAll(G.them);
+  for (var r = 1; r < K("rollsPerRound"); r++){
+    var keep = botHolds(G.them.values);
+    for (var i = 0; i < G.them.values.length; i++){
+      if (!keep[i]) G.them.values[i].value = roll(G.them.values[i].sides);
+    }
+  }
+}
+
+// Hold one die of each value inside the most promising window, plus any die
+// already showing a high number.
+function botHolds(vals){
+  var keep = {}, bestWin = null, st, v, i, need;
+  for (st = 1; st <= 10; st++){
+    need = [];
+    for (v = st; v < st + K("runMin") + 2 && v <= 10; v++){
+      for (i = 0; i < vals.length; i++)
+        if (vals[i].value === v && need.indexOf(i) < 0){ need.push(i); break; }
+    }
+    if (!bestWin || need.length > bestWin.length) bestWin = need;
+  }
+  for (i = 0; i < bestWin.length; i++) keep[bestWin[i]] = true;
+  for (i = 0; i < vals.length; i++)
+    if (!keep[i] && vals[i].value > vals[i].sides * 0.7) keep[i] = true;
+  return keep;
+}
+
+function submit(){
+  if (G.you.rolls === 0) return toast("Roll the dice before submitting");
+  playThem();
+  useTheirFlagToken();
+  var youRoll = runDice(G.you), themRoll = runDice(G.them);
+  var you = tally(youRoll, flagFace(G.you), flagMul(G.you), straightPick);
+  var them = tally(themRoll, flagFace(G.them), flagMul(G.them), null);
+
+  var bump = escalation();
+  // Direct is added AFTER shields have done their work, which is the whole point
+  // of it - it is the only damage in the game the other side cannot answer.
+  // Direct is kept SEPARATE from here on. Shields cannot touch it and neither can
+  // a ship thrown in front of it - that is the whole point of the word. Only the
+  // ordinary volley can be braced.
+  var youVolley  = Math.max(0, you.attack  + bump - them.defense);
+  var themVolley = Math.max(0, them.attack + bump - you.defense);
+
+  // Automatic for both sides. Once your base is at the cap the reactor has
+  // nothing left to build, so it runs the surplus off as Energy instead.
+  // The Reactor pays the same number as every other face: 2 at level 1, 3 at
+  // level 2, 4 at level 3. One number for the whole flagship, no exceptions.
+  //
+  // It measured safe for a reason worth knowing: Energy SATURATES. Once you are
+  // buying a ship a round and your eight slots are full, more Energy has nowhere
+  // to go - so doubling the Reactor barely moved how much the face is worth
+  // (51.0% at +1, 50.2% at +2, against a second Attack face). What it does change
+  // is the early game, where Energy is genuinely scarce.
+  if (flagFace(G.you) === "reactor"){
+    if (G.you.base < K("reactorCap")) G.you.base += flagMul(G.you);
+    else you.energy += K("reactorNow");
+  }
+  if (flagFace(G.them) === "reactor"){
+    if (G.them.base < K("reactorCap")) G.them.base += flagMul(G.them);
+    else them.energy += K("reactorNow");
+  }
+
+  if (you.shipPrize && G.you.dice.length < openSlots(G.you)){
+    G.you.dice.push(newShip(you.shipPrize));
+    you.shipBuilt = you.shipPrize;
+  }
+
+  // Everything is settled except where THEIR shot lands. That is yours to decide,
+  // so the round pauses here.
+  pending = { you: you, them: them, youDealt: 0, themDealt: 0,
+              volley: themVolley, direct: them.direct,
+              incoming: themVolley, soaked: 0, fed: [], bump: bump,
+              shipBuilt: you.shipBuilt || 0,
+              youDice: youRoll.slice(), themDice: themRoll.slice(),
+              youVolley: youVolley,
+              youTokenMove: G.you.flag.tokenMove && G.you.flag.tokenMove.round === G.round
+                ? copyState(G.you.flag.tokenMove) : null,
+              themTokenMove: G.them.flag.tokenMove && G.them.flag.tokenMove.round === G.round
+                ? copyState(G.them.flag.tokenMove) : null,
+              youFace: flagFace(G.you), themFace: flagFace(G.them) };
+  if (themVolley > 0 && canSoak(G.you) && K("soakMax") > 0){
+    G.phase = "brace";
+    return render();
+  }
+  settleRound();
+}
+
+// Apply the round once you have decided how to take the hit.
+function settleRound(){
+  var p = pending, you = p.you, them = p.them;
+  // Their brace only touches the volley. Direct is added afterwards and cannot be
+  // stopped by anything.
+  var youVolley = themBrace(p.youVolley);
+  p.themFed = themFed.slice();
+  p.youBlocked = p.youVolley - youVolley;
+  var youDealt  = youVolley + you.direct;
+  var themDealt = Math.max(0, p.volley - p.soaked) + p.direct;
+  p.themDealt = themDealt;
+  p.youDealt  = youDealt;
+  p.youHpBefore = G.you.hp;
+  p.themHpBefore = G.them.hp;
+
+  G.you.hp  += you.heal;
+  G.them.hp += them.heal;
+  G.you.hp  -= themDealt;
+  G.them.hp -= youDealt;
+  G.you.damage  += youDealt;
+  G.them.damage += themDealt;
+  G.you.energy  += you.energy  + G.you.base;
+  G.them.energy += them.energy + G.them.base;
+  p.youHpAfter = G.you.hp;
+  p.themHpAfter = G.them.hp;
+
+  G.report = p;
+  pending = null;
+  G.phase = "report";
+  render();
+}
+
+// ── taking the hit ───────────────────────────────────────────────────────
+// The attacker never chooses a target. The DEFENDER decides where the damage
+// lands, which is what stops the death spiral that killed attacker-chosen
+// targeting: nobody ever picks a trade that is worse for them than the
+// alternative, so the victim always controls their own decline.
+//
+// The defender may commit as many available ships as they want. Each blocks its
+// own size and then misses the next round. The choice is no longer "which single
+// ship is mathematically closest"; it is how much of next round's fleet you are
+// willing to give up to protect the flagship now.
+function wholeShips(side){
+  return side.dice.filter(function(d){ return !isDamaged(d); });
+}
+function canSoak(side){ return wholeShips(side).length > 0; }
+// Damaged for exactly one round. You keep the ship - you just fight the next
+// round without it.
+function soakWith(side, i){
+  var ship = side.dice[i];
+  ship.out = G.round + 1;
+  return soakOf(ship.s);
+}
+// They feed the smallest hull that covers the hit, and only when it matters.
+// Their side braces too, and the player has to be TOLD. Without this, your six
+// points of Direct simply vanish from the report and it reads like a bug - which
+// is exactly how it was reported.
+var themFed = [];
+function themBrace(dmg){
+  var t = G.them, used = 0, i, pick, whole;
+  themFed = [];
+  if (dmg <= 0) return dmg;
+  while (dmg > 0 && used < K("soakMax")){
+    whole = [];
+    for (i = 0; i < t.dice.length; i++) if (!isDamaged(t.dice[i])) whole.push(i);
+    if (!whole.length) break;
+    if (t.hp - dmg > 25) break;                       // not worth a ship yet
+    whole.sort(function(a, b){ return t.dice[a].s - t.dice[b].s; });
+    pick = whole[0];
+    for (i = 0; i < whole.length; i++)
+      if (soakOf(t.dice[whole[i]].s) >= dmg){ pick = whole[i]; break; }
+    themFed.push({ s: t.dice[pick].s, soak: soakOf(t.dice[pick].s) });
+    dmg = Math.max(0, dmg - soakWith(t, pick));
+    used++;
+  }
+  return dmg;
+}
+
+function escalation(){
+  var from = K("escFrom");
+  if (!from || G.round <= from) return 0;
+  return (G.round - from) * K("escPer");
+}
+// The match is over when a flagship is destroyed. There is no round limit any
+// more - measured across 54,000 uncapped matches, not one failed to end, because
+// attack scales with fleet quality while healing per die shrinks as your ships
+// get bigger. The ramp is already in the dice.
+function matchOver(){
+  return G.you.hp <= 0 || G.them.hp <= 0 || G.round >= K("rounds");
+}
+function nextRound(){
+  if (matchOver()){ G.phase = "over"; return render(); }
+  G.round++;
+  G.phase = "shop";
+  // Growth belongs to the round transition, not the shop renderer. Calling it
+  // from shopView meant every purchase and every re-render grew the opponent
+  // again in the same round.
+  themGrow();
+  savePageCheckpoint("shop");
+  render();
+}
+
+function startRound(){
+  if (G.guide && G.round > 1){
+    G.guide = false;
+    rememberGuide();
+  }
+  G.you.rolls = 0;
+  sel = {};
+  straightPick = null;
+  readyRoll(G.you);
+  G.phase = "roll";
+  savePageCheckpoint("roll");
+  render();
+}
+
+
+// ── shop ─────────────────────────────────────────────────────────────────
+function buyDie(sides){
+  var cost = priceOf(sides);
+  if (G.you.dice.length >= openSlots(G.you))
+    return toast(openSlots(G.you) < K("maxDice") ? "Open another slot first" : "No room \u2014 upgrade or scrap a ship");
+  if (G.you.energy < cost) return;
+  G.you.energy -= cost;
+  G.you.dice.push(newShip(sides));
+  toast("d" + sides + " joined your fleet");
+  render();
+}
+function growDie(i){
+  var ship = G.you.dice[i], next, cost;
+  if (!ship) return;
+  if (isDamaged(ship)) return toast("That ship is damaged \u2014 it is back next round");
+  next = nextSize(ship.s);
+  if (!next) return toast("That ship is already a d10");
+  cost = growCost(ship.s);
+  if (G.you.energy < cost) return toast("Upgrading that ship costs " + cost + " Energy");
+  G.you.energy -= cost;
+  ship.s = next;
+  toast("Slot " + (i + 1) + " upgraded into a d" + next);
+  render();
+}
+function unlockSlot(){
+  var next = openSlots(G.you) + 1, cost;
+  if (next > K("maxDice")) return;
+  cost = slotCost(next);
+  if (G.you.energy < cost) return toast("Opening slot " + next + " costs " + cost + " Energy");
+  G.you.energy -= cost;
+  G.you.slots = next;
+  toast("Slot " + next + " is open");
+  render();
+}
+function sellDie(i){
+  if (G.you.dice.length <= 1) return toast("You need at least one ship");
+  if (isDamaged(G.you.dice[i])) return toast("That ship is damaged \u2014 it is back next round");
+  var sides = G.you.dice[i].s;
+  G.you.energy += sellValue(sides);
+  G.you.dice.splice(i, 1);
+  toast("Scrapped a d" + sides + " for " + sellValue(sides) + " Energy");
+  render();
+}
+
+// The opponent grows on a fixed schedule so it keeps pace.
+// They grow on a schedule rather than thinking. botPace is the rate.
+// get: 1 is an even match, lower makes them easier to beat.
+// How often something happens, given a rate per round. A rate of 0.25 fires in one
+// round out of four; a rate of 1.5 fires once every round and twice in half of them.
+function timesPerRound(rate){
+  var n = Math.floor(rate);
+  if (Math.random() < rate - n) n++;
+  return n;
+}
+
+// botPace USED TO BE A COIN FLIP - "Math.random() < pace" - which meant every value
+// at or above 1 was identical, because the gate always passed. The Tune panel
+// offered a dial up to 3 and two thirds of it did nothing, so there was no way to
+// make the opponent harder. It is a RATE now, and it moves in both directions.
+//
+// The rates below are set so that pace 1 reproduces the old schedule exactly - a
+// ship bought on rounds 2, 4 and 6 and one hull grown on 3, 5, 7 and 9 - because
+// that is the schedule every measurement in VERSIONS.md was taken against.
+function themGrow(){
+  var t = G.them, pace = K("botPace"), i, nx, n;
+  if (pace <= 0) return;
+
+  // Levels arrive sooner at a higher pace. At pace 1 that is rounds 4 and 8.
+  if (G.round === Math.max(2, Math.round(4 / pace))) t.flag.lvl = Math.max(t.flag.lvl || 1, 2);
+  if (G.round === Math.max(3, Math.round(8 / pace))) t.flag.lvl = Math.max(t.flag.lvl || 1, 3);
+
+  // 0.25 a round is three ships across a twelve-round match, matching [2, 4, 6].
+  for (n = timesPerRound(0.25 * pace); n > 0; n--){
+    if (t.dice.length >= K("maxDice")) break;
+    if (t.dice.length >= openSlots(t)) t.slots = Math.min(K("maxDice"), openSlots(t) + 1);
+    t.dice.push(newShip(4));
+  }
+  // 0.33 a round is four grown hulls, matching [3, 5, 7, 9].
+  for (n = timesPerRound(0.33 * pace); n > 0; n--){
+    for (i = 0; i < t.dice.length; i++){
+      nx = { 4:6, 6:8, 8:10 }[t.dice[i].s];
+      if (nx){ t.dice[i].s = nx; break; }
+    }
+  }
+}
+
+// ── views ────────────────────────────────────────────────────────────────
+// The hull is the shape: triangle for a d4, square for a d6, diamond for a d8,
+// pentagon for a d10. Once the silhouette carries the size, the little "d4"
+// caption is redundant and comes off - you read the ship at a glance instead of
+// reading a label.
+//
+// Numbers sit at each shape's visual centre, which is not the same as its
+// geometric one. A triangle's mass is low so the digit drops; a pentagon's is
+// slightly high so it lifts.
+// Each hull has its own centre of mass, so the number and the Energy bolts sit
+// where they would actually be printed on that face rather than at the geometric
+// middle. A triangle is widest at the bottom, so its bolts tuck low; a diamond
+// narrows fast, so its number rides higher to leave room beneath.
+//
+// The bolts are large now, which makes the polygon walls the real constraint. A
+// bolt at scale r is 12r tall and about 7r wide, so two of them at boltY need
+// (9r + 7r) of clear width there. The diamond is the tightest — at y 76 it is
+// only 34 units across — so it runs smaller bolts than the others.
+var HULLS = {
+  // Placed by measuring, not by eye. A checker walks every corner of the digit
+  // and every vertex of every mark, and reports its distance to the hull outline
+  // - negative if it has escaped. Nothing sits closer than 3.5 units to an edge.
+  //
+  // Eyeballing this failed three times in a row, because the two hulls that go
+  // wrong are the two that narrow: the triangle toward its apex and its base
+  // corners, and the diamond in both directions at once. The square and the
+  // pentagon have room everywhere and never needed touching.
+  //
+  // The triangle carries the smallest marks in the game (1.10 against the
+  // pentagon's 1.80) and that is simply how much room a triangle has once a
+  // full-size number is in it.
+  4:  { pts:"50,10 93,84 7,84",            textY:63, scale:0.95, boltY:73, boltR:1.10 },
+  6:  { pts:"15,15 85,15 85,85 15,85",     textY:48, scale:0.92, boltY:68, boltR:1.70 },
+  8:  { pts:"50,6 92,50 50,94 8,50",       textY:50, scale:0.95, boltY:62, boltR:1.42 },
+  10: { pts:"50,5 94,38 77,92 23,92 6,38", textY:52, scale:1.00, boltY:72, boltR:1.80 }
+};
+
+// One small lightning glyph, drawn rather than typed, so it scales cleanly and
+// never turns into an emoji on someone's phone.
+var BOLT = "M0,-6 L-3.4,1 L-0.6,1 L-2.4,6 L3.4,-1.4 L0.6,-1.4 Z";
+// A medical cross, drawn at the same 12-unit height as the bolt so the two
+// symbols sit in exactly the same place on the face and read as siblings.
+var CROSS = "M-2,-6 L2,-6 L2,-2 L6,-2 L6,2 L2,2 L2,6 L-2,6 L-2,2 L-6,2 L-6,-2 L-2,-2 Z";
+// Direct: a double chevron. It points, because that is what the damage does - it
+// goes through rather than landing on something.
+var CHEV = "M-4,-6 L1.2,0 L-4,6 L-1.2,6 L4,0 L-1.2,-6 Z";
+
+// One row of symbols, centred, drawn inside the hull below the number. Bolts on
+// a 1 or a 2, crosses on a 3 - never both, so they can share the same slot.
+function marksSvg(count, glyph, colour, y, r, gap, cls){
+  if (!count) return "";
+  var out = "", start = -(gap * (count - 1)) / 2, i;
+  for (i = 0; i < count; i++){
+    out += '<path class="' + cls + '" d="' + glyph + '" fill="' + colour + '" ' +
+      'transform="translate(' + (50 + start + i * gap) + ',' + y + ') scale(' + r + ')"/>';
+  }
+  return out;
+}
+function boltsSvg(count, boltY, r){
+  return marksSvg(count, BOLT, "var(--nrg)", boltY, r, 9 * r, "mk");
+}
+// The cross is 12 units across where the bolt is only 7. Two things ran the
+// three of them together into a solid bar: the bolt's gap was narrower than a
+// cross, and the hull's glow is a 5px drop-shadow, which bled across whatever
+// space was left. So crosses get a smaller scale, a much wider gap, and a
+// tighter shadow of their own (see .hull path.cr).
+// Gap tuned by eye against the glyph: a space about 60% of a cross's width
+// reads as three symbols without drifting apart. 13r was too airy, 9r too tight.
+function crossesSvg(count, y, r){
+  return marksSvg(count, CROSS, "var(--hp)", y, r * 0.52, 10 * r, "cr");
+}
+// The chevrons are PRINTED on every 2 in full violet, always - the same as the
+// yellow bolts on a 1 and a 4, and the green crosses on a 3. A face's picture does
+// not come and go, and it does not fade either.
+//
+// I got this wrong twice: first hiding the mark, then dimming it, both times
+// reasoning that it should not advertise damage that is not landing. It is the
+// wrong worry. The die must read the same every time you look at it, and the
+// signal for "Direct is live this round" belongs on the CARD, not on the ink -
+// which is what the violet border does.
+function chevronsSvg(count, y, r){
+  return marksSvg(count, CHEV, "var(--direct)", y, r * 0.9, 9 * r, "ch");
+}
+
+// The flagship is a die too, so it gets a hull like everything else - a rounded
+// d6 face. Its solid face colour teaches which bonus fired this round, while the
+// gold ring says "flagship." Same number size as the ships, so the grid reads as
+// one family.
+// Which colour a face is boosting. The flagship is painted SOLID in it - not a
+// percentage of it - so it is exactly the red you see on a red ship, the exact
+// green of the crosses, the exact violet of the chevrons.
+//
+// A solid face needs a number you can read on it, and white fails on the light
+// colours: on yellow it measures 1.2:1, which is barely there. So each face
+// carries its own dark ink, tinted toward its own colour rather than plain
+// black. Every one clears 5:1, and yellow clears 13:1.
+var FLAGTINT = {
+  energy2: { fill:"var(--nrg)",    ink:"#211a02" },
+  reactor: { fill:"var(--nrg)",    ink:"#211a02" },
+  repair:  { fill:"var(--hp)",     ink:"#06291b" },
+  direct:  { fill:"var(--direct)", ink:"#1e1233" },
+  defEach: { fill:"var(--blue)",   ink:"#062a47" },
+  atkEach: { fill:"var(--red)",    ink:"#3d0812" }
+};
+function flagTint(id){ return FLAGTINT[id] || { fill:"#f2f5ff", ink:"#101828" }; }
+function flagHullSvg(n, id){
+  var t = flagTint(id);
+  return '<svg class="hull" viewBox="0 0 100 100" aria-hidden="true">' +
+    '<rect x="11" y="11" width="78" height="78" rx="17" fill="' + t.fill + '" ' +
+      'stroke="#f2f5ff" stroke-width="2.6"/>' +
+    '<rect x="19" y="19" width="62" height="62" rx="11" fill="none" ' +
+      'stroke="' + t.ink + '" stroke-opacity="0.22" stroke-width="1"/>' +
+    '<text x="50" y="63" text-anchor="middle" fill="' + t.ink + '" font-size="36.8" font-weight="800" ' +
+      'style="font-variant-numeric:tabular-nums">' + n + '</text>' +
+    '</svg>';
+}
+
+// The legend draws the SAME paths the dice do, at a readable size. If a symbol
+// ever changes, the key changes with it - it cannot go stale.
+function glyph(path, colour, scale){
+  return '<svg class="gly" viewBox="-8 -8 16 16" aria-hidden="true">' +
+    '<path d="' + path + '" fill="' + colour + '" transform="scale(' + (scale || 1) + ')"/></svg>';
+}
+// How to read a die. One row per face, so the 1 and the 2 are visibly separate
+// things - they were crammed into one run before and you could not tell where
+// one ended and the next began.
+function keyRow(face, colour, marks, does){
+  return '<div class="krow">' +
+    '<b style="color:' + colour + '">' + face + '</b>' +
+    '<span class="kmark">' + marks + '</span>' +
+    '<span class="kdoes">' + does + '</span></div>';
+}
+function legendHtml(){
+  return '<h3 class="ktitle">How to read a die</h3>' +
+    '<p class="say">Every ship rolls one face. <span class="red">Even numbers hit</span>, ' +
+    '<span class="blue">odd numbers block</span>. Printed marks do a second job on top, ' +
+    'and every mark always pays.</p>' +
+    '<div class="ktab">' +
+      keyRow("1", "var(--nrg)", glyph(BOLT, "var(--nrg)", 1.05).repeat(K("oneEnergy")),
+        'blocks for <b>1</b>, and pays <b class="nrg">' + K("oneEnergy") + ' Energy</b>') +
+      keyRow("2", "var(--direct)", glyph(CHEV, "var(--direct)", 0.95).repeat(K("twoDirect")),
+        'hits for <b>2</b>, and fires <b class="dir">' + K("twoDirect") + ' Direct</b> \u2014 ' +
+        'unblockable damage to the Enemy flagship, always') +
+      keyRow("3", "var(--hp)", glyph(CROSS, "var(--hp)", 0.78).repeat(Math.min(K("healThree"), 4)),
+        'blocks for <b>3</b>, and <b class="hp">repairs ' + K("healThree") + '</b>') +
+      keyRow("4", "var(--nrg)", glyph(BOLT, "var(--nrg)", 1.05).repeat(K("fourEnergy")),
+        'hits for <b>4</b>, and pays <b class="nrg">' + K("fourEnergy") + ' Energy</b>') +
+      keyRow("5+", "var(--dim)", glyph(CROSS, "var(--hp)", 0.78) +
+        glyph(CHEV, "var(--direct)", 0.95),
+        'upgrading a ship adds escalating repair on 5 / 7 / 9 and Direct on 6 / 8 / 10') +
+    '</div>';
+}
+
+function faceMarksHtml(value){
+  var marks = "";
+  if (energyOf(value)) marks += glyph(BOLT, "var(--nrg)", 0.78).repeat(energyOf(value));
+  if (healOf(value)) marks += glyph(CROSS, "var(--hp)", 0.66).repeat(healOf(value));
+  if (directOf(value)) marks += glyph(CHEV, "var(--direct)", 0.72).repeat(directOf(value));
+  return marks || '<span style="color:var(--slot)">—</span>';
+}
+function faceEffectText(value){
+  var parts = [value % 2 === 0 ? 'hits for ' + value : 'blocks for ' + value];
+  if (energyOf(value)) parts.push('earns ' + energyOf(value) + ' Energy');
+  if (healOf(value)) parts.push('repairs ' + healOf(value));
+  if (directOf(value)) parts.push('fires ' + directOf(value) + ' Direct');
+  return parts.join(' · ');
+}
+function allDiceFacesHtml(){
+  return '<div class="facebooks">' + [4,6,8,10].map(function(sides){
+    var rows = "";
+    for (var value = 1; value <= sides; value++){
+      rows += '<div class="faceentry"><b style="color:' +
+        (value % 2 === 0 ? 'var(--red)' : 'var(--blue)') + '">' + value + '</b>' +
+        '<span class="marks">' + faceMarksHtml(value) + '</span>' +
+        '<span>' + faceEffectText(value) + '</span></div>';
+    }
+    return '<div class="facebook"><h4>d' + sides + ' — faces 1 through ' +
+      sides + '</h4>' + rows + '</div>';
+  }).join("") + '</div>';
+}
+
+function hullSvg(size, value, kind){
+  var h = HULLS[size] || HULLS[6];
+  var col = kind === "attack" ? "var(--red)" : kind === "defense" ? "var(--blue)" : "var(--faint)";
+  return '<svg class="hull" viewBox="0 0 100 100" aria-hidden="true">' +
+    '<polygon points="' + h.pts + '" fill="' + col + '" fill-opacity="0.13" ' +
+      'stroke="' + col + '" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<text x="50" y="' + h.textY + '" text-anchor="middle" fill="' + col + '" ' +
+      'font-size="' + (40 * h.scale) + '" font-weight="800" ' +
+      'style="font-variant-numeric:tabular-nums">' + value + '</text>' +
+    boltsSvg(energyOf(value), h.boltY, h.boltR) +
+    crossesSvg(healOf(value) ? Math.min(healOf(value), 4) : 0, h.boltY, h.boltR) +
+    chevronsSvg(kind !== "dry" ? Math.min(directOf(value), 4) : 0, h.boltY, h.boltR) +
+    '</svg>';
+}
+
+// A thin ring in the flagship's own colour round every die that is feeding it
+// this round. It used to appear for Direct alone, which quietly said the other
+// five faces were doing less - they are not, they multiply just as hard.
+//
+// The tests below must stay a mirror of applyFace: whatever it counts is what
+// gets ringed. A ring round a die that is not paying would be worse than no ring
+// at all. The #1 face is deliberately absent - the Reactor raises your standing
+// income and does not care what any die shows, so there is nothing to point at.
+function feedsFlag(value){
+  if (!G || !G.you) return "";
+  var f = FACES[flagFace(G.you)];
+  if (!f || !f.gives) return "";          // the Reactor matches no die, so no ring
+  return faceMatches(f, value) ? " feeds " + f.ring : "";
+}
+
+function dieHtml(d, i, clickable){
+  if (d.dead){
+    return '<div class="die hurt"><span class="slotno">' + (i + 1) + '</span>' +
+      hullSvg(d.sides, 0, "dry") + '<div class="kind">Damaged</div></div>';
+  }
+  if (G.you.rolls === 0){
+    return '<div class="die ready noPick"><span class="slotno">' + (i + 1) + '</span>' +
+      hullSvg(d.sides, "", "dry") + '<div class="kind">Ready</div></div>';
+  }
+  var k = kindOf(d.value);
+  var cls = k === "attack" ? "r" : "b";
+  var label = k === "attack" ? "Attack" : "Shield";
+  var extra = (d.inrun ? " inrun" : "") + (animate[i] ? " rolled" : "") +
+    feedsFlag(d.value);
+  return '<div class="die ' + cls + (sel[i] ? " sel" : "") + extra + '"' +
+    (clickable ? ' data-die="' + i + '"' : '') + '>' +
+    '<span class="slotno">' + (i + 1) + '</span>' +
+    hullSvg(d.sides, d.value, k) +
+    '<div class="kind">' + label + '</div></div>';
+}
+
+// Nine cells. The flagship holds the middle; the fleet forms up around it.
+// Every slot around the flagship is numbered 1 to 8, filled or empty, so a ship
+// has an address. "The d8 in slot 3" beats "the third one along" the moment two
+// ships are the same size - which is most of the time.
+function gridHtml(){
+  var cells = [], fleet = G.you.values.slice(0, 8), i, ix;
+  for (i = 0; i < 9; i++){
+    if (i === 4){ cells.push(flagHtml()); continue; }
+    ix = i < 4 ? i : i - 1;
+    cells.push(ix < fleet.length
+      ? dieHtml(fleet[ix], ix, G.you.rolls > 0)
+      : '<div class="slot"><span class="slotno">' + (ix + 1) + '</span></div>');
+  }
+  return '<div class="grid">' + cells.join("") + '</div>';
+}
+
+function flagHtml(){
+  var id = flagFace(G.you), p = FACES[id], n = flagNumber(G.you);
+  if (G.you.rolls === 0){
+    return '<div class="die flag ready noPick">' +
+      flagHullSvg("", id) + '<div class="fcap">Ready</div></div>';
+  }
+  return '<div class="die flag' + (sel.flag ? ' sel' : '') +
+    (flagInLine ? ' inrun' : '') +
+    (animate.flag ? ' rolled' : '') + '" data-flag="1">' +
+    flagHullSvg(n, id) +
+    '<div class="fcap" style="color:' + flagTint(id).fill + '">' +
+      (p.shortF ? p.shortF(flagMul(G.you)) : (p.short || p.name)) + '</div>' +
+    '</div>';
+}
+
+// A small reference so the payoffs are never a mystery.
+// How long a line a given biggest ship can head. Its own ships cover 1..N, and
+// the flagship contributes ONE more value on top - so the ceiling is N + 1.
+// Four d4s and a flagship 5 make five in a row at the d4 rate; six in a row is
+// beyond them, because the flagship only has one number to give.
+function reachable(length, biggest){ return length <= biggest + 1; }
+function straightTableHtml(){
+  var sizes = [4,6,8,10], rows = "";
+  var lo = K("runMin");
+  for (var L = lo; L <= lo + 3; L++){
+    rows += '<tr><td>' + L + ' in a row</td>';
+    for (var i = 0; i < sizes.length; i++){
+      if (!reachable(L, sizes[i])){
+        rows += '<td class="na" title="A d' + sizes[i] + ' only rolls 1 to ' + sizes[i] +
+          ', so it cannot make ' + L + ' in a row">\u2014</td>';
+        continue;
+      }
+      var r = straightReward(L, sizes[i]);
+      // The top tier pays a hull AND damage; showing only the hull undersold the
+      // best prize in the game.
+      rows += '<td>' + (r.kind === "energy" ? r.energy + "\u26a1"
+                      : r.kind === "ship" ? "d" + r.ship + " +" + r.attack
+                      : r.attack) + '</td>';
+    }
+    rows += '</tr>';
+  }
+  return '<table class="stab"><tr><th>biggest ship</th>' +
+    sizes.map(function(s){ return '<th>d' + s + '</th>'; }).join("") + '</tr>' + rows +
+    '</table>';
+}
+
+// What this roll is currently worth. It belongs at the top, under the health,
+// because it is the answer to "how am I doing" - and you want that before you
+// start deciding which dice to send back.
+function totalsHtml(t){
+  return '<div class="tot">' +
+    '<div class="a"><div class="n">' + t.attack + '</div><div class="l">Attack</div></div>' +
+    '<div class="d"><div class="n">' + t.defense + '</div><div class="l">Shields</div></div>' +
+    '<div class="e"><div class="n">' + t.energy + '</div><div class="l">Energy</div></div>' +
+    '<div class="h"><div class="n">' + t.heal + '</div><div class="l">Repair</div></div>' +
+    '<div class="dir"><div class="n">' + t.direct + '</div><div class="l">Direct</div></div>' +
+    '</div>';
+}
+
+// The reroll button lives in the middle of the health board. That centre column
+// was carrying a two-word label and nothing else, and this is the button you
+// press most - so it goes where your thumb already is, between the two scores.
+function rerollBtnHtml(){
+  if (G.you.rolls === 0){
+    return '<button class="go mid-btn" id="reroll">Roll 1 of ' +
+      K("rollsPerRound") + '<small>Roll every ready die</small></button>';
+  }
+  var picked = pickedDice().length;
+  var chosen = picked + (sel.flag ? 1 : 0);
+  var payCost = chosen * K("rerollCost");
+  if (G.you.rolls < K("rollsPerRound")){
+    return '<button class="go mid-btn" id="reroll"' + (chosen ? '' : ' disabled') + '>' +
+      'Roll ' + (G.you.rolls + 1) + ' of ' + K("rollsPerRound") +
+      '<small>' + (chosen ? chosen + ' selected' : 'Select dice to reroll') + '</small></button>';
+  }
+  return '<button class="mid-btn" id="reroll"' +
+    (chosen && G.you.energy >= payCost ? '' : ' disabled') + '>' +
+    'Energy reroll' +
+    '<small>' + (payCost || K("rerollCost")) + '\u26a1</small></button>';
+}
+
+// The bottom bar. Two different numbers on this screen were both called Energy -
+// the counter at the top is what this ROLL earns, the bar is what you have BANKED
+// to spend - so the bar now says Banked, and shows where it lands once the round
+// is paid in. Base is the standing income the Reactor builds, which was invisible
+// until now even though it is the only thing on your flagship that lasts.
+function dockMetrics(){
+  var earning = (G.phase === "roll" && lastTally) ? lastTally.energy + G.you.base : 0;
+  return '<div class="big"><div class="n p">' + G.you.energy +
+      (earning ? '<span class="soon">\u2192 ' + (G.you.energy + earning) + '</span>' : '') +
+      '</div><div class="l">Energy bank</div></div>' +
+    '<div><div class="n' + (G.you.base ? ' p' : '') + '">' +
+      (G.you.base ? '+' + G.you.base : '0') + '</div>' +
+      '<div class="l">Base energy<br>per round</div></div>' +
+    '<div><div class="n">' + G.you.dice.length + '/' + openSlots(G.you) +
+      '</div><div class="l">Ships /<br>open slots</div></div>';
+}
+
+// The straight is the biggest thing that can happen in a round and the board was
+// nearly silent about it - four dice picked up an orange underline and that was
+// all. Worse, the RULE that a long straight may be cashed as a shorter one had no
+// control anywhere, so `straightPick` was never set by a human and the report's
+// "cashed as 5" branch was unreachable. This is that missing screen.
+function straightTiers(length){
+  var out = [], L;
+  for (L = K("runMin"); L <= length; L++) out.push(L);
+  return out;
+}
+
+function straightBannerHtml(t){
+  if (!t.run) return "";
+  var r = t.run, tiers = straightTiers(r.length), taken = r.taken || r.length;
+  var h = '<div class="strk"><div class="strkh">' +
+    '<span class="stag">' + r.length + ' in a row</span>' +
+    '<span class="st">' + r.start + ' through ' + r.top +
+      ' \u00b7 biggest ship <b>d' + r.biggest + '</b>' +
+      (flagInLine ? ' \u00b7 flagship in the line' : '') + '</span></div>';
+  if (tiers.length > 1){
+    h += '<div class="choose">Choose your prize</div><div class="picks">' +
+      tiers.slice().reverse().map(function(L){
+        var rw = straightReward(L, r.biggest);
+        var label = rw.label + (rw.ship && G.you.dice.length >= openSlots(G.you)
+          ? ' \u00b7 requires an open slot' : '');
+        return '<button class="pick' + (L === taken ? ' on' : '') + '" data-take="' + L + '">' +
+          '<b>' + L + ' in a row</b><span>' + label + '</span>' +
+          '<i>' + (L === taken ? 'taking' : 'take') + '</i></button>';
+      }).join("") + '</div>';
+  } else {
+    h += '<div class="strkp">Pays <b>' + r.reward.label + '</b></div>';
+  }
+  return h + '</div>';
+}
+
+function guideHtml(stage){
+  if (!G.guide) return "";
+  var copy = {
+    ready: '<b>Start by rolling everything.</b> Ready means this ship will roll. ' +
+      'Damaged ships sit out for one round.',
+    straight: '<b>Build a line, not merely the highest total.</b> A d4 only rolls ' +
+      '1–4, which makes it excellent at covering the low end of a straight. Keep ' +
+      'one of each useful number and reroll duplicates or numbers outside your best line.',
+    token: '<b>This is your final free result.</b> Submit it, buy Energy rerolls, or ' +
+      'spend your once-per-game Flagship Token to turn the flagship one number up or down.',
+    brace: '<b>You control where the volley lands.</b> Every ship you put in the way ' +
+      'protects health now but removes one die from your next round.',
+    report: '<b>Read the two health stories first.</b> They show previous health, ' +
+      'damage, repair and current health. The exact arithmetic stays below.',
+    shop: '<b>Choose a fleet direction.</b> Upgrade ships to become taller, open slots ' +
+      'and buy ships to become wider, or upgrade the flagship so matching dice pay more.'
+  }[stage] || "";
+  return '<div class="coach"><div class="coachhead"><b>Guided first match</b>' +
+    '<button id="guide-skip">Skip guide</button></div><p>' + copy + '</p></div>';
+}
+
+function flagTokenHtml(){
+  if (G.you.rolls < K("rollsPerRound")) return "";
+  var enemyToken = G.them.flag.token ? "ready" : "used";
+  if (!G.you.flag.token){
+    return '<div class="flagtoken spent"><div class="tokencopy"><b>Flagship Token used</b>' +
+      '<small>You used your one turn this match · Enemy token is ' + enemyToken + '.</small>' +
+      '</div></div>';
+  }
+  return '<div class="flagtoken"><div class="tokencopy"><b>Flagship Token · ready</b>' +
+    '<small>Once per match, turn #' + flagNumber(G.you) +
+      ' one number down or up · 1 and 6 wrap · Enemy token is ' + enemyToken + '.</small></div>' +
+    '<div class="turns"><button data-flagturn="-1">−1</button>' +
+      '<button data-flagturn="1">+1</button></div></div>';
+}
+
+function rollView(){
+  if (G.you.rolls === 0){
+    flagInLine = false;
+    lastTally = null;
+    return '<h2>Round ' + G.round + ' ready</h2>' +
+      guideHtml("ready") +
+      '<p class="say">Your available ships and flagship are ready. Press <b>Roll 1 of ' +
+      K("rollsPerRound") + '</b> to roll them all.</p>' +
+      gridHtml() +
+      '<div class="foot"><p class="hint">After the first roll, tap only the dice you ' +
+      'want to roll again.</p></div>';
+  }
+  var live = runDice(G.you);
+  var t = tally(live, flagFace(G.you), flagMul(G.you), straightPick);
+  var vals = live.map(function(d){ return d.value; });
+  lastTally = t;
+  var fn = flagNumber(G.you);
+  flagInLine = !!(t.run && fn >= t.run.start && fn <= t.run.top);
+  if (t.run){
+    for (var v = t.run.start; v <= t.run.top; v++){
+      var ix = vals.indexOf(v);
+      if (ix >= 0) live[ix].inrun = true;
+    }
+  }
+  var rollsLeft = Math.max(0, K("rollsPerRound") - G.you.rolls);
+
+  // Totals first, tucked under the health board, so the running answer to "how
+  // am I doing" is the first thing under the stakes. Then the roll controls, in
+  // the gap that used to be empty - and the dice directly beneath them, which is
+  // what matters: you have to see the grid at the moment the numbers change.
+  // No "Roll 1 of 3" heading - the reroll button already says how many you have
+  // left, and saying it twice is just furniture. Totals, then the controls, then
+  // the dice. Reference material goes to the bottom, where you can find it when
+  // you want it and it is out of the way when you don't.
+  var h = guideHtml(G.you.rolls >= K("rollsPerRound") ? "token" : "straight") +
+    totalsHtml(t) +
+    straightBannerHtml(t) +
+    flagTokenHtml() +
+    gridHtml();
+  var footer = '<div class="foot">' +
+    legendHtml() +
+    '<p class="hint">' + (rollsLeft
+      ? 'Tap the dice you want to change \u2014 they outline in <b>white</b>. Anything you send back gambles its attack.'
+      : 'Free rolls are gone. From here a reroll costs ' + K("rerollCost") +
+        ' Energy a die \u2014 or submit and put the Energy toward a ship.') + '</p></div>';
+
+
+  h += footer;
+
+  return h;
+}
+
+// You have seen the number. Now: does it all land on the flagship, or do you
+// feed it a ship or two and limp into the next round?
+function braceView(){
+  var p = pending, left = Math.max(0, p.incoming - p.soaked);
+  var used = p.fed ? p.fed.length : 0, room = K("soakMax") - used;
+  var total = left + p.direct;
+
+  var h = '<h2>Enemy shot has landed</h2>' +
+    guideHtml("brace") +
+    '<div class="tot three">' +
+      '<div class="a"><div class="n">' + left + '</div><div class="l">Volley</div></div>' +
+      '<div class="dir"><div class="n">' + p.direct + '</div><div class="l">Direct</div></div>' +
+      '<div class="h"><div class="n">' + Math.max(0, G.you.hp + p.you.heal) + '</div>' +
+        '<div class="l">Your flagship</div></div>' +
+    '</div>' +
+    '<p class="say">The <span class="red">volley</span> can be taken on a ship instead. ' +
+    '<b class="dir">Direct</b> cannot be stopped by anything \u2014 it always reaches your flagship.</p>';
+
+  if (p.fed && p.fed.length){
+    h += '<p class="say">' + p.fed.map(function(f){
+      return 'Your <b>d' + f.s + '</b> in slot ' + f.slot + ' took <b>' + f.soak + '</b>';
+    }).join(' \u00b7 ') + '.</p>';
+  }
+
+  if (left > 0 && room > 0 && canSoak(G.you)){
+    h += '<div class="choose">Choose as many ships as you want</div>' +
+      '<p class="hint">Each selected ship blocks damage equal to its size, then it is ' +
+      '<b>damaged</b> for the next round. Protect more health now, or keep more dice ' +
+      'rolling next round.</p>';
+  } else if (left > 0){
+    // Say WHICH limit you have hit. "No ship can take this one" blamed the fleet
+    // even when the real answer was that you had already used your one ship.
+    h += '<p class="hint">' + (room <= 0
+      ? 'That is your ' + (K("soakMax") === 1 ? 'one ship' : K("soakMax") + ' ships') +
+        ' for this round \u2014 the rest lands on the flagship.'
+      : 'Every ship is damaged, so nothing can step in \u2014 this lands on the flagship.') +
+      '</p>';
+  }
+
+  // The same 3x3 the roll screen uses, so the board never changes shape. Empty
+  // empty slots still show, because "slot 5 is empty" is information too.
+  var cells = [], fleet = G.you.dice, i, ix, d, hurt, pick;
+  for (i = 0; i < 9; i++){
+    if (i === 4){
+      cells.push('<div class="die flag brace-flag"><div class="flbl">Flagship</div>' +
+        '<div class="fcap hp">' + Math.max(0, G.you.hp + p.you.heal) + '</div></div>');
+      continue;
+    }
+    ix = i < 4 ? i : i - 1;
+    d = fleet[ix];
+    if (!d){ cells.push('<div class="slot"><span class="slotno">' + (ix+1) + '</span></div>'); continue; }
+    hurt = isDamaged(d);
+    pick = !hurt && left > 0 && room > 0;
+    cells.push('<div class="die' + (hurt ? " hurt" : "") + (pick ? "" : " noPick") + '"' +
+      (pick ? ' data-brace="' + ix + '"' : '') + '>' +
+      '<span class="slotno">' + (ix+1) + '</span>' +
+      hullSvg(d.s, "", hurt ? "dry" : "defense") +
+      '<div class="kind">' + (hurt ? "Damaged" : pick ? "d" + d.s + " \u00b7 blocks " + soakOf(d.s)
+        : "d" + d.s) + '</div></div>');
+  }
+  h += '<div class="grid">' + cells.join("") + '</div>';
+
+  h += '<div class="row"><button id="brace-reset">Reset choices on this page</button>' +
+    '<button class="go" id="brace-done">' +
+    (total > 0
+      ? 'Continue \u2014 flagship takes ' + total
+      : 'Continue \u2014 nothing gets through') +
+    '</button></div>';
+  return h;
+}
+
+// Both rolls, side by side, sorted low to high. Sorting is what makes a straight
+// legible: any value inside the run sits contiguously once sorted, so the whole
+// line can be wrapped in one gold box and read as 3-4-5-6-7 at a glance. Slot
+// order carries no meaning by the time the round is over - the notes below still
+// name the slot for anything that mattered.
+function rollRow(label, dice, run, taken){
+  var sorted = dice.slice().sort(function(a, b){ return a.value - b.value; });
+  var lo = run ? run.start : 1e9, hi = run ? run.top : -1;
+  var pre = [], mid = [], post = [], i, d;
+
+  function chip(d){
+    if (d.flag){
+      var tint = flagTint(d.face);
+      return '<span class="chip fl" style="background:' + tint.fill +
+        ';color:' + tint.ink + '">' + d.value + '</span>';
+    }
+    var k = kindOf(d.value);
+    return '<span class="chip ' + (k === "attack" ? "red" : k === "defense" ? "blue" : "nrg") +
+      '">' + d.value + '</span>';
+  }
+  for (i = 0; i < sorted.length; i++){
+    d = sorted[i];
+    if (d.value < lo) pre.push(chip(d));
+    else if (d.value <= hi) mid.push(chip(d));
+    else post.push(chip(d));
+  }
+
+  var verdict;
+  if (!run){
+    verdict = '<span class="no">no straight</span>';
+  } else if (taken && taken < run.length){
+    verdict = '<b>' + run.length + ' in a row</b> \u2014 cashed as ' + taken +
+      ' for <b>' + run.reward.label + '</b>';
+  } else {
+    verdict = '<b>' + run.length + ' in a row</b> \u2014 <b>' + run.reward.label + '</b>';
+  }
+
+  return '<div class="rr"><div class="rl">' + label + '</div>' +
+    '<div class="chips">' + pre.join("") +
+      (mid.length ? '<span class="runbox">' + mid.join("") + '</span>' : "") +
+      post.join("") + '</div></div>' +
+    '<div class="verd' + (run ? " win" : "") + '">' + verdict + '</div>';
+}
+
+function reportView(){
+  var r = G.report, bump = r.bump || 0;
+
+  // Every line has to add up on screen. Before v67 the total quietly folded in
+  // Direct, so a player reading "attacked with 12, shields blocked 7, so 9 got
+  // through" was looking at arithmetic that was wrong by exactly the Direct.
+  function lr(label, val, cls, kind){
+    return '<div class="lr' + (cls ? " tone-" + cls : "") +
+      (kind ? " " + kind : "") + '"><span>' + label + '</span>' +
+      '<b' + (cls ? ' class="' + cls + '"' : '') + '>' + val + '</b></div>';
+  }
+  function faceTone(id){
+    var gives = FACES[id].gives;
+    if (gives === "attack") return "red";
+    if (gives === "defense") return "blue";
+    if (gives === "heal") return "hp";
+    if (gives === "direct") return "dir";
+    return "nrg";
+  }
+  function faceEffect(id){
+    return '<b class="' + faceTone(id) + '">' + FACES[id].name + '</b>';
+  }
+  function rewardEffect(run){
+    var cls = run.reward.kind === "energy" ? "nrg" : "red";
+    return '<b class="' + cls + '">' + run.reward.label + '</b>';
+  }
+
+  // ── your shot ──
+  var yAtk = r.you.attack + bump;
+  var yStopped = Math.min(yAtk, r.them.defense);
+  var yWasted  = Math.max(0, r.them.defense - yAtk);
+  var yThrough = r.youVolley - (r.youBlocked || 0);
+  var mine = lr("Your fleet attacked", r.you.attack, "red");
+  if (bump) mine += lr("War escalation", "+" + bump, "red");
+  mine += lr("Enemy shields", yStopped ? "−" + yStopped : "0", "blue");
+  if (r.themFed && r.themFed.length){
+    mine += lr("Enemy put " + r.themFed.map(function(f){ return "a d" + f.s; }).join(" and ") +
+      " in the way", "−" + r.youBlocked, "blue");
+  }
+  mine += lr("Through to Enemy flagship", yThrough, "", "sub");
+  mine += lr(r.you.direct ? "Direct — no shield stops it" : "Direct",
+    (r.you.direct ? "+" : "") + r.you.direct, "dir");
+  mine += lr("Damage to Enemy flagship", r.youDealt, "red", "end");
+
+  // ── their shot ──
+  var tAtk = r.them.attack + bump;
+  var tStopped = Math.min(tAtk, r.you.defense);
+  var tWasted  = Math.max(0, r.you.defense - tAtk);
+  var tThrough = Math.max(0, r.volley - r.soaked);
+  var theirs = lr("Enemy fleet attacked", r.them.attack, "red");
+  if (bump) theirs += lr("War escalation", "+" + bump, "red");
+  theirs += lr("Your shields", tStopped ? "−" + tStopped : "0", "blue");
+  if (r.fed && r.fed.length){
+    theirs += lr("You put " + r.fed.map(function(f){
+      return "your d" + f.s + " in slot " + f.slot; }).join(" and ") + " in the way",
+      "−" + Math.min(r.soaked, r.volley), "blue");
+  }
+  theirs += lr("Through to your flagship", tThrough, "", "sub");
+  theirs += lr(r.direct ? "Direct — no shield stops it" : "Direct",
+    (r.direct ? "+" : "") + r.direct, "dir");
+  theirs += lr("Damage to your flagship", r.themDealt, "red", "end");
+
+  // Keep each fleet's explanation inside its own visual story. Before v82 these
+  // notes mixed "you" and "Enemy" back into one neutral card, undoing the side
+  // distinction precisely where the report became hardest to read.
+  var yourNotes = "", enemyNotes = "";
+  if (r.you.run) yourNotes += '<div class="line">Your <b>' + r.you.run.taken +
+    ' in a row</b> paid ' + rewardEffect(r.you.run) + '.</div>';
+  if (r.shipBuilt) yourNotes += '<div class="line">Your straight built a free <b>d' +
+    r.shipBuilt + '</b>.</div>';
+  if (tWasted) yourNotes += '<div class="line"><b class="blue">' + tWasted +
+    ' Shields</b> went to waste — you out-shielded the Enemy shot.</div>';
+  if (r.fed && r.fed.length) yourNotes += '<div class="line">' + r.fed.map(function(f){
+    return 'Your <b>d' + f.s + '</b> in slot ' + f.slot; }).join(" and ") +
+    ' took the hit, so ' + (r.fed.length === 1 ? 'it is' : 'they are') +
+    ' <b>damaged</b> next round — no roll, no scrapping.</div>';
+  yourNotes += '<div class="line">Your flagship fired ' + faceEffect(r.youFace) + '.</div>';
+  if (r.youTokenMove) yourNotes += '<div class="line">You spent your <b>Flagship Token</b> ' +
+    'to turn #' + r.youTokenMove.from + ' to <b>#' + r.youTokenMove.to + '</b>.</div>';
+  yourNotes += '<div class="line">You banked <b class="nrg">' + r.you.energy +
+    ' Energy</b> from low rolls.</div>';
+
+  if (r.them.run) enemyNotes += '<div class="line">Enemy <b>' + r.them.run.taken +
+    ' in a row</b> paid ' + rewardEffect(r.them.run) + '.</div>';
+  if (yWasted) enemyNotes += '<div class="line"><b class="blue">' + yWasted +
+    ' Shields</b> went to waste — Enemy over-defended.</div>';
+  if (r.themFed && r.themFed.length) enemyNotes += '<div class="line">Enemy put ' +
+    r.themFed.map(function(f){ return 'a <b>d' + f.s + '</b>'; }).join(" and ") +
+    ' in the way; ' + (r.themFed.length === 1 ? 'it is' : 'they are') +
+    ' <b>damaged</b> next round.</div>';
+  enemyNotes += '<div class="line">Enemy flagship fired ' + faceEffect(r.themFace) + '.</div>';
+  if (r.themTokenMove) enemyNotes += '<div class="line">Enemy spent its <b>Flagship Token</b> ' +
+    'to turn #' + r.themTokenMove.from + ' to <b>#' + r.themTokenMove.to + '</b>.</div>';
+
+  function healthCard(kind, side, before, after, damage, repair){
+    var previousLabel = G.round === 1 ? "Start" : "Round " + (G.round - 1);
+    var shownBefore = Math.max(0, before), shownAfter = Math.max(0, after);
+    var change = shownAfter - shownBefore;
+    var changeText = change > 0 ? "+" + change : (change < 0 ? "−" + Math.abs(change) : "0");
+    var changeKind = change > 0 ? "up" : (change < 0 ? "down" : "even");
+    return '<div class="healthcard ' + kind + '"><div class="side">' + side + ' flagship</div>' +
+      '<div class="healthline"><div class="healthpoint"><b>' + shownBefore +
+        '</b><small>' + previousLabel + '</small></div>' +
+      '<div class="healtharrow">→</div>' +
+      '<div class="healthpoint"><b>' + shownAfter +
+        '</b><small>Round ' + G.round + '</small></div></div>' +
+      '<div class="healthmoves"><span class="hurt">−' + damage + ' damage</span>' +
+      '<span class="repair">+' + repair + ' repaired</span>' +
+      '<span class="healthnet ' + changeKind + '"><b>' + changeText +
+        '</b><small>Total change</small></span></div></div>';
+  }
+
+  return '<h2>Round ' + G.round + ' result</h2>' +
+    guideHtml("report") +
+    '<div class="report-sides">' +
+      '<section class="reportside you">' +
+        healthCard("you", "Your", r.youHpBefore, r.youHpAfter, r.themDealt, r.you.heal) +
+        '<div class="sideblock rolls">' +
+          rollRow("You", r.youDice, r.you.run, r.you.run && r.you.run.taken) +
+        '</div>' +
+        '<div class="sideblock led"><div class="ledh"><span>Damage to you</span>' +
+          '<b class="red">' + r.themDealt + '</b></div>' + theirs + '</div>' +
+        '<div class="sidenotes">' + yourNotes + '</div>' +
+      '</section>' +
+      '<section class="reportside enemy">' +
+        healthCard("enemy", "Enemy", r.themHpBefore, r.themHpAfter, r.youDealt, r.them.heal) +
+        '<div class="sideblock rolls">' +
+          rollRow("Enemy", r.themDice, r.them.run, r.them.run && r.them.run.taken) +
+        '</div>' +
+        '<div class="sideblock led"><div class="ledh"><span>Damage to Enemy</span>' +
+          '<b class="red">' + r.youDealt + '</b></div>' + mine + '</div>' +
+        '<div class="sidenotes">' + enemyNotes + '</div>' +
+      '</section>' +
+    '</div>' +
+    '<div class="leg reportleg">The die ringed in gold is the flagship \u2014 its color ' +
+      'shows the bonus it fired, and its number joins the line but never fires on its own.</div>';
+}
+
+
+// Upgrade the whole flagship a level. The bonus on every face rises together, so it
+// is one purchase and one number rather than six little decisions.
+function flagUpgradeHtml(){
+  var lvl = G.you.flag.lvl || 1;
+  if (lvl >= 3){
+    return '<div class="card"><div class="rep"><div class="line">' +
+      'Your flagship is at <b style="color:var(--gold)">level 3</b> \u2014 every matching ' +
+      'die gets <b>+4</b>. That is the ceiling.</div></div></div>';
+  }
+  var next = lvl + 1, cost = flagLvlCost(next), broke = G.you.energy < cost;
+  return '<div class="buy"><div class="i"><b>Flagship \u2014 level ' + next + '</b><small>' +
+    'The bonus on every face rises from <b>+' + (lvl + 1) + '</b> to <b>+' + (next + 1) +
+    '</b> \u2014 including the Reactor.</small></div>' +
+    '<button data-flagup="1"' + (broke ? ' disabled' : '') + '>' + cost + '\u26a1</button></div>';
+}
+
+
+// What a hull actually carries. The old shop said a d10 had "4 attack faces,
+// 4 shield" - it was quietly skipping the 1 and the 2, which was true of a rule
+// we dropped long ago. Every face fights: evens hit, odds block, and the 1 and 2
+// pay Energy ON TOP of that. Counted here rather than described, so the shop
+// cannot drift away from the engine again.
+// A heading should say what you can DO here. "Shipyard" is a place; "Buy a new
+// ship" is an action, and the colour says which of the three rooms you are in.
+function shopHead(tone, title, sub){
+  return '<div class="shead ' + tone + '"><h3>' + title + '</h3>' +
+    '<div class="ssub">' + sub + '</div></div>';
+}
+
+// The only thing you can buy for the flagship. There is nothing to choose - one
+// purchase lifts all six faces together - so there is nothing here to get wrong.
+function flagshipSectionHtml(){
+  var lvl = G.you.flag.lvl || 1;
+  return '<div class="card">' +
+    shopHead("gold", "Upgrade your flagship",
+      lvl >= 3 ? "Fully upgraded \u2014 every matching die gets +4"
+               : "One purchase raises the bonus on all six faces") +
+    '<p>Your flagship rolls one of its six faces each round. It adds a <b>bonus</b> ' +
+    'to the ships that match that face — a flagship <b>3</b> adds repair to each ' +
+    'of your 3s, while a flagship <b>6</b> adds attack to every even die. A level ' +
+    'raises that bonus on all six faces at once.</p>' +
+    '<p class="hint">The <b>#1</b> face is the exception: it does not match a die. ' +
+    'It raises your standing Energy instead, and a level raises that too.</p>' +
+    '<div class="lvlbar">' + [1,2,3].map(function(n){
+      return '<div class="lvl' + (n === lvl ? " now" : n < lvl ? " past" : "") + '">' +
+        '<div class="ln">Level ' + n + '</div>' +
+        '<div class="lp">each matching die<br>gets <b>+' + (n + 1) + '</b></div></div>';
+    }).join("") + '</div>' +
+    '<div class="faceref">' + [1,2,3,4,5,6].map(flagFaceReferenceHtml).join("") + '</div>' +
+    flagUpgradeHtml() + '</div>';
+}
+
+function flagFaceDetail(n, m){
+  return n === 1 ? 'Raise base Energy by ' + m
+    : n === 2 ? 'Each ship showing 2 gets +' + m + ' Direct'
+    : n === 3 ? 'Each ship showing 3 repairs +' + m
+    : n === 4 ? 'Each ship showing 4 earns +' + m + ' Energy'
+    : n === 5 ? 'Each odd ship blocks +' + m
+    : 'Each even ship attacks +' + m;
+}
+function flagFaceReferenceHtml(n){
+  var m = flagMul(G.you), p = FACES[G.you.flag.faces[n-1]], detail = flagFaceDetail(n, m);
+  return '<div class="fref"><b>' + n + '</b><span><strong>' + p.name +
+    '</strong><small>' + detail + '</small></span></div>';
+}
+function allFlagshipFacesHtml(){
+  var faces = starterFaces(), m = flagMul(G.you);
+  return '<div class="flagfaces">' + faces.map(function(id, i){
+    var n = i + 1;
+    return '<div class="flagface">' + flagHullSvg(n, id) +
+      '<strong>#' + n + ' · ' + FACES[id].name + '</strong>' +
+      '<small>' + flagFaceDetail(n, m) + '</small></div>';
+  }).join("") + '</div>';
+}
+
+function hullFacts(sides){
+  var f = { hit:0, block:0, energy:0, repair:0, direct:0 }, v;
+  for (v = 1; v <= sides; v++){
+    if (v % 2 === 0) f.hit++; else f.block++;
+    if (energyOf(v)) f.energy++;
+    if (healOf(v))   f.repair++;
+    if (directOf(v)) f.direct++;
+  }
+  return f;
+}
+function growthMarksHtml(sides){
+  if (sides < 6) return 'the four low marks only';
+  var topOdd = sides - 1, repair = healOf(topOdd), direct = directOf(sides);
+  return 'new top faces: <b class="hp">' + topOdd + ' repairs ' + repair +
+    '</b> · <b class="dir">' + sides + ' fires ' + direct + ' Direct</b>';
+}
+
+// A ship you are thinking of buying should look like the ship you will get, so
+// this is the same hull the board draws. Reading a row of text and then finding
+// a shape on the grid was two different languages for one object.
+function buyCardHtml(sides){
+  var cost = priceOf(sides), f = hullFacts(sides);
+  var full = G.you.dice.length >= openSlots(G.you);
+  var can = !full && G.you.energy >= cost;
+  return '<div class="ship' + (can ? " can" : " cant") + '">' +
+    hullSvg(sides, "", can ? "attack" : "dry") +
+    '<div class="sname">d' + sides + '</div>' +
+    '<div class="sfaces"><b class="red">' + f.hit + '</b> hit · ' +
+      '<b class="blue">' + f.block + '</b> block</div>' +
+    '<div class="sfaces avg">averages <b>' + ((sides + 1) / 2).toFixed(1) + '</b> a roll</div>' +
+    '<div class="sline">straights pay at the <b>d' + sides + '</b> tier</div>' +
+    '<div class="sline">' + growthMarksHtml(sides) + '</div>' +
+    '<button class="sbuy" data-buysize="' + sides + '"' + (can ? '' : ' disabled') + '>' +
+      '<b>' + cost + '⚡</b>' +
+      (full ? '<i>' + (openSlots(G.you) < K("maxDice") ? 'open a slot first' : 'no slot free') +
+        '</i>' : '') +
+    '</button></div>';
+}
+
+// The scrapyard is your own board, not a list. Same 3x3, same hulls, same slot
+// numbers - so "scrap the d4 in slot 2" is a thing you can see rather than
+// something you have to translate.
+function fleetGridHtml(){
+  var cells = [], i, ix, d, hurt, next, cost;
+  for (i = 0; i < 9; i++){
+    if (i === 4){
+      cells.push('<div class="die flag shopflag"><div class="flbl">Flagship</div>' +
+        '<div class="fcap hp">' + Math.max(0, G.you.hp) + '</div>' +
+        '<div class="chg">level ' + (G.you.flag.lvl || 1) + '</div></div>');
+      continue;
+    }
+    ix = i < 4 ? i : i - 1;
+    if (ix >= openSlots(G.you)){
+      cells.push('<div class="slot locked"><span class="slotno">' + (ix + 1) + '</span>' +
+        '<span class="free">locked</span></div>');
+      continue;
+    }
+    d = G.you.dice[ix];
+    if (!d){
+      cells.push('<div class="slot"><span class="slotno">' + (ix + 1) + '</span>' +
+        '<span class="free">slot free</span></div>');
+      continue;
+    }
+    hurt = isDamaged(d);
+    next = nextSize(d.s);
+    cost = growCost(d.s);
+    cells.push('<div class="die noPick' + (hurt ? " hurt" : "") + '">' +
+      '<span class="slotno">' + (ix + 1) + '</span>' +
+      (next ? '<div class="shipacts top"><button class="growb" data-grow="' + ix + '"' +
+        (hurt || G.you.energy < cost ? ' disabled' : '') + '>' +
+        (hurt ? 'Damaged' : 'Upgrade to d' + next + ' · ' + cost + '⚡') + '</button></div>' : '') +
+      hullSvg(d.s, "", hurt ? "dry" : "defense") +
+      '<div class="kind">d' + d.s + '</div>' +
+      '<div class="shipacts">' +
+        '<button class="scrapb" data-sell="' + ix + '"' +
+          (hurt || G.you.dice.length <= 1 ? ' disabled' : '') + '>' +
+          (hurt ? 'Damaged' : 'Scrap · ' + sellValue(d.s) + '⚡') + '</button>' +
+      '</div></div>');
+  }
+  return '<div class="grid">' + cells.join("") + '</div>';
+}
+
+function slotSectionHtml(){
+  var open = openSlots(G.you), next = open + 1;
+  if (open >= K("maxDice")){
+    return '<div class="card">' +
+      shopHead("blue", "Open another fleet slot", "All " + K("maxDice") + " slots are open") +
+      '<p>Your formation is at full width. Spend Energy upgrading the ships already in it.</p></div>';
+  }
+  var cost = slotCost(next), can = G.you.energy >= cost;
+  return '<div class="card">' +
+    shopHead("blue", "Open another fleet slot", open + " of " + K("maxDice") + " slots open") +
+    '<p>Width is permanent: once a slot is open, any ship in it rolls every round. ' +
+    'Opening it does not include a ship.</p>' +
+    '<div class="slotoffer"><div class="i"><b>Open slot ' + next + '</b>' +
+      '<small>Then buy any ship to fill it.</small></div>' +
+      '<button data-unlock="1"' + (can ? '' : ' disabled') + '>' + cost + '⚡' +
+      '</button></div></div>';
+}
+
+function shopView(){
+  var full = G.you.dice.length >= openSlots(G.you);
+  var filled = G.you.dice.length, cap = openSlots(G.you);
+  var theirBig = Math.max.apply(null, G.them.dice.map(function(d){ return d.s; }));
+
+  return '<h2>Between rounds</h2>' +
+    guideHtml("shop") +
+
+    '<div class="tot three purse">' +
+      '<div class="e"><div class="n">' + G.you.energy + '</div><div class="l">Energy to spend</div></div>' +
+      '<div><div class="n">' + filled + '/' + cap + '</div><div class="l">Ships / open slots</div></div>' +
+      '<div><div class="n">' + G.them.dice.length + ' ships</div>' +
+        '<div class="l">Enemy fleet · largest d' + theirBig + '</div></div>' +
+    '</div>' +
+    '<p class="say">Every price is listed on the <b class="nrg">Upgrade costs</b> page.</p>' +
+
+    '<div class="card">' +
+    shopHead("gold", "Upgrade the ships you own",
+      'Upgrade one step: d4 → d6 → d8 → d10') +
+    '<p>Upgrading keeps the same slot and costs <b>' + growCost(4) + '⚡, then ' +
+    growCost(6) + '⚡, then ' + growCost(8) + '⚡</b> at today’s prices. ' +
+    'Or scrap for ' + K("sellBack") + '% if you truly want the slot empty. A damaged ship must wait.</p>' +
+    fleetGridHtml() + '</div>' +
+
+    slotSectionHtml() +
+
+    '<div class="card">' +
+    shopHead("blue", "Buy a new ship",
+      full ? (cap < K("maxDice") ? 'Every open slot is full — open another or upgrade'
+                                  : 'Every slot is full — upgrade or scrap instead')
+           : (cap - filled) + ' of ' + cap + ' slots still free') +
+    '<p>A new ship makes you wider; upgrading a ship makes you taller. Wider fleets roll ' +
+    'more dice and cover more numbers. Taller fleets hit harder and lift straight prizes.</p>' +
+    '<div class="samefaces">Every ship begins with the same low marks — ' +
+      glyph(BOLT, "var(--nrg)", 0.6) + '<b class="nrg">1</b> ' +
+      glyph(CHEV, "var(--direct)", 0.62) + '<b class="dir">2</b> ' +
+      glyph(CROSS, "var(--hp)", 0.55) + '<b class="hp">3</b> ' +
+      glyph(BOLT, "var(--nrg)", 0.6) + '<b class="nrg">4</b>' +
+      '. Upgrades then add escalating marks: <b class="hp">5 / 7 / 9 repair 1 / 2 / 3</b>, ' +
+      'and <b class="dir">6 / 8 / 10 fire 1 / 2 / 3 Direct</b>.</div>' +
+    '<div class="ships">' + [4,6,8,10].map(buyCardHtml).join("") + '</div></div>' +
+
+    flagshipSectionHtml();
+}
+// ── the two reference screens ────────────────────────────────────────────────
+// Energy was the one number on the board with no explanation anywhere. You could
+// watch it climb for six rounds without ever learning that a single point of it,
+// spent at the right moment, is what turns four-in-a-row into five.
+function costsView(){
+  function row(what, price, why){
+    return '<div class="cr"><div class="cw">' + what + '</div>' +
+      '<div class="cp">' + price + '</div>' +
+      '<div class="cy">' + why + '</div></div>';
+  }
+  var e = G.you.energy;
+
+  return '<h2>Upgrade costs</h2>' +
+    '<p class="say">You have <b class="nrg">' + e + ' Energy</b>' +
+    (G.you.base ? ' and <b class="nrg">+' + G.you.base + '</b> comes in each round' : '') +
+    '.</p>' +
+    '<div class="jumpnav" aria-label="Jump to an upgrade option">' +
+      '<button data-jump="cost-buy">Buy ships</button>' +
+      '<button data-jump="cost-upgrade">Upgrade ships</button>' +
+      '<button data-jump="cost-slots">Open slots</button>' +
+      '<button data-jump="cost-flagship">Flagship</button>' +
+      '<button data-jump="cost-rerolls">Rerolls</button>' +
+      '<button data-jump="cost-energy">Earn Energy</button>' +
+    '</div>' +
+
+    '<div class="card jumpmark" id="cost-buy">' +
+    shopHead("blue", "Buy ships", "Between rounds") +
+    '<div class="ctab">' +
+      [4,6,8,10].map(function(sd){
+        return row('A <b>d' + sd + '</b>',
+          priceOf(sd) + '⚡',
+          'Averages ' + ((sd + 1) / 2).toFixed(1) + ' a roll, hits on ' + (sd / 2) +
+          ' faces and blocks on ' + (sd / 2) + ', and lifts a straight to the d' + sd + ' tier.');
+      }).join("") +
+    '</div>' +
+    '<p class="hint">You have ' + (openSlots(G.you) - G.you.dice.length) + ' of ' + openSlots(G.you) +
+    ' open slots free.</p></div>' +
+
+    '<div class="card jumpmark" id="cost-upgrade">' +
+    shopHead("gold", "Upgrade ships in place", "Between rounds, without losing the ship") +
+    '<div class="ctab">' +
+      row('<b>d4 → d6</b>', growCost(4) + '⚡', 'Adds 1 repair on the 5 and 1 Direct on the 6.') +
+      row('<b>d6 → d8</b>', growCost(6) + '⚡', 'Adds 2 repair on the 7 and 2 Direct on the 8.') +
+      row('<b>d8 → d10</b>', growCost(8) + '⚡', 'Adds 3 repair on the 9 and 3 Direct on the 10. The ceiling.') +
+    '</div></div>' +
+
+    '<div class="card jumpmark" id="cost-slots">' +
+    shopHead("blue", "Fleet slots", "Permanent width; the ship is bought separately") +
+    '<div class="ctab">' +
+      [5,6,7,8].map(function(n){
+        var open = n <= openSlots(G.you);
+        return row('<b>Slot ' + n + '</b>' + (open ? ' <span class="ok">open</span>' : ''),
+          slotCost(n) + '⚡', open ? 'Already part of your formation.'
+          : 'Open the slot, then buy any ship to fill it.');
+      }).join("") +
+    '</div></div>' +
+
+    '<div class="card jumpmark" id="cost-flagship">' +
+    shopHead("gold", "Flagship levels", "Raises the bonus on all six faces") +
+    '<div class="ctab">' +
+      row('<b>Level 2</b> — each matching die gets <b>+3</b>', K("flagUp2") + '⚡',
+          'The face decides what matches: exact numbers on 2 / 3 / 4, every odd die ' +
+          'on 5, and every even die on 6. One purchase raises all six faces.') +
+      row('<b>Level 3</b> — each matching die gets <b>+4</b>', K("flagUp3") + '⚡',
+          'The ceiling. Nothing on the flagship goes higher.') +
+    '</div>' +
+    '<p class="hint">You are on <b style="color:var(--gold)">level ' +
+    (G.you.flag.lvl || 1) + '</b>, so each matching die gets <b>+' + flagMul(G.you) +
+    '</b>.</p></div>' +
+
+    '<div class="card jumpmark" id="cost-rerolls">' +
+    shopHead("nrg", "Extra rerolls", "Spent during a round, not after") +
+    '<div class="ctab">' +
+      row('One more roll of a die, past your ' + K("rollsPerRound") + ' free ones',
+          K("rerollCost") + '⚡ each',
+          'The only thing Energy buys mid-round. Whatever you send back gambles the ' +
+          'attack it was already showing.') +
+    '</div></div>' +
+
+    '<div class="card jumpmark" id="cost-energy">' +
+    shopHead("nrg", "Where it comes from", "Every round, without asking") +
+    '<div class="ctab">' +
+      row('Every <b>1</b> you roll', '+' + K("oneEnergy") + '⚡', 'The best low roll on any die.') +
+      row('Every <b>4</b> you roll', '+' + K("fourEnergy") + '⚡', 'And it still hits for 4.') +
+      row('Your standing income', '+' + G.you.base + '⚡ a round',
+          'The flagship\'s <b>#1</b> face raises this for the rest of the match.') +
+      row('A straight of ' + K("runMin"), 'Energy',
+          'That tier pays Energy instead of damage — see How to play.') +
+    '</div></div>' +
+
+    '<div class="card"><div class="rep"><div class="line">' +
+    '<b>Wide or tall?</b> Opening a slot and buying its ship gives you another die every ' +
+    'round. Upgrading an existing ship gives up that width for a stronger die now. Flagship ' +
+    'levels are the third claim on the same Energy. The best answer should change with the ' +
+    'fleet you are building.</div></div></div>' +
+
+    '<div class="row"><button class="go" id="back">Back to the game</button></div>';
+}
+function helpView(){
+  return '<h2>How to play</h2>' +
+    '<p class="say">Every die is a ship. Your <b style="color:var(--gold)">flagship</b> ' +
+    'sits in the middle with <b class="hp">' + K("startHP") + '</b> health, and the ' +
+    'match ends the moment one flagship is destroyed. There is no round limit — ' +
+    'most matches run 8 to 17.</p>' +
+
+    '<div class="card">' +
+    shopHead("gold", "Guided first match", "Learn each decision when it appears") +
+    '<p>Guided tips explain rolling, straights, damage and upgrades on the screen ' +
+    'where you make that decision. They teach the game without changing the dice.</p>' +
+    '<button id="guide-start"' + (G.guide ? ' disabled' : '') + '>' +
+      (G.guide ? 'Guided tips are on' : 'Show guided tips in this match') +
+    '</button></div>' +
+
+    '<div class="card">' +
+    shopHead("blue", "A round, start to finish", "Four steps, always the same") +
+    '<div class="rep">' +
+      '<div class="line"><b>1 · Roll.</b> The round opens with every available die ' +
+      '<b>Ready</b>. Roll 1 rolls everything. Before rolls 2 and 3, tap only the ship ' +
+      'dice or flagship you want to roll again. After the final free roll, either ' +
+      'submit, buy another reroll, or use your Flagship Token.</div>' +
+      '<div class="line"><b>2 · Submit.</b> Both fleets fire at once. Your attack meets ' +
+      'Enemy shields; Enemy attack meets yours. Whatever is left over lands on a flagship.</div>' +
+      '<div class="line"><b>3 · Take the hit.</b> You choose where Enemy damage goes — ' +
+      'all on your flagship, or put as many ships as you want in front of it. Every ship ' +
+      'you choose will miss the next round.</div>' +
+      '<div class="line"><b>4 · Spend.</b> Between rounds you upgrade ships, open slots, buy ' +
+      'new ships or upgrade the flagship. ' +
+      'Then it starts again.</div>' +
+    '</div></div>' +
+
+    '<div class="card">' + shopHead("red", "How to read a die", "One rule, then printed marks") +
+    legendHtml().replace('<h3 class="ktitle">How to read a die</h3>', '') + '</div>' +
+
+    '<div class="card">' +
+    shopHead("red", "Every face on every die", "The complete ship reference") +
+    '<p>The number always fights: even hits, odd blocks. The symbols beside it pay ' +
+    'an extra effect at the same time.</p>' +
+    allDiceFacesHtml() + '</div>' +
+
+    '<div class="card">' +
+    shopHead("gold", "Your flagship", "Six faces, one per number") +
+    '<p>It rolls like any other die, but it never fights. Its number joins your ' +
+    'straight, and whichever face it lands on <b>adds a bonus to the matching ships</b> — ' +
+    '2, 3 and 4 match that exact number; 5 boosts every odd shield and 6 boosts every even ' +
+    'attack. ' +
+    'Those dice get a thin ring in the flagship\'s colour so you can see it happening. ' +
+    'The <b>#1</b> face is the exception: it raises your standing Energy for the rest ' +
+    'of the match, so it rings nothing.</p>' +
+    '<p><b>Both fleets receive one Flagship Token per match.</b> After the final free ' +
+    'roll, spend it to rotate the flagship one number up or down. The ends wrap: ' +
+    '#1 can turn down to #6, and #6 can turn up to #1.</p>' +
+    allFlagshipFacesHtml() + '</div>' +
+
+    '<div class="card">' +
+    shopHead("blue", "Straights", "The reason to reroll") +
+    '<p>' + K("runMin") + ' or more numbers in a row across your whole fleet — and your ' +
+    'flagship\'s number counts toward the line. <b>Length</b> decides what kind of prize ' +
+    'you get; the <b>biggest ship</b> in the line decides how large it is. You may ' +
+    'always cash a long straight as a shorter one if you would rather have the Energy ' +
+    'than the hit.</p>' + straightTableHtml() + '</div>' +
+
+    '<div class="card">' +
+    shopHead("red", "Taking damage", "The defender always chooses") +
+    '<p>When the Enemy volley gets through you may put <b>as many available ships as you ' +
+    'want</b> in front of it. Each blocks damage equal to its own size — a d10 blocks ' +
+    '10 — and is then <b>damaged</b> for the next round. Every ship you use is one less ' +
+    'die you will roll next round. It returns the round after that.</p>' +
+    '<p><b class="dir">Direct</b> is the exception. A <b>2</b> fires ' +
+    K("twoDirect") + ' Direct, and upgrading ships add more chevrons on 6 / 8 / 10. ' +
+    'Nothing stops Direct — not shields, not a ship thrown ' +
+    'in the way. It always reaches the flagship.</p></div>' +
+
+    '<div class="card">' +
+    shopHead("gold", "Winning", "And the long game") +
+    '<p>Destroy the Enemy flagship. If both fall in the same round, the heavier final volley ' +
+    'wins; if those are level, damage across the whole match breaks the tie.</p>' +
+    '<p><b>War escalation is the long-game timer.</b> It begins after round ' +
+    K("escFrom") + ': both fleets add <b class="red">+' + K("escPer") +
+    ' attack in round ' + (K("escFrom") + 1) + '</b>, <b class="red">+' +
+    (K("escPer") * 2) + ' in round ' + (K("escFrom") + 2) + '</b>, and another +' +
+    K("escPer") + ' each round after that. It does not change your dice or Direct; it ' +
+    'only makes ordinary volleys hit harder so a defensive match cannot stall forever.</p>' +
+    '</div>' +
+
+    '<div class="row"><button class="go" id="back">Back to the game</button></div>';
+}
+
+function tuneView(){
+  var rows = Object.keys(C).map(function(k){
+    var c = C[k];
+    return '<div class="tune">' +
+      '<div class="i"><b>' + c.label + '</b>' +
+      (c.note ? '<small>' + c.note + '</small>' : '') + '</div>' +
+      '<input type="number" data-set="' + k + '" value="' + c.v + '" ' +
+      'min="' + c.min + '" max="' + c.max + '" step="' + (c.step || 1) + '"></div>';
+  }).join("");
+  return '<h2>Tune the game</h2>' +
+    '<p class="say">Change anything, then start a fresh match to feel it. ' +
+    'These are the numbers worth arguing about \u2014 nothing here is settled.</p>' +
+    '<div class="card">' + rows + '</div>' +
+    '<div class="row"><button class="go" id="restart">Start a fresh match</button>' +
+    '<button id="back">Back to the game</button>' +
+    '<button id="reset">Reset to defaults</button></div>';
+}
+
+// Everyone fires at once across the galaxy, so both flagships going up in the
+// same volley is not an edge case - measured at 18.9% of matches, near enough
+// one in five. It needs a real answer rather than a shrug.
+//
+// The cascade, in order:
+//   1. the heavier final volley - decided by the round you just watched, and it
+//      lets someone steal it with one enormous last salvo
+//   2. most damage across the whole match - level only 4.7% of the time after
+//      step one, so this almost always settles it
+//   3. a true mutual destruction - which lands in about 1 match in 5,000
+function winner(){
+  var mine = G.you.hp, yours = G.them.hp, r = G.report || {};
+  if (mine > 0 && yours > 0)
+    return { who: mine > yours ? "you" : mine < yours ? "them" : "draw", why: "health" };
+  if (yours <= 0 && mine > 0) return { who: "you",  why: "kill" };
+  if (mine <= 0 && yours > 0) return { who: "them", why: "kill" };
+  if ((r.youDealt || 0) !== (r.themDealt || 0))
+    return { who: r.youDealt > r.themDealt ? "you" : "them", why: "volley" };
+  if (G.you.damage !== G.them.damage)
+    return { who: G.you.damage > G.them.damage ? "you" : "them", why: "total" };
+  return { who: "draw", why: "mutual" };
+}
+
+function overView(){
+  var yours = Math.max(0, G.you.hp), theirs = Math.max(0, G.them.hp);
+  var v = winner(), r = G.report || {}, headline, sub;
+  var won = v.who === "you";
+
+  if (v.why === "kill"){
+    headline = won ? "Enemy flagship is destroyed" : "Your flagship is destroyed";
+    var rd = G.round + (G.round === 1 ? " round" : " rounds");
+    sub = won ? "You won it in " + rd + "." : "Enemy finished it in " + rd + ".";
+  } else if (v.why === "volley"){
+    headline = won ? "You win the exchange" : "You lose the exchange";
+    sub = "Both flagships went up in round " + G.round +
+      ". The heavier final volley takes it — <b>" + (r.youDealt || 0) + "</b> against <b>" +
+      (r.themDealt || 0) + "</b>.";
+  } else if (v.why === "total"){
+    headline = won ? "You win on the record" : "You lose on the record";
+    sub = "Both flagships destroyed, and the last volleys were level. " +
+      "Damage across the whole match decides it.";
+  } else if (v.why === "mutual"){
+    headline = "Mutual destruction";
+    sub = "Both flagships gone, the final volleys level, and neither of you " +
+      "dealt a point more than the other across " + G.round + " rounds. Nobody wins this one.";
+  } else {
+    headline = v.who === "draw" ? "Dead heat" : won ? "You win on health" : "You lose on health";
+    sub = "Neither flagship fell inside " + K("rounds") + " rounds.";
+  }
+  return '<div class="card center">' +
+    '<h3>' + headline + '</h3>' +
+    '<div style="font-size:46px;font-weight:800;margin:10px 0" class="hp">' + yours + ' – ' + theirs + '</div>' +
+    '<p>' + sub + '</p>' +
+    '<p class="say">You dealt <b>' + G.you.damage + '</b> damage across the match; Enemy dealt <b>' +
+      G.them.damage + '</b>.</p>' +
+    '<button class="go" id="again">Play again</button></div>';
+}
+
+function render(){
+  var body = G.phase === "tune" ? tuneView()
+           : G.phase === "costs" ? costsView()
+           : G.phase === "help" ? helpView()
+           : G.phase === "brace" ? braceView()
+           : G.phase === "roll" ? rollView()
+           : G.phase === "report" ? reportView()
+           : G.phase === "shop" ? shopView() : overView();
+  var label = G.phase === "brace" ? ""
+            : G.phase === "roll" ? "Submit round"
+            : G.phase === "report" ? (matchOver() ? "See result" : "Continue")
+            : G.phase === "shop" ? "Go to round " + G.round : "";
+
+  document.getElementById("app").innerHTML =
+    '<div class="wrap"><header><h1>Fleet Dice <button class="ver" id="tune">v' + VERSION + '</button></h1>' +
+    '<span><button class="tiny nrg" id="costs">Upgrade costs</button> ' +
+    '<span class="pill">' + (G.phase === "over" ? "Finished" : "Round " + G.round) + '</span></span></header>' +
+    '<div class="board"><div class="score you-score"><div class="who">You</div>' +
+    '<div class="val hp">' + Math.max(0, G.you.hp) + '</div></div>' +
+    (G.phase === "roll" ? rerollBtnHtml() : '<div class="mid">FLAGSHIP<br>HEALTH</div>') +
+    '<div class="score enemy-score r"><div class="who">Enemy</div><div class="val hp">' +
+      Math.max(0, G.them.hp) + '</div></div></div>' +
+    body + '</div>' +
+    (G.phase === "over" || G.phase === "tune" || G.phase === "costs" ||
+      G.phase === "help" || G.phase === "brace" ? "" :
+      '<div class="dock"><div class="dockin"><div class="met">' + dockMetrics() +
+      '</div><button class="tiny howto" id="help">How<br>to play</button>' +
+      (G.phase === "shop" || (G.phase === "roll" && G.you.rolls > 0)
+        ? '<button class="tiny resetpage" id="page-reset">Reset choices<br>on this page</button>' : '') +
+      '<button class="go" id="next"' +
+        (G.phase === "roll" && G.you.rolls === 0 ? ' disabled' : '') +
+        '>' + label + '</button></div></div>');
+
+  wire();
+  animate = {};        // consumed - a tap re-renders without replaying it
+}
+
+function wire(){
+  var n = document.getElementById("next");
+  if (n) n.onclick = function(){
+    if (G.phase === "roll") submit();
+    else if (G.phase === "report") nextRound();
+    else if (G.phase === "shop") startRound();
+  };
+  Array.prototype.forEach.call(document.querySelectorAll("[data-take]"), function(el){
+    el.onclick = function(){
+      straightPick = +el.getAttribute("data-take");
+      render();
+    };
+  });
+  var rr = document.getElementById("reroll");
+  if (rr) rr.onclick = doReroll;
+  var pr = document.getElementById("page-reset");
+  if (pr) pr.onclick = resetPageChoices;
+  var ag = document.getElementById("again");
+  if (ag) ag.onclick = function(){ newGame(false); };
+  var gs = document.getElementById("guide-skip");
+  if (gs) gs.onclick = function(){
+    G.guide = false;
+    rememberGuide();
+    render();
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-flagturn]"), function(el){
+    el.onclick = function(){
+      if (G.phase !== "roll" || G.you.rolls < K("rollsPerRound")) return;
+      if (!useFlagToken(G.you, +el.getAttribute("data-flagturn"))) return;
+      sel.flag = false;
+      straightPick = null;
+      animate = { flag:true };
+      render();
+    };
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-brace]"), function(el){
+    el.onclick = function(){
+      var i = +el.getAttribute("data-brace");
+      feedShip(i);
+    };
+  });
+  function feedShip(i){
+    var d = G.you.dice[i], previousOut = d.out, soak = soakWith(G.you, i);
+    pending.fed = pending.fed || [];
+    pending.fed.push({ s: d.s, slot: i + 1, soak: soak, previousOut: previousOut });
+    pending.soaked += soak;
+    render();
+  }
+  var br = document.getElementById("brace-reset");
+  if (br) br.onclick = function(){
+    (pending.fed || []).forEach(function(f){
+      if (G.you.dice[f.slot - 1]) G.you.dice[f.slot - 1].out = f.previousOut || 0;
+    });
+    pending.fed = [];
+    pending.soaked = 0;
+    render();
+  };
+  var bd = document.getElementById("brace-done");  if (bd) bd.onclick = settleRound;
+
+  var fu = document.querySelector("[data-flagup]");
+  if (fu) fu.onclick = function(){
+    var lvl = G.you.flag.lvl || 1, cost = flagLvlCost(lvl + 1);
+    if (lvl >= 3 || G.you.energy < cost) return;
+    G.you.energy -= cost;
+    G.you.flag.lvl = lvl + 1;
+    toast("Flagship upgraded \u2014 each matching die now gets +" + flagMul(G.you));
+    render();
+  };
+
+  function returnFromReference(){
+    var resume = G.resume || "roll";
+    delete G.resume;
+    G.phase = resume;
+    render();
+  }
+  function openReference(phase){
+    if (G.phase === phase) return returnFromReference();
+    if (G.phase !== "costs" && G.phase !== "help" && G.phase !== "tune")
+      G.resume = G.phase;
+    G.phase = phase;
+    render();
+  }
+  var cs = document.getElementById("costs");
+  if (cs) cs.onclick = function(){ openReference("costs"); };
+  var hp = document.getElementById("help");
+  if (hp) hp.onclick = function(){ openReference("help"); };
+  var tn = document.getElementById("tune");
+  if (tn) tn.onclick = function(){
+    if (G.phase === "tune") return returnFromReference();
+    openReference("tune");
+  };
+  var bk = document.getElementById("back");
+  if (bk) bk.onclick = returnFromReference;
+  var gst = document.getElementById("guide-start");
+  if (gst) gst.onclick = function(){
+    G.guide = true;
+    returnFromReference();
+  };
+  Array.prototype.forEach.call(document.querySelectorAll("[data-jump]"), function(el){
+    el.onclick = function(){
+      var target = document.getElementById(el.getAttribute("data-jump"));
+      if (target && target.scrollIntoView) target.scrollIntoView({ behavior:"smooth", block:"start" });
+    };
+  });
+  var rs = document.getElementById("restart");
+  if (rs) rs.onclick = function(){ newGame(false); };
+  var rd = document.getElementById("reset");
+  if (rd) rd.onclick = function(){
+    Object.keys(C).forEach(function(k){ C[k].v = DEFAULTS[k]; });
+    newGame(false);
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-set]"), function(el){
+    el.onchange = function(){
+      var k = el.getAttribute("data-set"), c = C[k];
+      var v = parseFloat(el.value);
+      if (isNaN(v)) v = c.v;
+      C[k].v = Math.max(c.min, Math.min(c.max, v));
+      render();
+    };
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-die]"), function(el){
+    el.onclick = function(){
+      var i = el.getAttribute("data-die");
+      sel[i] = !sel[i];
+      render();
+    };
+  });
+  var fl = document.querySelector("[data-flag]");
+  if (fl) fl.onclick = function(){
+    sel.flag = !sel.flag;
+    render();
+  };
+  Array.prototype.forEach.call(document.querySelectorAll("[data-buysize]"), function(el){
+    el.onclick = function(){ buyDie(+el.getAttribute("data-buysize")); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-grow]"), function(el){
+    el.onclick = function(){ growDie(+el.getAttribute("data-grow")); };
+  });
+  var us = document.querySelector("[data-unlock]");
+  if (us) us.onclick = unlockSlot;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-sell]"), function(el){
+    el.onclick = function(){ sellDie(+el.getAttribute("data-sell")); };
+  });
+}
+
+function toast(msg){
+  var old = document.querySelector(".toast");
+  if (old) old.remove();
+  var el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2200);
+}
+
+newGame();
+</script>
+</body>
+</html>

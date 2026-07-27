@@ -1,0 +1,72 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { absoluteAppUrl } from "@/lib/paths";
+
+export function InvitePanel({
+  matchId,
+  code,
+}: {
+  matchId: string;
+  code: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const url = useMemo(
+    () => absoluteAppUrl(`/join/?id=${encodeURIComponent(matchId)}`),
+    [matchId],
+  );
+  const message = `Join my Fleet Dice match. Game code ${code}: ${url}`;
+
+  async function copyInvite() {
+    await navigator.clipboard.writeText(message);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }
+
+  async function shareInvite() {
+    if (navigator.share) {
+      await navigator.share({
+        title: "Fleet Dice match",
+        text: `Join my Fleet Dice match. Game code ${code}.`,
+        url,
+      });
+      return;
+    }
+    await copyInvite();
+  }
+
+  return (
+    <section className="invite-panel">
+      <div className="signal" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
+      <p className="eyebrow">PRIVATE ROOM OPEN</p>
+      <h1>Waiting for the Enemy.</h1>
+      <p>Send either the link or these four numbers. The match starts when they arrive.</p>
+      <div className="room-code" aria-label={`Game code ${code}`}>
+        {code.split("").map((number, index) => (
+          <span key={`${number}-${index}`}>{number}</span>
+        ))}
+      </div>
+      <div className="invite-actions">
+        <button className="action-button red-action" onClick={shareInvite}>
+          Share invite
+        </button>
+        <button className="action-button outline-action" onClick={copyInvite}>
+          {copied ? "Copied" : "Copy link + code"}
+        </button>
+        <a
+          className="action-button outline-action"
+          href={`sms:?&body=${encodeURIComponent(message)}`}
+        >
+          Text invite
+        </a>
+      </div>
+      <p className="waiting-note">
+        Keep this page open. Your battlefield will appear automatically.
+      </p>
+    </section>
+  );
+}
