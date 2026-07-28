@@ -23,9 +23,20 @@ export const metadata: Metadata = {
   },
   description:
     "Build a fleet of dice, chase straights, and break the enemy flagship.",
+  applicationName: "Fleet Dice",
+  themeColor: "#080c18",
+  appleWebApp: {
+    capable: true,
+    title: "Fleet Dice",
+    statusBarStyle: "black-translucent",
+  },
   icons: {
-    icon: `${basePath}/favicon.svg`,
+    icon: [
+      { url: `${basePath}/favicon.svg`, type: "image/svg+xml" },
+      { url: `${basePath}/icon-192.png`, sizes: "192x192", type: "image/png" },
+    ],
     shortcut: `${basePath}/favicon.svg`,
+    apple: [{ url: `${basePath}/apple-touch-icon.png`, sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "Fleet Dice",
