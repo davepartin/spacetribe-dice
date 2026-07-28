@@ -1323,7 +1323,7 @@ input:focus {
 
 .fleet-board {
   display: grid;
-  grid-template-columns: minmax(52px, 0.9fr) minmax(58px, 0.95fr) minmax(110px, 1.45fr) minmax(52px, 0.9fr);
+  grid-template-columns: minmax(48px, 0.85fr) minmax(52px, 0.9fr) minmax(44px, 0.75fr) minmax(100px, 1.35fr) minmax(48px, 0.85fr);
   align-items: center;
   gap: 0;
   margin-bottom: 10px;
@@ -1372,7 +1372,6 @@ input:focus {
 
 .fleet-score.energy-score {
   border-left: 1px solid var(--line);
-  border-right: 1px solid var(--line);
 }
 
 .fleet-score.energy-score .who {
@@ -1389,6 +1388,20 @@ input:focus {
   color: var(--faint);
   font-size: 11px;
   font-weight: 700;
+}
+
+.fleet-score.base-score {
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+
+.fleet-score.base-score .who {
+  color: color-mix(in srgb, var(--energy) 55%, var(--faint));
+}
+
+.fleet-score.base-score .val {
+  color: var(--energy);
+  font-size: 19px;
 }
 
 .fleet-score.enemy-score {
@@ -2190,7 +2203,16 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
 .brace-flag {
   cursor: default;
-  gap: 4px;
+  gap: 6px;
+}
+
+.fleet-die.static.brace-flag,
+.fleet-die.brace-flagship {
+  min-height: 148px;
+  padding: 8px 6px 7px;
+  box-shadow: none;
+  border-color: color-mix(in srgb, var(--repair) 40%, var(--line));
+  background: color-mix(in srgb, var(--repair) 8%, #121c30);
 }
 
 .brace-header {
@@ -2220,13 +2242,14 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
 .brace-flag-label {
   color: var(--faint);
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 850;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .brace-flag-hp {
+  color: var(--repair);
   font-size: 34px;
   line-height: 1;
   font-variant-numeric: tabular-nums;

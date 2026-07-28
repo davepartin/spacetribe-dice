@@ -259,6 +259,10 @@ function HealthBoard({
           {earning > 0 ? <span className="soon">→{you.energy + earning}</span> : null}
         </div>
       </div>
+      <div className="fleet-score base-score">
+        <div className="who">Base</div>
+        <div className="val">{you.baseEnergy}</div>
+      </div>
       {mid ?? (
         <div className="fleet-mid">
           FLAGSHIP
@@ -275,12 +279,10 @@ function HealthBoard({
 }
 
 function MatchDock({
-  metrics,
   onHelp,
   primary,
   onCancel,
 }: {
-  metrics: ReactNode;
   onHelp: () => void;
   primary?: ReactNode;
   onCancel?: () => void;
@@ -288,7 +290,6 @@ function MatchDock({
   return (
     <div className="match-dock">
       <div className="match-dock-in">
-        <div className="match-met">{metrics}</div>
         {primary}
       </div>
       <div className="match-dock-links">
@@ -304,21 +305,6 @@ function MatchDock({
         )}
       </div>
     </div>
-  );
-}
-
-function playerMetrics(you: PlayerState, _enemy: PlayerState) {
-  return (
-    <>
-      <div>
-        <div className="n">{you.baseEnergy}</div>
-        <div className="l">Base /<br />round</div>
-      </div>
-      <div>
-        <div className="n">{you.ships.length}/{you.slots}</div>
-        <div className="l">Ships /<br />slots</div>
-      </div>
-    </>
   );
 }
 
@@ -401,7 +387,6 @@ function MatchStage({
         <p>Your dice stay hidden until both fleets submit.</p>
       </section>
       <MatchDock
-        metrics={playerMetrics(you, enemy)}
         onCancel={onCancel}
         onHelp={onHelp}
       />
@@ -542,7 +527,6 @@ function Shipyard({
         </section>
       </section>
       <MatchDock
-        metrics={playerMetrics(you, enemy)}
         onCancel={onCancel}
         onHelp={onHelp}
         primary={
@@ -735,7 +719,6 @@ function RollFleet({
         ) : null}
       </section>
       <MatchDock
-        metrics={playerMetrics(you, enemy)}
         onCancel={onCancel}
         onHelp={onHelp}
         primary={
@@ -858,8 +841,8 @@ function BraceFleet({
           ships={you.ships}
           slots={you.slots}
           renderFlag={() => (
-            <div className="fleet-die flag brace-flag static">
-              <div className="brace-flag-label">Flagship</div>
+            <div className="fleet-die brace-flag brace-flagship static">
+              <div className="brace-flag-label">Flagship Health</div>
               <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
               <span className="brace-flag-risk">
                 {flagshipDamage > 0 ? `Takes ${flagshipDamage}` : "Safe"}
@@ -901,7 +884,6 @@ function BraceFleet({
         />
       </section>
       <MatchDock
-        metrics={playerMetrics(you, enemy)}
         onCancel={onCancel}
         onHelp={onHelp}
         primary={
@@ -923,8 +905,8 @@ function BraceFleet({
               type="button"
             >
               {flagshipDamage > 0
-                ? `Continue — flagship takes ${flagshipDamage}`
-                : "Continue — flagship is safe"}
+                ? `Continue — Flagship takes ${flagshipDamage} Dmg`
+                : "Continue — Flagship is safe"}
             </button>
           </div>
         }
@@ -1037,7 +1019,6 @@ function RoundResult({
       </section>
       {!finished ? (
         <MatchDock
-          metrics={playerMetrics(you, enemy)}
           onCancel={onCancel}
           onHelp={onHelp}
           primary={
