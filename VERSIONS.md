@@ -36,12 +36,37 @@ The three most useful settings for the current game:
   matches end too abruptly; raise it if defensive matches still drag.
 - **How fast they grow** — 1 is the present baseline. Drop it to 0.5 if the
   opponent is running away while other numbers are still being tuned.
+- **Enemy plan** — 0 picks Width / Capital / Command at random each match. Set
+  1, 2 or 3 to force one plan while you feel it.
 
 ---
 
 ## Versions
 
-### 83 — rolls stay put (current)
+### 84 — Enemy has a plan (current)
+
+Solo Enemy no longer follows one invisible growth schedule. At the start of each
+match it picks **Width**, **Capital**, or **Command**, and spends its growth
+actions that way for the whole game.
+
+| Plan | What you read | What it does |
+| --- | --- | --- |
+| **Width** | going wide | Opens slots and adds ships first; upgrades the smallest later |
+| **Capital** | building capital | Buys less often (d6s after the fifth ship); upgrades the biggest |
+| **Command** | flagship command | Takes flagship levels earlier; then grows a mixed fleet |
+
+The plan is visible on the shipyard (`Enemy · going wide · largest d8`), repeated
+in the round report and on a kill-screen line, and named in How to play. Tune
+setting **Enemy plan** forces one while testing: `0` random, `1` Width, `2`
+Capital, `3` Command.
+
+`botPace` is still the overall speed dial. The three plans keep roughly the same
+action budget as the old pace-1 schedule; they aim it differently so a loss can
+feel like “they outgrew me wide” instead of “the timer bought ships.”
+
+Versus is unchanged — a human opponent already has a real plan.
+
+### 83 — rolls stay put
 
 **Reset choices on this page** no longer appears on the rolling screen. A roll is
 a committed move: once the dice have been rolled, you cannot undo that roll (or

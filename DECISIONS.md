@@ -82,8 +82,8 @@ stance.
 
 ## What is still thin
 
-- The opponent remains a transparent growth schedule, not a player whose plan can
-  be read or disrupted.
+- The opponent picks Width, Capital, or Command each match. That is readable now;
+  it is still a scripted plan, not a mind that reacts to your shop.
 - Scrapping may now be so rare that it is mostly an escape hatch.
 - Flagship-first became competitive after its prices fell to 10 and 16, but the
   sample is still too small to call that path solved.

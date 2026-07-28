@@ -3,8 +3,9 @@ const src=fs.readFileSync(new URL("simple.html", import.meta.url),"utf8");
 const dom=new JSDOM(src,{runScripts:"dangerously",pretendToBeVisual:true});
 await new Promise(r=>setTimeout(r,200));
 const w=dom.window;
-// what the opponent's fleet looks like after 12 rounds, at each pace
-console.log("Opponent's fleet after 12 rounds, 400 runs each:\n");
+// Force Width so the pace dial is measured against one plan, not a random mix.
+w.C.enemyPlan.v = 1;
+console.log("Opponent Width plan after 12 rounds, 400 runs each:\n");
 const rows=[];
 for(const pace of [0.5,0.75,1,1.5,2,3]){
   w.C.botPace.v=pace;

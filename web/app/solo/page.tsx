@@ -17,7 +17,7 @@ export default function SoloPage() {
       </div>
       <iframe
         className="solo-game"
-        src={withBasePath("/fleet-dice-v83.html")}
+        src={withBasePath("/fleet-dice-v84.html")}
         title="Fleet Dice solo game"
         allow="fullscreen"
       />
