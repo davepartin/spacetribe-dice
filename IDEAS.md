@@ -1,10 +1,174 @@
-# Five ideas — after a full review of v77
+# Five ideas — after a full review of v83
 
-> **v82 status:** ideas 1 (upgrade ships in place), 2 (escalating marks on new
-> faces), and 3 (buy fleet slots) are now built and under playtest. The analysis
-> below is preserved because it explains why those changes were chosen; its
-> “current game” numbers describe v77, not v82. v82 also adds the guided first
-> match and the once-per-game Flagship Token for both fleets.
+Dave, I went through the rules, the screens, the audits, and fresh measurements
+against `simple.html` as it stands today. The big story from the v77 review is
+over: the shop is no longer solved. What replaces it is quieter, and more useful.
+
+The old v77 write-up is preserved at the bottom — it explains why upgrades,
+escalating marks, and paid slots got built. Its “current game” numbers describe
+v77, not v83.
+
+---
+
+## The finding that matters: the opening is contested; the endgame still loves width
+
+Eighty full matches per plan against the pace-1 opponent, both sides using the
+Flagship Token the same way:
+
+| Plan | Wins | Avg rounds | Ships | Total sides |
+| --- | ---: | ---: | ---: | ---: |
+| **Fill slots with d4s, then upgrade the smallest** | **56%** | 13.6 | 5.6 | 48.9 |
+| Build toward six ships, then upgrade | **53%** | 13.4 | 5.2 | 47.6 |
+| Fifth d6, then upgrade the largest | **49%** | 13.2 | 4.6 | 43.6 |
+| Only buy width, never upgrade | 38% | 14.1 | 7.9 | 31.6 |
+| Flagship levels first, then balanced | **28%** | 13.5 | 4.5 | 40.9 |
+
+Three plans sit inside seven points. That is the opposite of v77’s 100% / 7%
+spread. **You can fill-then-upgrade, go balanced, or lean capital, and the bot
+does not punish you for picking wrong.** Pure width that never upgrades falls
+behind. Flagship-first is the weak path right now.
+
+Always-upgrade-biggest versus always-upgrade-smallest, same opening to six
+ships, fifty matches each: **48% vs 46%**. So “always finish the biggest ship”
+is not secretly the answer. That decision in the shipyard is real.
+
+What is *not* fixed is finished-fleet math when both sides stop shopping:
+
+| Fight (frozen fleets, 60 matches) | Left wins |
+| --- | ---: |
+| 8 × d4 vs 4 × d10 | **95%** |
+| 8 × d4 vs 6 × d6 | **97%** |
+| 8 × d4 vs 4 × d8 + 2 × d4 | 47% |
+| 4 × d6 + 2 × d8 vs 8 × d4 | 45% |
+
+**Skinny capital fleets still lose to a full swarm.** Mixed fleets that keep
+some width fight even. The escalating marks did their job — a grown d8 / d10 is
+worth owning — but a board of eight small dice is still the strongest *finished*
+shape at equal money.
+
+That is the next balance question, not “is there one opening?” The opening is
+healthy. The endgame still tips toward the widest legal fleet.
+
+What eight ships of one size produce a round (three rolls, hold logic, 4,000
+rounds each) still matches the HANDOFF table: d6 remains the straight king at
+~63%, and Direct / repair now rise with size instead of collapsing.
+
+---
+
+## 1. Soften pure-width’s finished advantage without undoing the opening
+
+Do **not** re-solve the shop by making d4s bad again. The fill-then-grow opening
+is working. What you want is: eight d4s that never grew should feel finished and
+fragile, not finished and dominant.
+
+Three ways, in the order I trust them:
+
+- **Make late Direct and repair lean on upgraded faces more than low faces.**
+  The ladder already does some of this (d10 Direct 7.55 vs d4 Direct 2.82). A
+  gentle nudge — slightly less Direct on the 2, slightly more on 8 / 10 — would
+  push players to grow without taxing the opening.
+- **Give surplus shields a job** (the Wall from `DIRECTIONS.md`). Formation’s
+  raw attack is mediocre; if unused defence became Charge or Counterfire, a
+  grown fleet that blocks hard would finally punish a swarm’s soft volleys.
+- **Do not raise slot prices again on a hunch.** Slots already cost 7 / 8 / 9 /
+  10. The policies that buy them and then upgrade are the ones winning.
+
+I would measure a small Direct ladder tweak first. It is one Tune-panel afternoon
+and it targets the exact column that made the old swarm unfair.
+
+## 2. Rescue flagship-first, or admit it is a trap
+
+At **28%** it is the only plan that looks broken rather than merely behind.
+Either the level prices (10 then 16) still cost too much for what the rings pay
+in a real match, or the bot’s growth schedule simply outruns a player who skips
+ships for two purchases.
+
+Two clean tests:
+
+- Drop the second level to 14 and re-run the five policies.
+- Or leave the prices and change the teaching: the guide / Upgrade Costs page
+  should not present flagship levels as a peer of “buy a ship” if the maths say
+  they are a garnish.
+
+I would rather the path be *viable but specialised* than politely recommended
+and secretly bad.
+
+## 3. Make the Flagship Token rarer in practice
+
+Both fleets spend it in almost every match under the current bot rule (~0.94
+spends per match). A once-per-game button that fires every game is a free
+reroll with extra steps, not a story.
+
+Tighten the spend threshold, or teach humans to hold it for a straight / war
+escalation turn. The measurement that matters is not “does the token change win
+rate by 4 points” — samples that size are noise — it is “do humans remember they
+have it, and do they regret spending it early?” Family play is the test; the
+bot is currently too eager to model that.
+
+## 4. Give Enemy a readable plan
+
+`DECISIONS.md` still calls this thin, and it is right. Solo Enemy grows on a
+schedule (`themGrow`). You cannot bluff it, starve it, or bait a bad shop. Versus
+already has the real opponent; solo’s next jump in *feel* is an Enemy that looks
+like it wants width, capital, or command — even a three-plan weighted picker
+would make brace and shop reads mean something.
+
+This is separate from balance. The 38–56% band can stay. What changes is whether
+losing feels like “they outplayed my formation” instead of “the timer grew.”
+
+## 5. Ship the shareable round (still the best unbuilt idea from v77)
+
+Idea 5 from the v77 review is still open, and versus makes it more valuable, not
+less. A round report that copies as one image — both fleets, the orange straight
+bar, the ledger, the health cards — turns a play-by-day match into something you
+send. The report screen is already honest and colour-split; it wants a button,
+not a redesign.
+
+Closest cousin for versus clarity: the guided first match is still solo-only.
+Porting even the roll + straight tips into online would catch the exact failure
+Dave hit on the phone — forgetting that straights are the engine while learning
+the symbols.
+
+---
+
+## What the review checked and did not change
+
+**Audits.** `test-dead-code.py` is clean. `test-vocabulary.py` is clean enough —
+`sell` only survives as the internal `data-sell` / `sellValue` scrap wiring, not
+as player-facing copy. `test-dead-css.py` still flags `.tone-red` and friends;
+those classes *are* applied from JavaScript (`tone-` + colour), so the audit is
+a false positive, not dead style.
+
+**Screens.** How to play, the straight banner, Ready → Roll 1, brace multi-ship,
+report health cards, and Upgrade Costs all still hang together. HANDOFF’s 24 rule
+claims still match the engine. v83’s “no reset on the roll page” holds.
+
+**Versus gaps (not bugs, just parity debt).** Guided tips are solo-only. Scrap
+is solo-only on purpose. Rules live in `web/lib/game.ts` and need to stay lined
+up when solo numbers move.
+
+**No rule numbers were changed in this review.** The measurements above are the
+argument; the Tune panel is still yours.
+
+---
+
+## Decision-density check (v83)
+
+A normal round still asks for: one shipyard commitment, several keep/reroll
+taps, an occasional straight-tier pick, one Flagship Token across the match, and
+sometimes a painful brace. That target from `DECISIONS.md` still holds. The thin
+spots are Enemy personality, flagship-first value, and whether eight unfinished
+d4s should remain a complete plan.
+
+---
+
+# Archive — five ideas after a full review of v77
+
+> **Status after v82/v83:** ideas 1 (upgrade ships in place), 2 (escalating marks
+> on new faces), and 3 (buy fleet slots) are built. Idea 4 became the Flagship
+> Token. Idea 5 (shareable round) is still open — see above. The analysis below
+> is preserved because it explains why those changes were chosen; its “current
+> game” numbers describe v77, not v83.
 
 Dave, I went through every screen, every process, pulled out the dead code, and
 ran playtests. Most of it was tidying. But the playtests turned up something that

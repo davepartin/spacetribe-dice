@@ -1,4 +1,4 @@
-# Every decision a player makes — v82
+# Every decision a player makes — v83
 
 This list is deliberately strict. A button is not a decision unless two sensible
 players could choose differently in the same situation.
@@ -10,10 +10,10 @@ These now compete for the same Energy. An upgrade improves a die already rolling
 width adds another roll forever but requires both a slot and a ship; the flagship
 raises the value of matching results across the fleet.
 
-**Which ship upgrades? — Strong, if the face ladder holds up.** Upgrading a d4 cheaply
-adds 5 and 6, upgrading a d8 completes the powerful 9 and 10 marks, and a mixed
-fleet covers straights differently from a uniform fleet. Human play must confirm
-that “always finish the biggest ship” is not secretly the answer.
+**Which ship upgrades? — Strong.** Upgrading a d4 cheaply adds 5 and 6,
+upgrading a d8 completes the powerful 9 and 10 marks, and a mixed fleet covers
+straights differently from a uniform fleet. Always-biggest versus always-smallest
+measured 48% vs 46% — not a solved heuristic.
 
 **Which new ship do I buy? — Good.** A d4 is cheap and rich in low marked faces.
 A d6 is the best straight ship. A d8 or d10 rolls higher and carries stronger
@@ -68,9 +68,9 @@ the same volley as one valuable large ship. Direct bypasses this choice.
 ## Across the match
 
 **Wide formation, tall capital fleet, flagship command, or a hybrid? — Promising,
-not yet proven.** The latest v82 policies landed from 34% to 46% against the bot
-instead of the old dominant policy's 100%. That is enough to justify playtesting,
-not enough to declare four balanced archetypes.
+with a hole.** The v83 80-match pass landed fill-then-upgrade / balanced /
+capital at 56% / 53% / 49%. Flagship-first fell to 28%. Three fleet identities
+are real enough to play; command is not, until its prices or teaching change.
 
 **Straight coverage or raw output? — Strong.** A d6 fleet covers 1–6 most tightly.
 Larger ships hit and block harder and own the strongest upper marks. Mixed fleets
@@ -85,10 +85,13 @@ stance.
 - The opponent remains a transparent growth schedule, not a player whose plan can
   be read or disrupted.
 - Scrapping may now be so rare that it is mostly an escape hatch.
-- Flagship-first became competitive after its prices fell to 10 and 16, but the
-  sample is still too small to call that path solved.
-- The escalating upper marks make capital fleets viable, but may make d10s too
-  universal. This needs live play, not more confident prose.
+- Flagship-first is weak at 28% in the v83 sample — prices or teaching need a
+  look before this path is offered as equal.
+- Pure width still dominates skinny finished capital fleets in frozen fights;
+  mixed fleets are fine. Softening that endgame without re-solving the opening
+  is the open balance question (see `IDEAS.md`).
+- The Flagship Token fires in almost every bot match. Human regret, not bot win
+  rate, is the real test of whether it is once-per-game or every-game.
 
 ## Decision-density target
 
