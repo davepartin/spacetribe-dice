@@ -7,6 +7,7 @@ import { Brand } from "./Brand";
 import { LiveBattlesBoard } from "./LiveBattlesBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
 import {
+  clearActiveMatch,
   enterLiveMatch,
   joinLiveMatchByCode,
   rememberedActiveMatch,
@@ -21,12 +22,39 @@ export function HomeScreen() {
   const [name, setName] = useState("");
   const [joining, setJoining] = useState(false);
   const [resuming, setResuming] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [error, setError] = useState("");
   const [savedMatchId, setSavedMatchId] = useState<string | null>(null);
 
   useEffect(() => {
-    setSavedMatchId(rememberedActiveMatch());
     setName(commanderName() === "Commander" ? "" : commanderName());
+    let cancelled = false;
+    async function loadSavedMatch() {
+      const id = rememberedActiveMatch();
+      if (!id) {
+        if (!cancelled) setSavedMatchId(null);
+        return;
+      }
+      try {
+        const match = await enterLiveMatch(id);
+        if (cancelled) return;
+        if (match.state.status === "finished") {
+          clearActiveMatch(id);
+          setSavedMatchId(null);
+          return;
+        }
+        setSavedMatchId(id);
+      } catch {
+        if (!cancelled) {
+          clearActiveMatch(id);
+          setSavedMatchId(null);
+        }
+      }
+    }
+    void loadSavedMatch();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function resumeMatch() {
@@ -35,12 +63,27 @@ export function HomeScreen() {
     setError("");
     try {
       const match = await enterLiveMatch(savedMatchId);
+      if (match.state.status === "finished") {
+        clearActiveMatch(savedMatchId);
+        setSavedMatchId(null);
+        setError("That match is already over. Start a new one when you’re ready.");
+        setResuming(false);
+        return;
+      }
       router.push(`/match/?id=${encodeURIComponent(match.id)}`);
     } catch (reason) {
       setSavedMatchId(null);
       setError(reason instanceof Error ? reason.message : "That saved room did not open.");
       setResuming(false);
     }
+  }
+
+  function quitSavedMatch() {
+    if (!savedMatchId) return;
+    setClearing(true);
+    clearActiveMatch(savedMatchId);
+    setSavedMatchId(null);
+    setClearing(false);
   }
 
   async function joinByCode(event: React.FormEvent) {
@@ -100,14 +143,24 @@ export function HomeScreen() {
             <p className="card-kicker">PICK UP WHERE YOU LEFT OFF</p>
             <h2>Return to your match</h2>
           </div>
-          <button
-            className="action-button gold-action"
-            disabled={resuming}
-            onClick={resumeMatch}
-            type="button"
-          >
-            {resuming ? "Opening…" : "Continue match"}
-          </button>
+          <div className="resume-actions">
+            <button
+              className="action-button light-action"
+              disabled={clearing || resuming}
+              onClick={quitSavedMatch}
+              type="button"
+            >
+              Quit game
+            </button>
+            <button
+              className="action-button gold-action"
+              disabled={resuming || clearing}
+              onClick={resumeMatch}
+              type="button"
+            >
+              {resuming ? "Opening…" : "Continue match"}
+            </button>
+          </div>
         </section>
       ) : null}
 

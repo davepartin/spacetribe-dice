@@ -22,10 +22,13 @@ import {
 } from "@/lib/game";
 import {
   cancelLiveMatch,
+  clearActiveMatch,
+  enterLiveMatch,
   playLiveAction,
   watchLiveMatch,
   type LiveMatch,
 } from "@/lib/firebase-match";
+import { withBasePath } from "@/lib/paths";
 import { FlagHull, ShipHull, flagFaceDetail } from "./DieArt";
 
 function friendlyFirebaseError(reason: unknown): string {
@@ -169,8 +172,20 @@ export function MatchGame() {
           <h1>{match.state.cancelledBy} ended this game.</h1>
           <p>The room is closed. Start a new match whenever you’re ready.</p>
           <div className="end-actions">
-            <Link className="action-button light-action" href="/">Return home</Link>
-            <Link className="action-button red-action" href="/versus">New match</Link>
+            <Link
+              className="action-button light-action"
+              href="/"
+              onClick={() => clearActiveMatch(match.id)}
+            >
+              Quit game
+            </Link>
+            <Link
+              className="action-button red-action"
+              href="/versus"
+              onClick={() => clearActiveMatch(match.id)}
+            >
+              New match
+            </Link>
           </div>
         </section>
       ) : match.state.status === "waiting" ? (
@@ -956,15 +971,22 @@ function RoundResult({
   const finished = match.state.status === "finished";
   const cancelled = Boolean(match.state.cancelledBy);
   const won = match.state.winner === match.side;
+  const draw = match.state.winner === "draw";
   const title = finished
     ? cancelled
       ? `${match.state.cancelledBy} ended this game.`
-      : match.state.winner === "draw"
+      : draw
       ? "Both flagships fell."
       : won
         ? "Enemy flagship destroyed."
         : "Your flagship is destroyed."
     : `Round ${you.round} result`;
+  const endArt = finished && !cancelled && !draw
+    ? {
+        src: withBasePath(won ? "/fleet-dice-victory.png" : "/fleet-dice-defeat.png"),
+        alt: won ? "Victory — you win" : "Defeat — your fleet was destroyed",
+      }
+    : null;
   return (
     <>
       <HealthBoard enemy={enemy} you={you} />
@@ -973,6 +995,13 @@ function RoundResult({
           <p className="eyebrow">{finished ? (cancelled ? "MATCH CANCELLED" : "MATCH OVER") : "BOTH FLEETS REVEALED"}</p>
           <h1>{title}</h1>
         </div>
+        {endArt ? (
+          <img
+            alt={endArt.alt}
+            className={`end-banner ${won ? "end-banner-win" : "end-banner-loss"}`}
+            src={endArt.src}
+          />
+        ) : null}
         <div className="report-grid">
           {you.report ? (
             <ReportSide
@@ -1033,8 +1062,20 @@ function RoundResult({
         </div>
         {finished ? (
           <div className="end-actions">
-            <Link className="action-button light-action" href="/">Return home</Link>
-            <Link className="action-button red-action" href="/versus">New match</Link>
+            <Link
+              className="action-button light-action"
+              href="/"
+              onClick={() => clearActiveMatch(match.id)}
+            >
+              Quit game
+            </Link>
+            <Link
+              className="action-button red-action"
+              href="/versus"
+              onClick={() => clearActiveMatch(match.id)}
+            >
+              New match
+            </Link>
           </div>
         ) : null}
       </section>

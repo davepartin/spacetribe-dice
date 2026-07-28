@@ -931,6 +931,17 @@ button:disabled {
   font-size: 24px;
 }
 
+.resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.resume-actions .action-button {
+  min-width: 0;
+}
+
 .join-hint {
   margin: 8px 0 0;
   color: var(--dim);
@@ -2745,6 +2756,30 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
 .report-title {
   margin-bottom: 20px;
+}
+
+.end-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: -4px 0 20px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px -28px #050914;
+}
+
+.end-banner-win {
+  border-color: color-mix(in srgb, var(--energy) 40%, var(--line));
+  box-shadow:
+    0 24px 60px -28px #050914,
+    0 0 36px -16px color-mix(in srgb, var(--energy) 45%, transparent);
+}
+
+.end-banner-loss {
+  border-color: color-mix(in srgb, var(--red) 45%, var(--line));
+  box-shadow:
+    0 24px 60px -28px #050914,
+    0 0 36px -16px color-mix(in srgb, var(--red) 40%, transparent);
 }
 
 .report-grid {

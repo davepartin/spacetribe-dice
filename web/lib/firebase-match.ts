@@ -155,7 +155,11 @@ export async function enterLiveMatch(matchId: string): Promise<LiveMatch> {
           : ROOM_FULL_MESSAGE,
       );
     }
-    rememberActiveMatch(matchId);
+    if (data.status === "finished" || data.state.status === "finished") {
+      clearActiveMatch(matchId);
+    } else {
+      rememberActiveMatch(matchId);
+    }
     return {
       id: matchId,
       side,
@@ -380,7 +384,11 @@ export async function watchLiveMatch(
           );
           return;
         }
-        rememberActiveMatch(matchId);
+        if (data.status === "finished" || data.state.status === "finished") {
+          clearActiveMatch(matchId);
+        } else {
+          rememberActiveMatch(matchId);
+        }
         onMatch({
           id: matchId,
           side,
