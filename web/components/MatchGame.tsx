@@ -427,34 +427,70 @@ function Shipyard({
   onCancel: () => void;
 }) {
   const nextSlot = you.slots + 1;
+  const nextSlotCost = you.slots >= 8 ? null : slotPrice(nextSlot);
   const flagCost = flagshipUpgradeCost(you.flag.level);
   return (
     <>
       <HealthBoard enemy={enemy} you={you} />
       <section className="stage stage-docked">
-        <p className="say">Upgrade ships, open slots, or raise the flagship — then roll.</p>
+        <p className="say">
+          Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll.
+        </p>
         <nav className="jump-nav" aria-label="Upgrade sections">
           <a href="#fleet-upgrades">Fleet</a>
           <a href="#buy-ships">Buy ships</a>
-          <a href="#open-slots">Slots</a>
-          <a href="#flagship-upgrade">Flagship</a>
         </nav>
 
         <section className="upgrade-section" id="fleet-upgrades">
           <div className="section-heading">
-            <h2>Upgrade ships</h2>
+            <h2>Upgrade fleet</h2>
             <span>{you.ships.length} / {you.slots} slots</span>
           </div>
           <FleetFormation
             ships={you.ships}
             slots={you.slots}
             renderFlag={() => (
-              <div className="fleet-die flag shop-flag static">
+              <div className="fleet-die shop-flag shop-flagship static">
                 <div className="brace-flag-label">Flagship</div>
                 <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
                 <span className="shop-flag-level">level {you.flag.level}</span>
+                {flagCost ? (
+                  <button
+                    className="ship-act flagship-upgrade-act"
+                    disabled={busy || flagCost > you.energy}
+                    onClick={() => play({ type: "shop", operation: "flagship" })}
+                    type="button"
+                  >
+                    Upgrade to level {you.flag.level + 1} for {flagCost}⚡
+                  </button>
+                ) : (
+                  <span className="ship-act ship-act-maxed">Level 3 maximum</span>
+                )}
               </div>
             )}
+            renderLocked={(index) => {
+              const isNext = index === you.slots && nextSlotCost != null;
+              if (!isNext) {
+                return (
+                  <div className="empty-slot locked-slot" aria-hidden="true">
+                    <span>{index + 1}</span>
+                    <small>locked</small>
+                  </div>
+                );
+              }
+              return (
+                <button
+                  className="empty-slot unlock-slot"
+                  disabled={busy || nextSlotCost > you.energy}
+                  onClick={() => play({ type: "shop", operation: "slot" })}
+                  type="button"
+                >
+                  <span className="slot-badge">{index + 1}</span>
+                  <span className="unlock-slot-label">Unlock fleet slot</span>
+                  <strong className="unlock-slot-cost">for {nextSlotCost}⚡</strong>
+                </button>
+              );
+            }}
             renderShip={(index) => {
               const ship = you.ships[index];
               const next = ship.sides === 4 ? 6 : ship.sides === 6 ? 8 : ship.sides === 8 ? 10 : null;
@@ -472,14 +508,7 @@ function Shipyard({
                       onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
                       type="button"
                     >
-                      {damaged ? (
-                        "Damaged"
-                      ) : (
-                        <>
-                          <span className="ship-act-label">Upgrade to d{next}</span>
-                          <span className="ship-act-cost">{cost}⚡</span>
-                        </>
-                      )}
+                      {damaged ? "Damaged" : `Upgrade to d${next} for ${cost}⚡`}
                     </button>
                   ) : (
                     <span className="ship-act ship-act-maxed">{damaged ? "Damaged" : "Max d10"}</span>
@@ -506,40 +535,10 @@ function Shipyard({
               >
                 <ShipHull ready sides={sides} value={0} />
                 <strong>d{sides}</strong>
-                <span>{priceOf(sides)}⚡</span>
+                <span>for {priceOf(sides)}⚡</span>
               </button>
             ))}
           </div>
-        </section>
-
-        <section className="upgrade-section option-row" id="open-slots">
-          <div>
-            <h2>Open a fleet slot</h2>
-            <p>More ships create more rolls and longer straights.</p>
-          </div>
-          <button
-            className="action-button outline-action"
-            disabled={busy || you.slots >= 8 || slotPrice(nextSlot) > you.energy}
-            onClick={() => play({ type: "shop", operation: "slot" })}
-            type="button"
-          >
-            {you.slots >= 8 ? "All slots open" : `Open slot ${nextSlot} · ${slotPrice(nextSlot)}⚡`}
-          </button>
-        </section>
-
-        <section className="upgrade-section option-row flagship-row" id="flagship-upgrade">
-          <div>
-            <h2>Upgrade your flagship</h2>
-            <p>Level {you.flag.level}: every face bonus is +{Math.min(4, you.flag.level + 1)}.</p>
-          </div>
-          <button
-            className="action-button gold-action"
-            disabled={busy || !flagCost || flagCost > you.energy}
-            onClick={() => play({ type: "shop", operation: "flagship" })}
-            type="button"
-          >
-            {flagCost ? `Upgrade to level ${you.flag.level + 1} · ${flagCost}⚡` : "Level 3 maximum"}
-          </button>
         </section>
       </section>
       <MatchDock
@@ -761,11 +760,13 @@ function FleetFormation({
   slots,
   renderShip,
   renderFlag,
+  renderLocked,
 }: {
   ships: { id: string }[];
   slots?: number;
   renderShip: (index: number) => ReactNode;
   renderFlag: () => ReactNode;
+  renderLocked?: (index: number) => ReactNode;
 }) {
   const openSlots = slots ?? Math.max(ships.length, 8);
   const cells = [];
@@ -788,6 +789,8 @@ function FleetFormation({
             <span>{index + 1}</span>
             <small>slot free</small>
           </div>
+        ) : renderLocked ? (
+          renderLocked(index)
         ) : (
           <div className="empty-slot locked-slot" aria-hidden="true">
             <span>{index + 1}</span>
@@ -836,13 +839,17 @@ function BraceFleet({
     <>
       <HealthBoard enemy={enemy} you={you} />
       <section className="stage stage-docked brace-stage">
-        <h2 className="stage-kicker">Enemy shot has landed</h2>
-        <p className="say">
-          Tap ships to block the volley. Each blocks its size, then misses the next round.{" "}
-          <b className="direct-text">Direct</b> always reaches the flagship.
-        </p>
+        <header className="brace-header">
+          <p className="eyebrow">ENEMY VOLLEY</p>
+          <h1 className="brace-title">Taking damage</h1>
+          <p className="brace-lead">
+            Choose ships to protect your flagship. Each ship you tap blocks its size,
+            then is <b>damaged for one round</b>.{" "}
+            <b className="direct-text">Direct</b> cannot be blocked.
+          </p>
+        </header>
         <div className="tot three">
-          <div className="a"><div className="n">{volleyLeft}</div><div className="l">Volley</div></div>
+          <div className="a"><div className="n">{volleyLeft}</div><div className="l">Volley left</div></div>
           <div className="dir"><div className="n">{you.directIncoming}</div><div className="l">Direct</div></div>
           <div className="h"><div className="n">{flagshipDamage}</div><div className="l">To flagship</div></div>
         </div>
@@ -854,30 +861,38 @@ function BraceFleet({
             <div className="fleet-die flag brace-flag static">
               <div className="brace-flag-label">Flagship</div>
               <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
+              <span className="brace-flag-risk">
+                {flagshipDamage > 0 ? `Takes ${flagshipDamage}` : "Safe"}
+              </span>
             </div>
           )}
           renderShip={(index) => {
             const ship = you.ships[index];
-            const damaged = ship.disabledRound === round;
+            const alreadyHurt = ship.disabledRound === round;
             const picked = selected.includes(ship.id);
             const canPick = pickable.has(ship.id) && (picked || volleyLeft > 0);
             return (
               <button
-                className={`fleet-die shield-die ${picked ? "selected" : ""} ${damaged ? "hurt" : ""} ${canPick ? "" : "no-pick"}`}
+                className={`fleet-die shield-die brace-ship-die ${picked ? "selected brace-sacrificed" : ""} ${alreadyHurt ? "hurt" : ""} ${canPick ? "" : "no-pick"}`}
                 disabled={!canPick || busy}
                 key={ship.id}
                 onClick={() => toggleShip(ship.id)}
                 type="button"
               >
                 <span className="slot-badge">{index + 1}</span>
-                <ShipHull ready sides={ship.sides} value={0} />
-                <span className="die-caption">
-                  {damaged
-                    ? "Damaged"
+                <div className="brace-hull-wrap">
+                  <ShipHull ready sides={ship.sides} value={0} />
+                  {picked ? (
+                    <span className="brace-damage-overlay">Damaged for one round</span>
+                  ) : null}
+                </div>
+                <span className={`die-caption ${picked ? "brace-caption-picked" : ""}`}>
+                  {alreadyHurt
+                    ? "Already damaged"
                     : picked
-                      ? `Blocks ${ship.sides}`
+                      ? `Blocking ${ship.sides}`
                       : canPick
-                        ? `d${ship.sides} · tap`
+                        ? `Tap — Block ${ship.sides}`
                         : `d${ship.sides}`}
                 </span>
               </button>
@@ -909,7 +924,7 @@ function BraceFleet({
             >
               {flagshipDamage > 0
                 ? `Continue — flagship takes ${flagshipDamage}`
-                : "Continue — nothing gets through"}
+                : "Continue — flagship is safe"}
             </button>
           </div>
         }
@@ -969,6 +984,11 @@ function RoundResult({
               flagLevel={enemy.flag.level}
               kind="enemy"
               label="ENEMY FLAGSHIP"
+              note={
+                enemy.phase === "shop" || enemy.phase === "ready" || enemy.phase === "rolling"
+                  ? `${enemy.name} moved on to upgrades — their round summary stays here.`
+                  : undefined
+              }
               report={enemy.report}
             />
           ) : enemy.dice.length ? (
@@ -997,7 +1017,16 @@ function RoundResult({
                 </div>
               ) : null}
             </article>
-          ) : null}
+          ) : (
+            <article className="report-side enemy">
+              <h2>ENEMY FLAGSHIP</h2>
+              <p className="pending-enemy">
+                {enemy.phase === "shop"
+                  ? `${enemy.name} is already in the shipyard.`
+                  : `${enemy.name} is still resolving this round.`}
+              </p>
+            </article>
+          )}
         </div>
         {finished ? (
           <div className="end-actions">
@@ -1032,16 +1061,19 @@ function ReportSide({
   label,
   kind,
   flagLevel = 1,
+  note,
 }: {
   report: RoundReport;
   label: string;
   kind: "you" | "enemy";
   flagLevel?: number;
+  note?: string;
 }) {
   const change = report.hpAfter - report.hpBefore;
   return (
     <article className={`report-side ${kind}`}>
       <h2>{label}</h2>
+      {note ? <p className="report-note">{note}</p> : null}
       <div className="health-movement">
         <div><strong>{report.hpBefore}</strong><span>START</span></div>
         <b>→</b>

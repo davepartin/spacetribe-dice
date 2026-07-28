@@ -16,9 +16,10 @@ function readPage(...segments) {
 test("static export includes the Fleet Dice home screen", () => {
   const html = readPage("index.html");
   assert.match(html, /<title>Fleet Dice<\/title>/i);
-  assert.match(html, /BUILD THE FLEET/);
-  assert.match(html, /Solo Command/);
-  assert.match(html, /Versus Command/);
+  assert.match(html, /fleet-dice-key-art\.png/);
+  assert.match(html, /Build the fleet\. Break the flagship/i);
+  assert.match(html, /SOLO COMMAND/);
+  assert.match(html, /VERSUS COMMAND/);
   assert.match(html, /Join your enemy/);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape|chatgpt\.site/i);
 });

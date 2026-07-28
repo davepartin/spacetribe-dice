@@ -519,7 +519,8 @@ function handleContinue(state: MatchState, player: PlayerState) {
   player.incoming = 0;
   player.directIncoming = 0;
   player.braceShips = [];
-  player.report = null;
+  // Keep report until the next roll starts so the other commander can still
+  // read this summary while they finish the reveal screen.
   player.acknowledged = false;
   syncMatchRound(state);
   finishIfNeeded(state);

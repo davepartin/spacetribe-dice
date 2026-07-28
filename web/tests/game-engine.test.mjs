@@ -132,12 +132,14 @@ test("a commander continues to upgrades alone without waiting on the enemy", () 
   applyAction(state, "host", { type: "continue" });
   assert.equal(host.phase, "shop");
   assert.equal(host.round, 2);
+  assert.ok(host.report, "host round summary stays for the enemy to read");
   assert.equal(guest.phase, "report");
   assert.equal(guest.round, 1);
   assert.equal(state.round, 1);
 
   applyAction(state, "guest", { type: "continue" });
   assert.equal(guest.phase, "shop");
+  assert.ok(guest.report, "guest round summary stays until the next roll starts");
   assert.equal(guest.round, 2);
   assert.equal(state.round, 2);
 });
