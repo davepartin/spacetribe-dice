@@ -239,16 +239,25 @@ function HealthBoard({
   you,
   enemy,
   mid,
+  earning = 0,
 }: {
   you: PlayerState;
   enemy: PlayerState;
   mid?: ReactNode;
+  earning?: number;
 }) {
   return (
     <section className="fleet-board">
       <div className="fleet-score you-score">
         <div className="who">You</div>
         <div className="val">{Math.max(0, you.hp)}</div>
+      </div>
+      <div className="fleet-score energy-score">
+        <div className="who">Energy</div>
+        <div className="val">
+          {you.energy}
+          {earning > 0 ? <span className="soon">→{you.energy + earning}</span> : null}
+        </div>
       </div>
       {mid ?? (
         <div className="fleet-mid">
@@ -298,16 +307,9 @@ function MatchDock({
   );
 }
 
-function playerMetrics(you: PlayerState, _enemy: PlayerState, earning = 0) {
+function playerMetrics(you: PlayerState, _enemy: PlayerState) {
   return (
     <>
-      <div className="big">
-        <div className="n p">
-          {you.energy}
-          {earning > 0 ? <span className="soon">→ {you.energy + earning}</span> : null}
-        </div>
-        <div className="l">Energy<br />bank</div>
-      </div>
       <div>
         <div className="n">{you.baseEnergy}</div>
         <div className="l">Base /<br />round</div>
@@ -633,7 +635,12 @@ function RollFleet({
 
   return (
     <>
-      <HealthBoard enemy={enemy} mid={midButton} you={you} />
+      <HealthBoard
+        enemy={enemy}
+        earning={you.phase === "rolling" ? earning : 0}
+        mid={midButton}
+        you={you}
+      />
       <section className="stage stage-docked">
         <p className="say">
           {you.phase === "ready"
@@ -729,7 +736,7 @@ function RollFleet({
         ) : null}
       </section>
       <MatchDock
-        metrics={playerMetrics(you, enemy, you.phase === "rolling" ? earning : 0)}
+        metrics={playerMetrics(you, enemy)}
         onCancel={onCancel}
         onHelp={onHelp}
         primary={

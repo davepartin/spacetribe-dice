@@ -3,7 +3,20 @@
 This is the single entry point for anyone new to the project, human or AI.
 Everything you need to be useful is either here or pointed at from here.
 
-**Current version: v83.** Open `simple.html`.
+**There are two ways to play now:**
+
+| Track | What it is | Where |
+| --- | --- | --- |
+| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v83) — also shipped online at `/solo/` |
+| **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
+
+Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
+React app under `web/` that reimplements the same rules in TypeScript
+(`web/lib/game.ts`) and aims to **feel** like solo — same 3×3 fleet, same hull
+shapes, same colours, same how-to depth.
+
+**Dave is not a developer.** Prefer plain words. Do not commit or push unless he
+asks. Prefer showing something he can open on a phone over inventing architecture.
 
 ---
 
@@ -18,9 +31,10 @@ Copy everything between the lines.
 > maths and the code.
 >
 > **Read `HANDOFF.md` in this folder before doing anything.** It has the current
-> rules, the numbers, the file map, and the working process. Then read `IDEAS.md`
-> for where the game stands right now and what I'm deciding between, and
-> `VERSIONS.md` for how we got here.
+> rules, the numbers, the file map, solo vs versus, Firebase, artwork, and the
+> working process. Then read `IDEAS.md` for where the game stands as a design,
+> and `VERSIONS.md` for how we got here. For the online app, also skim
+> `web/README.md`.
 >
 > How I want you to work:
 >
@@ -28,29 +42,36 @@ Copy everything between the lines.
 >    turned out to be wrong, mine and yours. Before you tell me a change is good,
 >    play it out in simulation and show me the numbers. If you're guessing, say
 >    you're guessing.
-> 2. **The whole game is one file, `simple.html`.** No build step, no server. I
->    open it by double-clicking. Keep it that way.
-> 3. **Snapshot before you change rules.** Copy `simple.html` to the next
+> 2. **Two codebases, one game.** Solo design still lives in **`simple.html`**
+>    (one file, no build). Online solo + versus live under **`web/`** (Next.js,
+>    Firebase, GitHub Pages). Know which track you're changing. Do not "port by
+>    rewriting the whole game" when a small solo→versus visual fix is enough.
+> 3. **Snapshot before you change solo rules.** Copy `simple.html` to the next
 >    `simpleNN.html`, bump the `VERSION` string, then edit. Never edit an old
 >    snapshot. Write up what changed and why in `VERSIONS.md`, newest at the top,
->    including the measurements that justified it.
-> 4. **Numbers are mine, rules are ours.** Anything numeric lives in the `C`
->    object and is editable live in the Tune panel, so I can feel a change without
->    a rebuild. If I tell you a setting felt right, make it the default.
-> 5. **Test in the real build, not just in a model.** There are 30 `test-*` scripts
->    in this folder. Run them. They boot the actual file, play real matches and
->    read what the screen says.
+>    including the measurements that justified it. Versus rule changes go in
+>    `web/lib/game.ts` and need tests under `web/tests/`.
+> 4. **Numbers are mine, rules are ours.** In solo, anything numeric lives in the
+>    `C` object and is editable live in the Tune panel. If I tell you a setting
+>    felt right, make it the default. Versus currently hard-codes the same
+>    numbers in TypeScript — keep them aligned with solo unless we decide
+>    otherwise.
+> 5. **Test in the real build, not just in a model.** Root `test-*` scripts boot
+>    `simple.html`. Versus has `web` unit tests (`pnpm test` from `web/`). Run
+>    the ones that touch what you changed.
 > 6. **Assert before you write.** A find-and-replace that matches nothing reports
->    success and changes nothing. This has cost us four separate versions. Every
->    edit should prove it matched before saving the file.
+>    success and changes nothing. Every edit should prove it matched.
 > 7. **Tell me when I'm wrong, and show your working.** I'd rather hear "that
 >    measured at 84% and would break the game" than have you build it politely.
 > 8. **Plain words.** If you use a term, make sure it names something in the game
 >    today. We once carried a word for nine versions after deleting the rule it
 >    described.
+> 9. **Don't commit unless I ask.** When I say commit and push, push to `main`
+>    so GitHub Pages updates. Never force-push. Never commit `firebase-debug.log`
+>    or secrets.
 >
-> Write like you're explaining it to me over coffee — warm, direct, paragraphs
-> over bullet lists, and no jargon I haven't used first.
+> Write like you're explaining it to me over coffee — warm, direct, and no
+> jargon I haven't used first.
 
 ---
 
@@ -60,15 +81,36 @@ Each player commands a **fleet of dice**. Every die is a ship: a **d4**, **d6**,
 **d8** or **d10**, sitting in a 3×3 grid. In the middle is your **flagship**, a
 normal **d6** with **health**. The match ends when a flagship is destroyed.
 
-Both sides submit a round at once — the idea is friends playing over days,
-everyone locking in their round and finding out next morning what happened.
+**Ship shapes (read these at a glance):**
+
+| Die | Hull shape |
+| --- | --- |
+| d4 | triangle |
+| d6 | square |
+| d8 | diamond |
+| d10 | pentagon |
+
+**Printed marks (always pay):**
+
+| Mark | Colour | Meaning |
+| --- | --- | --- |
+| Lightning bolt | yellow | Energy |
+| Plus / cross | green | Repair |
+| Chevron | violet | Direct (unblockable) |
 
 The design brief that started it: *dice that upgrade in size and in individual
 faces, some faces blank and upgradeable, and it has to be genuinely fun.*
 
+Family playtests (Dave and his daughter) proved the emotional core: health going
+up, then a killer roll and a straight you can *see*, and you cheer. Clarity of
+buttons, scoring colours, and how-to matter as much as balance.
+
 ---
 
-## The rules as they stand (v82)
+## The rules as they stand (v83)
+
+These rules are the truth for **solo**. Versus follows the same combat math.
+Versus UI differences are called out in [Online versus](#online-versus--what-we-learned).
 
 ### Every ship die
 
@@ -136,8 +178,10 @@ own token by the same rule.
 
 ### A round
 
-1. **Between rounds.** Upgrade a ship one size, scrap it, buy a new ship, unlock a
-   fleet slot, or upgrade the flagship's level.
+1. **Between rounds.** Upgrade a ship one size, buy a new ship, unlock a fleet
+   slot, or upgrade the flagship's level. *(Solo still allows **scrap** for half
+   price. Versus shipyard UI no longer offers scrap — upgrade / buy / slots /
+   flagship only.)*
 2. **Roll.** The page begins with every available die Ready. Roll 1 rolls
    everything. Before rolls 2 and 3, tap only the dice you want to change.
    Afterward use the once-per-match Flagship Token, or buy an extra reroll for
@@ -147,10 +191,11 @@ own token by the same rule.
    flagship's number counts toward the line. **Length** decides what kind of prize;
    the **biggest ship in the line** decides how big. A long straight may be cashed
    as a shorter one — there is a banner on the roll screen with a button per tier
-   and the totals move live as you pick.
-4. **Submit.** Both fleets fire at once. Your **volley** is `your attack − their
-   shields`. **Direct** is tracked separately and **nothing stops it** — not
-   shields, not a ship thrown in front of it.
+   and the totals move live as you pick. Dice in the straight get an **orange bar
+   across the bottom of the slot** (solo and versus).
+4. **Submit / lock.** Both fleets fire once both sides have locked. Your **volley**
+   is `your attack − their shields`. **Direct** is tracked separately and
+   **nothing stops it** — not shields, not a ship thrown in front of it.
 5. **Take the hit.** If the volley got through, *you* decide: all on the flagship,
    or put **as many available ships as you want** in front of it. Each blocks its
    own size — a d10 blocks 10 — and is **Damaged** for the next round: greyed in
@@ -175,8 +220,9 @@ long-game timer that stops repeated ship sacrifices from stalling the match.
 
 ## The numbers today
 
-All live in the **Tune** panel, which now opens from the **version number** next
+All live in the solo **Tune** panel, which opens from the **version number** next
 to the title. It is a designer tool, so it does not get a player-facing button.
+Versus hard-codes matching values in `web/lib/game.ts`.
 
 | Setting | Value | |
 | --- | ---: | --- |
@@ -187,7 +233,7 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 | Dice needed for a straight | **5** | at 4, straights fired in 82% of rounds |
 | Straight multiplier | 1 | scales the whole prize table |
 | Ship prices — d4/d6/d8/d10 | 4 / 6 / 9 / 13 | priced by measured value, not by size |
-| Scrap value | 50% | |
+| Scrap value | 50% | solo only in the UI now |
 | Fleet slots | 4 open of 8 | plus the flagship. You start with 4 d4s and 0 Energy |
 | Unlock slots 5 / 6 / 7 / 8 | 7 / 8 / 9 / 10⚡ | always 2 more than the slot number |
 | Upgrade d4→d6 / d6→d8 / d8→d10 | 2 / 3 / 4⚡ | the difference between ship prices |
@@ -214,12 +260,11 @@ to the title. It is a designer tool, so it does not get a player-facing button.
 
 ## Where the game stands — read this before changing anything
 
-v82 keeps v81's economy and multi-ship defense, then adds a guided first match
-and one Flagship Token to each fleet. You start with four open slots and must buy
-width; or you can spend small amounts upgrading
-the four ships already in formation. The player now has the same in-place upgrade
-language as the opponent, although the opponent's schedule remains a difficulty
-abstraction and does not spend Energy.
+### Solo balance (unchanged brief)
+
+v83 keeps v81's economy and multi-ship defense, guided first match tips, and one
+Flagship Token per fleet. You start with four open slots and must buy width; or
+you can spend small amounts upgrading the four ships already in formation.
 
 This is a **first balance pass, not proof of balance**. Five automated policies
 played the real game against the pace-1 opponent:
@@ -254,36 +299,170 @@ spreads across ten numbers. But the escalating upper marks now give every growth
 step a visible output gain: d10s no longer lose repair and Direct merely because
 their faces are larger.
 
+### Versus / human play
+
+Versus is live online. Dave and family play it for real. Priority has shifted from
+"does multiplayer exist?" to **clarity and solo parity**: can a new person learn
+from How to play, see a straight on the board, read Energy / Repair / Direct, and
+join a room without getting stuck.
+
+---
+
+## Online versus — what we learned
+
+### Product shape
+
+- **Home:** key art hero, Solo, Create match, Join with four-digit code,
+  optional Continue match, live battles board.
+- **Create:** name → private room → big room code + share / text invite.
+  **Host stays on that page.** They are already in the game.
+- **Guest:** opens invite link *or* types the four numbers on the home page
+  (Jackbox-style) → joins → both play.
+- **Do not open your own invite link** after creating a room. That was the #1
+  confusion. Opening it after a friend has joined looks like a Firebase
+  "permissions" error; it really means "this room already has two players."
+
+### Sync model (important)
+
+- Waiting for the opponent is only required **after locking rolls** (both must
+  submit before the volley resolves).
+- **Brace**, **report Continue**, **shipyard**, and **starting the next roll**
+  are per-player. You do not wait on them to shop or assign damage.
+
+### Solo → versus parity (done or in progress)
+
+| Solo feel | Versus status |
+| --- | --- |
+| 3×3 fleet with flagship in the center | Done on roll / brace / shipyard |
+| Hull shapes + face marks | Done (`DieArt.tsx`) |
+| Flagship face colours + captions (not "FLAGSHIP · …") | Done |
+| Orange straight bar on slots (`.inrun`) | Done |
+| Health board You / Enemy | Done — **You** is dark theme with a **thin white border** (not light grey); keep green / yellow / violet score colours |
+| Round report You panel | Same dark + white border treatment |
+| How to play with shapes, marks, every face, six flagship faces, straights table | Done in `ReferenceSheets.tsx` — keep it as deep as solo |
+| Dock: How to play left, Cancel right as real buttons | Done; Cancel asks "Are you sure?" |
+| Scrap in shipyard | **Removed from versus UI** (solo still has scrap) |
+| Upgrade labels readable on 3×3 cells | Done (stacked label + cost) |
+| Guided first-match tips | Solo only for now |
+
+### Jackbox join / Firebase lessons
+
+1. **Room codes** live in Firestore `codes/{0000}` → `matchId`, plus seating
+   (`hostUid`, `guestUid`, `status`) so the client can say "room full" or
+   "re-enter" without needing a forbidden read on an active match.
+2. **Anonymous Auth** only — no passwords. Browser remembers the anonymous uid.
+   Creating on phone A and joining from phone B as "the same person" does not
+   reclaim host; stay on the original tab.
+3. **`firestore.rules` must stay deployed** whenever join/create rules change:
+   ```bash
+   cd web
+   npx -y firebase-tools@latest deploy --only firestore:rules --project space-tribes
+   ```
+4. Friendly errors beat "Missing or insufficient permissions." Prefer:
+   *That room already has two players. If you created the game, stay on your
+   original game tab.*
+5. Invite URLs should include `id` and `code` when possible:
+   `/join/?id=…&code=0525`.
+
+### Key files (versus)
+
+| Path | Role |
+| --- | --- |
+| `web/lib/game.ts` | Rules engine (shared truth for online) |
+| `web/lib/firebase-match.ts` | Create / join / play / watch / cancel |
+| `web/lib/firebase.ts` | Anonymous auth + config (`space-tribes`) |
+| `web/firestore.rules` | Security rules — deploy separately from Pages |
+| `web/components/MatchGame.tsx` | All match screens + dock |
+| `web/components/DieArt.tsx` | Ship / flagship SVGs + mark icons |
+| `web/components/ReferenceSheets.tsx` | How to play + upgrade costs |
+| `web/components/HomeScreen.tsx` | Landing + code join |
+| `web/public/fleet-dice-key-art.png` | Brand key art |
+| `web/public/fleet-dice-v83.html` | Solo file shipped inside the online app |
+| `.github/workflows/deploy-web.yml` | Push `main` → GitHub Pages |
+
+---
+
+## Brand and artwork
+
+**Key art:** `web/public/fleet-dice-key-art.png`  
+(Cinematic flagship cube with faces 1 Reactor / 2 Direct / 3 Repair / 6 Attack,
+floating polyhedral dice, title **FLEET DICE**, tagline **BUILD THE FLEET. BREAK
+THE FLAGSHIP.**)
+
+Used on:
+
+- Home hero (billboard — the art *is* the brand; do not stack a second competing
+  headline on top of it)
+- Nav / match header brand mark (cropped thumb)
+- Versus create + join cards
+- Open Graph / Twitter share image
+
+Visual direction for UI: dark space panels, green repair, yellow energy, violet
+direct, red attack, blue shields. Avoid light-grey "You" cards — dark background
+plus a thin white border marks *your* side.
+
+---
+
+## Firebase and deploy
+
+| Piece | Detail |
+| --- | --- |
+| Firebase project | `space-tribes` |
+| Auth | Anonymous (must stay enabled) |
+| Authorized domain | `davepartin.github.io` (and localhost for dev) |
+| Firestore collections | `matches`, `codes`, `liveBattles` |
+| Hosting of the app | **GitHub Pages**, not Firebase Hosting |
+| App URL | https://davepartin.github.io/spacetribe-dice/ |
+| Deploy app | push to `main` (workflow builds `web/` static export) |
+| Deploy rules | `firebase deploy --only firestore:rules --project space-tribes` from `web/` |
+
+Local versus:
+
+```bash
+cd web
+pnpm install
+pnpm dev
+# open http://localhost:3000/spacetribe-dice/
+```
+
 ---
 
 ## The files
 
 | File | What it is |
 | --- | --- |
-| **`simple.html`** | The game. One file, no dependencies, opens by double-click. Always newest. |
-| **`simple01.html` … `simple82.html`** | Frozen snapshots. Never edited again, so any version reopens in one click. |
+| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest. |
+| **`simple01.html` … `simple82.html`** | Frozen solo snapshots. Never edited again. |
+| **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
+| **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
 | **`HANDOFF.md`** | This file. The entry point. |
-| **`IDEAS.md`** | Where the game stands now, what the playtests found, and five things worth building. Read after this. |
-| **`VERSIONS.md`** | Every version, newest first, with the measurements that justified it. |
-| **`TARGETING.md`** | Designed and measured, mostly unbuilt: targeting, fodder, Direct, buy order. Deepest analysis in the project — but written before several rule changes, so check dates. |
-| **`DIRECTIONS.md`** | Paths to victory, bluffing, Secret Directives, Trumps, the 2v2 layer. |
+| **`IDEAS.md`** | Where the design stands, what playtests found, things worth building. |
+| **`VERSIONS.md`** | Every solo version, newest first, with measurements. |
+| **`TARGETING.md`** | Designed and measured, mostly unbuilt. Check dates — predates some rule changes. |
+| **`DIRECTIONS.md`** | Paths to victory, bluffing, Secret Directives, Trumps, 2v2 layer. |
 | **`DECISIONS.md`** | Every decision a player makes, marked strong or thin. |
-| **`PANELS.md`** | The old flagship-panel catalogue. **Historical** — that store was removed in v72. Do not rebuild from it without reading VERSIONS.md v72 first. |
-| **`test-*.mjs` / `test-*.py`** | 29 scripts. See below. |
+| **`PANELS.md`** | Historical flagship-panel catalogue (removed in v72). |
+| **`test-*.mjs` / `test-*.py`** | Solo harness tests against `simple.html`. |
+| **`web/tests/`** | Versus engine / match tests. |
 
-`README.md` is accurate and describes this project.
+`README.md` at the repo root points here and to the live site.
 
 ---
 
 ## How we work
 
-1. Dave plays a few rounds and says what feels off.
-2. If it's a **number**, he changes it himself in the Tune panel and reports what
-   felt right. That becomes the default.
-3. If it's a **rule**, snapshot `simple.html` to the next number, bump `VERSION`,
-   change the live file, and write it up in `VERSIONS.md` with the measurements.
+1. Dave plays (solo or versus, often on a phone) and says what feels off.
+2. If it's a **solo number**, he can change it in Tune and report what felt
+   right. That becomes the default — and versus should stay aligned.
+3. If it's a **solo rule**, snapshot `simple.html`, bump `VERSION`, edit, write
+   `VERSIONS.md`.
+4. If it's **versus UX / online**, edit `web/`, keep copy plain, match solo
+   visuals when that's the ask, then **commit and push only when he says so**.
+5. If join/create breaks with permissions, check **rules deploy** before rewriting
+   the client.
 
-Numbers stay in his hands. Rules stay a conversation.
+Numbers stay in his hands. Rules stay a conversation. Versus clarity is now part
+of the product, not a side quest.
 
 ---
 
@@ -291,7 +470,7 @@ Numbers stay in his hands. Rules stay a conversation.
 
 **Nearly every design intuition in this project has been wrong at least once.**
 
-**Boot the real file with jsdom** and drive it through its own functions —
+**Boot the real solo file with jsdom** and drive it through its own functions —
 `newGame()`, `startRound()`, `submit()`, `nextRound()` — checking `errors` is
 empty. Everything is at top-level scope, so `w.tally(...)`, `w.bestRun(...)`,
 `w.priceOf(...)`, `w.C` and the rest are callable from a test.
@@ -328,6 +507,9 @@ while (w.G.phase !== "over") { /* drive the phases */ }
 | `test-handoff-accuracy.mjs` | every rule number claimed in this file, checked against the engine |
 | `test-dead-code.py`, `test-dead-css.py`, `test-vocabulary.py` | unreferenced functions, unapplied CSS, inconsistent words |
 
+**Versus:** from `web/`, `pnpm test` exercises the TypeScript engine and match
+helpers. Human play on two phones remains the real acceptance test for join UX.
+
 **Sample sizes.** Full matches through the real DOM are slow — 16 matches is about
 40 seconds, and 16 matches is ±12 points. Do not call a 5-point difference real on
 one run. For questions about a single round (what a fleet produces, what a face
@@ -354,6 +536,9 @@ because of a bug in the harness, not the game.
   slots fill up and there is nothing left to buy.
 - **A dial that is a coin flip has no upper half.** `botPace` was
   `Math.random() < pace`, so everything at or above 1 was the same opponent.
+- **Versus join "permissions" errors were often UX, not broken rules** — host
+  clicking their own invite after the guest seated, or reading an active match
+  as a third anonymous browser identity.
 
 ---
 
@@ -378,6 +563,10 @@ because of a bug in the harness, not the game.
    rules and in the report for many versions with no button anywhere.
 10. **Delete the furniture with the rule.** Comments describing a deleted mechanic
     are worse than dead code, because they misinform the next reader.
+11. **Versus should look like solo.** If solo teaches a symbol or a shape, versus
+    How to play and the board must show the same pictures.
+12. **Host stays; guest joins.** Creating a room is not the same as opening the
+    invite. Explain that on the waiting screen every time.
 
 ---
 
@@ -386,13 +575,19 @@ because of a bug in the harness, not the game.
 - **A decision attached to the flagship** — holding it deliberately, or spending
   its number once a match as a wild. `IDEAS.md` §4.
 - **A shareable round** — the report screen as an image you can send. `IDEAS.md`
-  §5, and the one with the most upside for playing over days.
+  §5, and still high upside for playing over days (versus makes this even more
+  valuable).
 - **Targeting** — shooting the economy or the heavies. Works only as *crippled
   for three rounds*, never as destruction. `TARGETING.md`.
 - **Jam, Secret Directives, Trumps** — `DIRECTIONS.md`. Jam is the important one:
   the first mechanic that reaches across and touches an opponent's roll.
-- **Multiplayer** — deliberately last. Lead with **joint straights**: your dice
-  and your teammate's combine into one line.
+- **Joint / 2v2 straights** — teammate dice combine into one line. Still future;
+  basic 1v1 versus is live.
+- **Versus guided first-match tips** — solo has them; versus does not yet.
+- **Full Tune panel in versus** — solo only; versus constants are code defaults.
+
+~~**Multiplayer**~~ — **built** as private 1v1 rooms with invite link + four-digit
+code. Remaining work is clarity, parity, and reliability — not greenfield sync.
 
 ## Open questions
 
@@ -407,3 +602,7 @@ because of a bug in the harness, not the game.
   fleet cannot win because eight d4s cap at a straight of four — that stopped
   being true when the flagship joined the line and `runMin` went to 5. Treat its
   conclusions as shapes, not current numbers.
+- **Should versus drop scrap from the engine entirely**, or only from the UI?
+  UI is already upgrade-only.
+- **Should solo and versus share one visual component library** so hulls / help
+  never drift again?

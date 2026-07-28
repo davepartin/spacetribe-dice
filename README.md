@@ -14,19 +14,21 @@ turn the flagship one number up or down after the final free roll.
 
 **Online (solo + versus):** [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/)  
 No OpenAI/ChatGPT sign-in. Versus rooms use a private invite link or four-digit
-code. Details live in [`web/README.md`](web/README.md).
+code (Jackbox-style). Host stays on their room; only the friend opens the invite.
+Details live in [`web/README.md`](web/README.md) and the **Online versus** section
+of [`HANDOFF.md`](HANDOFF.md).
 
 **Offline / design:** open **`simple.html`**. Double-click it — no server, no
 build step, no dependencies. The version number sits next to the title.
 
-Every number in the game is editable live in the **Tune** panel, top right.
+Every number in the solo game is editable live in the **Tune** panel, top right.
 Change one, start a fresh match, and feel the difference.
 
 ## Read it
 
 **Start with [HANDOFF.md](HANDOFF.md).** It has the complete rules, every number
-and the reason behind it, the file map, how we work, and the prompt to give a new
-assistant.
+and the reason behind it, solo vs versus, Firebase, artwork, the file map, how we
+work, and the prompt to give a new assistant.
 
 | File | What it holds |
 | --- | --- |
