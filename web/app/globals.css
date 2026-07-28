@@ -1620,7 +1620,6 @@ input:focus {
 .dock-btn,
 .howto-btn,
 .dock-cancel {
-  flex: 1 1 0;
   min-height: 44px;
   margin: 0;
   padding: 10px 14px;
@@ -1637,15 +1636,23 @@ input:focus {
 }
 
 .howto-btn {
+  flex: 3 1 0;
+  min-width: 0;
   color: #d8f0ff;
   background: color-mix(in srgb, var(--blue) 18%, #121c30);
   border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
 }
 
 .dock-cancel {
+  flex: 1 1 0;
+  min-width: 0;
   color: #ffd0d7;
   background: color-mix(in srgb, var(--red) 14%, #121c30);
   border-color: color-mix(in srgb, var(--red) 40%, var(--line));
+}
+
+.match-dock-links:not(:has(.dock-cancel)) .howto-btn {
+  flex: 1 1 100%;
 }
 
 .dock-btn:hover,

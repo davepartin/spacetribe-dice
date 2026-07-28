@@ -293,16 +293,14 @@ function MatchDock({
         {primary}
       </div>
       <div className="match-dock-links">
-        <button className="dock-btn howto-btn" onClick={onHelp} type="button">
-          How to play
-        </button>
         {onCancel ? (
           <button className="dock-btn dock-cancel" onClick={onCancel} type="button">
             Cancel game
           </button>
-        ) : (
-          <span className="dock-btn-spacer" aria-hidden="true" />
-        )}
+        ) : null}
+        <button className="dock-btn howto-btn" onClick={onHelp} type="button">
+          How to play
+        </button>
       </div>
     </div>
   );
