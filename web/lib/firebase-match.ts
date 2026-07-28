@@ -52,22 +52,73 @@ export type LiveBattleRow = {
   round: number;
 };
 
-const ACTIVE_MATCH_KEY = "fleet-dice-active-match";
+export type RememberedMatchCard = {
+  id: string;
+  code: string;
+  side: SideId;
+  status: MatchState["status"];
+  round: number;
+  youName: string;
+  enemyName: string | null;
+};
 
-export function rememberActiveMatch(matchId: string) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(ACTIVE_MATCH_KEY, matchId);
+const ACTIVE_MATCH_KEY = "fleet-dice-active-match";
+const ACTIVE_MATCHES_KEY = "fleet-dice-active-matches";
+const MAX_REMEMBERED_MATCHES = 6;
+
+function readRememberedMatchIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(ACTIVE_MATCHES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        return [...new Set(parsed.filter((value): value is string => typeof value === "string" && value.length > 0))];
+      }
+    }
+  } catch {
+    // Fall through to legacy single-id storage.
+  }
+  const legacy = localStorage.getItem(ACTIVE_MATCH_KEY);
+  return legacy ? [legacy] : [];
 }
 
+function writeRememberedMatchIds(ids: string[]) {
+  if (typeof window === "undefined") return;
+  const next = [...new Set(ids.filter(Boolean))].slice(0, MAX_REMEMBERED_MATCHES);
+  if (!next.length) {
+    localStorage.removeItem(ACTIVE_MATCHES_KEY);
+    localStorage.removeItem(ACTIVE_MATCH_KEY);
+    return;
+  }
+  localStorage.setItem(ACTIVE_MATCHES_KEY, JSON.stringify(next));
+  localStorage.setItem(ACTIVE_MATCH_KEY, next[0]!);
+}
+
+/** Remember a live room. Newest match stays first so Continue still works. */
+export function rememberActiveMatch(matchId: string) {
+  if (typeof window === "undefined" || !matchId) return;
+  writeRememberedMatchIds([matchId, ...readRememberedMatchIds().filter((id) => id !== matchId)]);
+}
+
+/** Forget one room, or all remembered rooms if no id is passed. */
 export function clearActiveMatch(matchId?: string) {
   if (typeof window === "undefined") return;
-  const current = localStorage.getItem(ACTIVE_MATCH_KEY);
-  if (!matchId || current === matchId) localStorage.removeItem(ACTIVE_MATCH_KEY);
+  if (!matchId) {
+    writeRememberedMatchIds([]);
+    return;
+  }
+  writeRememberedMatchIds(readRememberedMatchIds().filter((id) => id !== matchId));
 }
 
+/** Most recently opened remembered match id (legacy helper). */
 export function rememberedActiveMatch(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(ACTIVE_MATCH_KEY);
+  return readRememberedMatchIds()[0] ?? null;
+}
+
+/** All remembered live match ids, newest first. */
+export function rememberedMatchIds(): string[] {
+  return readRememberedMatchIds();
 }
 
 export async function createLiveMatch(name: string): Promise<{
@@ -137,7 +188,11 @@ export async function createLiveMatch(name: string): Promise<{
 }
 
 /** Re-open a match you already belong to (host or guest). */
-export async function enterLiveMatch(matchId: string): Promise<LiveMatch> {
+export async function enterLiveMatch(
+  matchId: string,
+  options: { remember?: boolean } = {},
+): Promise<LiveMatch> {
+  const remember = options.remember !== false;
   const db = requireDb();
   const user = await ensurePlayerIdentity();
   try {
@@ -157,7 +212,7 @@ export async function enterLiveMatch(matchId: string): Promise<LiveMatch> {
     }
     if (data.status === "finished" || data.state.status === "finished") {
       clearActiveMatch(matchId);
-    } else {
+    } else if (remember) {
       rememberActiveMatch(matchId);
     }
     return {
@@ -169,6 +224,37 @@ export async function enterLiveMatch(matchId: string): Promise<LiveMatch> {
   } catch (error) {
     throw friendlyJoinError(error);
   }
+}
+
+/** Refresh remembered rooms for the home list. Drops finished or invalid ones. */
+export async function loadRememberedMatchCards(): Promise<RememberedMatchCard[]> {
+  const ids = rememberedMatchIds();
+  if (!ids.length) return [];
+
+  const cards: RememberedMatchCard[] = [];
+  for (const id of ids) {
+    try {
+      const match = await enterLiveMatch(id, { remember: false });
+      if (match.state.status === "finished") {
+        clearActiveMatch(id);
+        continue;
+      }
+      const you = match.state.players[match.side]!;
+      const enemy = match.state.players[match.side === "host" ? "guest" : "host"];
+      cards.push({
+        id: match.id,
+        code: match.state.code,
+        side: match.side,
+        status: match.state.status,
+        round: you.round,
+        youName: you.name,
+        enemyName: enemy?.name ?? null,
+      });
+    } catch {
+      clearActiveMatch(id);
+    }
+  }
+  return cards;
 }
 
 export async function joinLiveMatch(matchId: string, name: string): Promise<LiveMatch> {

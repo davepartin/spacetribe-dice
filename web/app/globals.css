@@ -942,6 +942,75 @@ button:disabled {
   min-width: 0;
 }
 
+.your-matches {
+  margin-top: 18px;
+  padding: 22px 26px;
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, var(--line));
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--gold) 8%, #10182a);
+}
+
+.your-matches-head h2 {
+  margin: 4px 0 0;
+  font-size: 24px;
+}
+
+.your-matches-hint {
+  margin: 8px 0 0;
+  color: var(--dim);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.your-matches-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.your-match-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #0c1324;
+}
+
+.your-match-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.your-match-copy strong {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.your-match-copy span {
+  color: var(--faint);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.your-match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.your-match-actions .action-button {
+  min-height: 42px;
+  min-width: 0;
+  padding: 10px 14px;
+}
+
 .join-hint {
   margin: 8px 0 0;
   color: var(--dim);
@@ -3100,6 +3169,19 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
     flex-direction: column;
     align-items: stretch;
     padding: 20px 22px;
+  }
+
+  .your-matches {
+    padding: 20px 22px;
+  }
+
+  .your-match-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .your-match-actions .action-button {
+    flex: 1 1 0;
   }
 
   .join-strip form {

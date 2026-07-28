@@ -10,7 +10,8 @@ import {
   clearActiveMatch,
   enterLiveMatch,
   joinLiveMatchByCode,
-  rememberedActiveMatch,
+  loadRememberedMatchCards,
+  type RememberedMatchCard,
 } from "@/lib/firebase-match";
 import { withBasePath } from "@/lib/paths";
 
@@ -21,69 +22,55 @@ export function HomeScreen() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [joining, setJoining] = useState(false);
-  const [resuming, setResuming] = useState(false);
-  const [clearing, setClearing] = useState(false);
+  const [openingId, setOpeningId] = useState<string | null>(null);
+  const [loadingMatches, setLoadingMatches] = useState(true);
   const [error, setError] = useState("");
-  const [savedMatchId, setSavedMatchId] = useState<string | null>(null);
+  const [savedMatches, setSavedMatches] = useState<RememberedMatchCard[]>([]);
 
   useEffect(() => {
     setName(commanderName() === "Commander" ? "" : commanderName());
     let cancelled = false;
-    async function loadSavedMatch() {
-      const id = rememberedActiveMatch();
-      if (!id) {
-        if (!cancelled) setSavedMatchId(null);
-        return;
-      }
+    async function loadSavedMatches() {
+      setLoadingMatches(true);
       try {
-        const match = await enterLiveMatch(id);
-        if (cancelled) return;
-        if (match.state.status === "finished") {
-          clearActiveMatch(id);
-          setSavedMatchId(null);
-          return;
-        }
-        setSavedMatchId(id);
+        const cards = await loadRememberedMatchCards();
+        if (!cancelled) setSavedMatches(cards);
       } catch {
-        if (!cancelled) {
-          clearActiveMatch(id);
-          setSavedMatchId(null);
-        }
+        if (!cancelled) setSavedMatches([]);
+      } finally {
+        if (!cancelled) setLoadingMatches(false);
       }
     }
-    void loadSavedMatch();
+    void loadSavedMatches();
     return () => {
       cancelled = true;
     };
   }, []);
 
-  async function resumeMatch() {
-    if (!savedMatchId) return;
-    setResuming(true);
+  async function openMatch(matchId: string) {
+    setOpeningId(matchId);
     setError("");
     try {
-      const match = await enterLiveMatch(savedMatchId);
+      const match = await enterLiveMatch(matchId);
       if (match.state.status === "finished") {
-        clearActiveMatch(savedMatchId);
-        setSavedMatchId(null);
+        clearActiveMatch(matchId);
+        setSavedMatches((current) => current.filter((card) => card.id !== matchId));
         setError("That match is already over. Start a new one when you’re ready.");
-        setResuming(false);
+        setOpeningId(null);
         return;
       }
       router.push(`/match/?id=${encodeURIComponent(match.id)}`);
     } catch (reason) {
-      setSavedMatchId(null);
+      clearActiveMatch(matchId);
+      setSavedMatches((current) => current.filter((card) => card.id !== matchId));
       setError(reason instanceof Error ? reason.message : "That saved room did not open.");
-      setResuming(false);
+      setOpeningId(null);
     }
   }
 
-  function quitSavedMatch() {
-    if (!savedMatchId) return;
-    setClearing(true);
-    clearActiveMatch(savedMatchId);
-    setSavedMatchId(null);
-    setClearing(false);
+  function removeMatch(matchId: string) {
+    clearActiveMatch(matchId);
+    setSavedMatches((current) => current.filter((card) => card.id !== matchId));
   }
 
   async function joinByCode(event: React.FormEvent) {
@@ -109,7 +96,7 @@ export function HomeScreen() {
     <main className="home-shell">
       <nav className="home-nav">
         <Brand />
-        <a className="nav-link" href={withBasePath("/fleet-dice-v83.html#ref")}>
+        <a className="nav-link" href={withBasePath("/fleet-dice-v84.html#ref")}>
           How to play
         </a>
       </nav>
@@ -137,30 +124,55 @@ export function HomeScreen() {
         </div>
       </section>
 
-      {savedMatchId ? (
-        <section className="resume-strip">
-          <div>
-            <p className="card-kicker">PICK UP WHERE YOU LEFT OFF</p>
-            <h2>Return to your match</h2>
+      {!loadingMatches && savedMatches.length ? (
+        <section className="your-matches" aria-label="Your matches">
+          <div className="your-matches-head">
+            <p className="card-kicker">YOUR MATCHES</p>
+            <h2>
+              {savedMatches.length === 1
+                ? "1 game in progress"
+                : `${savedMatches.length} games in progress`}
+            </h2>
+            <p className="your-matches-hint">
+              Jump between live rooms on this phone. Remove only forgets the
+              shortcut — use Cancel game inside a match to end it for both players.
+            </p>
           </div>
-          <div className="resume-actions">
-            <button
-              className="action-button light-action"
-              disabled={clearing || resuming}
-              onClick={quitSavedMatch}
-              type="button"
-            >
-              Quit game
-            </button>
-            <button
-              className="action-button gold-action"
-              disabled={resuming || clearing}
-              onClick={resumeMatch}
-              type="button"
-            >
-              {resuming ? "Opening…" : "Continue match"}
-            </button>
-          </div>
+          <ul className="your-matches-list">
+            {savedMatches.map((card) => (
+              <li className="your-match-row" key={card.id}>
+                <div className="your-match-copy">
+                  <strong>
+                    {card.enemyName
+                      ? `${card.youName} vs ${card.enemyName}`
+                      : `${card.youName} · waiting`}
+                  </strong>
+                  <span>
+                    Game {card.code}
+                    {card.status === "waiting" ? " · waiting for opponent" : ` · Round ${card.round}`}
+                  </span>
+                </div>
+                <div className="your-match-actions">
+                  <button
+                    className="action-button light-action"
+                    disabled={openingId === card.id}
+                    onClick={() => removeMatch(card.id)}
+                    type="button"
+                  >
+                    Remove
+                  </button>
+                  <button
+                    className="action-button gold-action"
+                    disabled={Boolean(openingId)}
+                    onClick={() => openMatch(card.id)}
+                    type="button"
+                  >
+                    {openingId === card.id ? "Opening…" : "Open"}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
@@ -168,7 +180,7 @@ export function HomeScreen() {
         <article className="mode-card solo-card compact-mode">
           <p className="card-kicker">SOLO COMMAND</p>
           <h2>Play the computer</h2>
-          <p>The complete v83 game against AI on your phone.</p>
+          <p>The complete v84 game against AI on your phone.</p>
           <Link className="action-button light-action" href="/solo/">
             Start solo
           </Link>
