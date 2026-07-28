@@ -1655,20 +1655,30 @@ input:focus {
   min-height: 148px;
   cursor: default;
   gap: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .ship-act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   width: 100%;
-  min-height: 22px;
-  padding: 3px 4px;
+  min-height: 34px;
+  margin-top: 2px;
+  padding: 5px 3px;
   color: var(--ink);
   background: #18243d;
   border: 1px solid var(--line);
-  border-radius: 7px;
-  font-size: 8px;
+  border-radius: 8px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  line-height: 1.2;
+  line-height: 1.15;
+  white-space: normal;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -1677,14 +1687,33 @@ input:focus {
   cursor: not-allowed;
 }
 
-.ship-act-top {
-  color: #062a47;
-  background: color-mix(in srgb, var(--blue) 22%, #121c30);
-  border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
+.ship-upgrade-act {
+  color: #d8f0ff;
+  background: color-mix(in srgb, var(--blue) 28%, #121c30);
+  border-color: color-mix(in srgb, var(--blue) 55%, var(--line));
 }
 
-.ship-act-bottom {
+.ship-act-label {
+  display: block;
+  width: 100%;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.ship-act-cost {
+  display: block;
+  color: var(--energy);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.ship-act-maxed {
   color: var(--faint);
+  background: transparent;
+  border-style: dashed;
+  cursor: default;
 }
 
 .shop-flag-level {
@@ -1822,6 +1851,27 @@ input:focus {
   border-color: #fff;
   box-shadow: 0 0 0 1px #fff, 0 0 24px -8px #fff;
   transform: translateY(-2px);
+}
+
+.fleet-die.inrun {
+  border-color: #5a3410;
+}
+
+.fleet-die.inrun::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 4px;
+  border-radius: 3px 3px 0 0;
+  background: var(--orange);
+  box-shadow: 0 0 10px -1px var(--orange);
+}
+
+.fleet-die.inrun.selected::before {
+  left: 8px;
+  right: 8px;
 }
 
 .reroll-mark {

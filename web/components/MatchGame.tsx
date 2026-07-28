@@ -435,7 +435,7 @@ function Shipyard({
 
         <section className="upgrade-section" id="fleet-upgrades">
           <div className="section-heading">
-            <h2>Upgrade or scrap ships</h2>
+            <h2>Upgrade ships</h2>
             <span>{you.ships.length} / {you.slots} slots</span>
           </div>
           <FleetFormation
@@ -456,26 +456,27 @@ function Shipyard({
               return (
                 <div className={`fleet-die shop-ship ${damaged ? "hurt" : ""}`} key={ship.id}>
                   <span className="slot-badge">{index + 1}</span>
+                  <ShipHull ready sides={ship.sides} value={0} />
+                  <span className="die-caption">d{ship.sides}</span>
                   {next ? (
                     <button
-                      className="ship-act ship-act-top"
+                      className="ship-act ship-upgrade-act"
                       disabled={busy || damaged || (cost ?? 0) > you.energy}
                       onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
                       type="button"
                     >
-                      {damaged ? "Damaged" : `Upgrade to d${next} · ${cost}⚡`}
+                      {damaged ? (
+                        "Damaged"
+                      ) : (
+                        <>
+                          <span className="ship-act-label">Upgrade to d{next}</span>
+                          <span className="ship-act-cost">{cost}⚡</span>
+                        </>
+                      )}
                     </button>
-                  ) : null}
-                  <ShipHull ready sides={ship.sides} value={0} />
-                  <span className="die-caption">d{ship.sides}</span>
-                  <button
-                    className="ship-act ship-act-bottom"
-                    disabled={busy || damaged || you.ships.length <= 1}
-                    onClick={() => play({ type: "shop", operation: "scrap", shipId: ship.id })}
-                    type="button"
-                  >
-                    {damaged ? "Damaged" : `Scrap · +${Math.floor(priceOf(ship.sides) / 2)}⚡`}
-                  </button>
+                  ) : (
+                    <span className="ship-act ship-act-maxed">{damaged ? "Damaged" : "Max d10"}</span>
+                  )}
                 </div>
               );
             }}
@@ -578,6 +579,7 @@ function RollFleet({
     : undefined;
   const preview = you.dice.length ? previewTally(you, chosenStraightTake) : null;
   const earning = preview ? preview.energy + you.baseEnergy : 0;
+  const inrunIds = straightDieIds(you.dice, preview?.run);
 
   function toggleDie(id: string) {
     setSelected((current) =>
@@ -649,6 +651,7 @@ function RollFleet({
               <FleetDie
                 die={flag}
                 flagLevel={you.flag.level}
+                inrun={inrunIds.has(flag.id)}
                 onClick={() => toggleDie(flag.id)}
                 selected={selected.includes(flag.id)}
               />
@@ -669,6 +672,7 @@ function RollFleet({
             return (
               <FleetDie
                 die={die}
+                inrun={inrunIds.has(die.id)}
                 onClick={() => toggleDie(die.id)}
                 selected={selected.includes(die.id)}
                 slot={index + 1}
@@ -1056,6 +1060,19 @@ function ReportSide({
   );
 }
 
+function straightDieIds(
+  dice: DieValue[],
+  run: { start: number; top: number } | null | undefined,
+) {
+  if (!run) return new Set<string>();
+  const ids = new Set<string>();
+  for (let value = run.start; value <= run.top; value += 1) {
+    const die = dice.find((entry) => entry.value === value);
+    if (die) ids.add(die.id);
+  }
+  return ids;
+}
+
 function FleetDie({
   die,
   selected = false,
@@ -1063,6 +1080,7 @@ function FleetDie({
   staticDie = false,
   slot,
   flagLevel = 1,
+  inrun = false,
 }: {
   die: DieValue;
   selected?: boolean;
@@ -1070,6 +1088,7 @@ function FleetDie({
   staticDie?: boolean;
   slot?: number;
   flagLevel?: number;
+  inrun?: boolean;
 }) {
   const flag = die.flag ? flagFaceDetail(die.value, flagLevel) : null;
   const effect = flag
@@ -1079,7 +1098,7 @@ function FleetDie({
       : "Shield";
   return (
     <button
-      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
+      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${inrun ? "inrun" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
       disabled={staticDie}
       onClick={onClick}
       type="button"
