@@ -446,7 +446,7 @@ function Shipyard({
                     onClick={() => play({ type: "shop", operation: "flagship" })}
                     type="button"
                   >
-                    Upgrade to level {you.flag.level + 1} for {flagCost}⚡
+                    Upgrade to level {you.flag.level + 1} {flagCost}⚡
                   </button>
                 ) : (
                   <span className="ship-act ship-act-maxed">Level 3 maximum</span>
@@ -472,7 +472,7 @@ function Shipyard({
                 >
                   <span className="slot-badge">{index + 1}</span>
                   <span className="unlock-slot-label">Unlock fleet slot</span>
-                  <strong className="unlock-slot-cost">for {nextSlotCost}⚡</strong>
+                  <strong className="unlock-slot-cost">{nextSlotCost}⚡</strong>
                 </button>
               );
             }}
@@ -493,7 +493,7 @@ function Shipyard({
                       onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
                       type="button"
                     >
-                      {damaged ? "Damaged" : `Upgrade to d${next} for ${cost}⚡`}
+                      {damaged ? "Damaged" : `Upgrade to d${next} ${cost}⚡`}
                     </button>
                   ) : (
                     <span className="ship-act ship-act-maxed">{damaged ? "Damaged" : "Max d10"}</span>
@@ -520,7 +520,7 @@ function Shipyard({
               >
                 <ShipHull ready sides={sides} value={0} />
                 <strong>d{sides}</strong>
-                <span>for {priceOf(sides)}⚡</span>
+                <span>{priceOf(sides)}⚡</span>
               </button>
             ))}
           </div>
@@ -562,6 +562,8 @@ function RollFleet({
   onCancel: () => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const [rolledIds, setRolledIds] = useState<Set<string>>(() => new Set());
+  const [rollPulse, setRollPulse] = useState(0);
   const run = straightOptions(you);
   const [straightTake, setStraightTake] = useState<number | undefined>(run?.length);
   const chosenStraightTake = run
@@ -571,14 +573,33 @@ function RollFleet({
   const earning = preview ? preview.energy + you.baseEnergy : 0;
   const inrunIds = straightDieIds(you.dice, preview?.run);
 
+  useEffect(() => {
+    if (!rolledIds.size) return;
+    const timer = window.setTimeout(() => setRolledIds(new Set()), 360);
+    return () => window.clearTimeout(timer);
+  }, [rollPulse, rolledIds]);
+
+  function markRolled(ids: string[]) {
+    setRolledIds(new Set(ids));
+    setRollPulse((pulse) => pulse + 1);
+  }
+
   function toggleDie(id: string) {
     setSelected((current) =>
       current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
     );
   }
 
+  async function rollOpening() {
+    const ids = [...activeShips(you, round).map((ship) => ship.id), "flag"];
+    await play({ type: "roll", dice: [] });
+    markRolled(ids);
+  }
+
   async function rollSelected() {
-    await play({ type: "roll", dice: selected });
+    const ids = [...selected];
+    await play({ type: "roll", dice: ids });
+    markRolled(ids);
     setSelected([]);
   }
 
@@ -588,7 +609,7 @@ function RollFleet({
       <button
         className="go-btn mid-btn"
         disabled={busy}
-        onClick={() => play({ type: "roll", dice: [] })}
+        onClick={rollOpening}
         type="button"
       >
         Roll 1 of 3
@@ -648,6 +669,7 @@ function RollFleet({
                 flagLevel={you.flag.level}
                 inrun={inrunIds.has(flag.id)}
                 onClick={() => toggleDie(flag.id)}
+                rolled={rolledIds.has(flag.id)}
                 selected={selected.includes(flag.id)}
               />
             );
@@ -669,6 +691,7 @@ function RollFleet({
                 die={die}
                 inrun={inrunIds.has(die.id)}
                 onClick={() => toggleDie(die.id)}
+                rolled={rolledIds.has(die.id)}
                 selected={selected.includes(die.id)}
                 slot={index + 1}
               />
@@ -1106,6 +1129,7 @@ function FleetDie({
   slot,
   flagLevel = 1,
   inrun = false,
+  rolled = false,
 }: {
   die: DieValue;
   selected?: boolean;
@@ -1114,6 +1138,7 @@ function FleetDie({
   slot?: number;
   flagLevel?: number;
   inrun?: boolean;
+  rolled?: boolean;
 }) {
   const flag = die.flag ? flagFaceDetail(die.value, flagLevel) : null;
   const effect = flag
@@ -1123,7 +1148,7 @@ function FleetDie({
       : "Shield";
   return (
     <button
-      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${inrun ? "inrun" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
+      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${inrun ? "inrun" : ""} ${rolled ? "rolled" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
       disabled={staticDie}
       onClick={onClick}
       type="button"

@@ -2362,6 +2362,17 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   touch-action: pan-y;
 }
 
+@keyframes tumble {
+  0% { transform: rotate(0) scale(1); }
+  30% { transform: rotate(-14deg) scale(0.9); }
+  60% { transform: rotate(11deg) scale(1.06); }
+  100% { transform: rotate(0) scale(1); }
+}
+
+.fleet-die.rolled {
+  animation: tumble 0.32s ease;
+}
+
 .fleet-die .hull {
   display: block;
   width: 100%;
