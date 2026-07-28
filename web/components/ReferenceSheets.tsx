@@ -1,8 +1,11 @@
 "use client";
 
 import {
+  directOf,
+  energyOf,
   flagshipUpgradeCost,
   priceOf,
+  repairOf,
   slotPrice,
   type DieSize,
 } from "@/lib/game";
@@ -10,6 +13,7 @@ import {
   FlagHull,
   HullOutline,
   MarkIcon,
+  ShipHull,
   flagFaceDetail,
 } from "./DieArt";
 
@@ -22,12 +26,47 @@ const SHAPES: { sides: DieSize; name: string; shape: string }[] = [
   { sides: 10, name: "d10", shape: "pentagon" },
 ];
 
+const DIE_SIZES: DieSize[] = [4, 6, 8, 10];
+
 const STRAIGHT_ROWS: { length: number; rewards: (string | null)[] }[] = [
   { length: 5, rewards: ["6⚡", "9⚡", "12⚡", "15⚡"] },
   { length: 6, rewards: ["8", "12", "16", "20"] },
   { length: 7, rewards: [null, "18", "24", "30"] },
   { length: 8, rewards: [null, null, "d8 +16", "d10 +20"] },
 ];
+
+function faceEffectText(value: number) {
+  const parts = [value % 2 === 0 ? `hits for ${value}` : `blocks for ${value}`];
+  const energy = energyOf(value);
+  const repair = repairOf(value);
+  const direct = directOf(value);
+  if (energy) parts.push(`earns ${energy} Energy`);
+  if (repair) parts.push(`repairs ${repair}`);
+  if (direct) parts.push(`fires ${direct} Direct`);
+  return parts.join(" · ");
+}
+
+function FaceMarks({ value }: { value: number }) {
+  const energy = energyOf(value);
+  const repair = repairOf(value);
+  const direct = directOf(value);
+  if (!energy && !repair && !direct) {
+    return <span className="help-face-empty">—</span>;
+  }
+  return (
+    <span className="help-key-marks">
+      {Array.from({ length: energy }, (_, index) => (
+        <MarkIcon kind="bolt" key={`e-${index}`} />
+      ))}
+      {Array.from({ length: Math.min(repair, 4) }, (_, index) => (
+        <MarkIcon kind="cross" key={`r-${index}`} />
+      ))}
+      {Array.from({ length: Math.min(direct, 4) }, (_, index) => (
+        <MarkIcon kind="chev" key={`d-${index}`} />
+      ))}
+    </span>
+  );
+}
 
 export function ReferenceSheets({
   kind,
@@ -48,7 +87,7 @@ export function ReferenceSheets({
 }) {
   return (
     <div className="reference-overlay" role="dialog" aria-modal="true" aria-labelledby="reference-title">
-      <div className="reference-sheet">
+      <div className="reference-sheet reference-sheet-wide">
         {kind === "help" ? <HelpSheet flagLevel={flagLevel} /> : (
           <CostsSheet
             baseEnergy={baseEnergy}
@@ -81,6 +120,10 @@ function HelpSheet({ flagLevel }: { flagLevel: number }) {
 
       <article className="reference-card">
         <h3>A round, start to finish</h3>
+        <p className="reference-note" style={{ marginBottom: 10 }}>
+          Four steps, always the same — versus just keeps each commander on their own
+          pace after the reveal.
+        </p>
         <ol className="reference-steps">
           <li>
             <b>1 · Roll.</b> The round opens with every available die <b>Ready</b>.
@@ -110,12 +153,12 @@ function HelpSheet({ flagLevel }: { flagLevel: number }) {
         <h3>Ship shapes</h3>
         <p>
           The hull is the size. Once you know the silhouette, you can read the board
-          at a glance:
+          at a glance — same pictures you see when you roll:
         </p>
         <div className="help-shape-grid">
           {SHAPES.map((entry) => (
             <div className="help-shape-card" key={entry.sides}>
-              <HullOutline sides={entry.sides} />
+              <ShipHull ready sides={entry.sides} value={0} />
               <strong>{entry.name}</strong>
               <span>{entry.shape}</span>
             </div>
@@ -217,6 +260,39 @@ function HelpSheet({ flagLevel }: { flagLevel: number }) {
       </article>
 
       <article className="reference-card">
+        <h3>Every face on every die</h3>
+        <p>
+          The number always fights: even hits, odd blocks. The symbols beside it pay
+          an extra effect at the same time. These are the same ship pictures you see
+          on the board.
+        </p>
+        <div className="help-facebooks">
+          {DIE_SIZES.map((sides) => (
+            <div className="help-facebook" key={sides}>
+              <div className="help-facebook-head">
+                <HullOutline sides={sides} />
+                <div>
+                  <strong>d{sides}</strong>
+                  <span>faces 1 through {sides}</span>
+                </div>
+              </div>
+              {Array.from({ length: sides }, (_, index) => {
+                const value = index + 1;
+                return (
+                  <div className="help-face-row" key={value}>
+                    <ShipHull sides={sides} value={value} />
+                    <b className={value % 2 === 0 ? "damage-text" : "shield-text"}>{value}</b>
+                    <FaceMarks value={value} />
+                    <span>{faceEffectText(value)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article className="reference-card">
         <h3>Your flagship</h3>
         <p>
           It rolls like any other die, but it never fights. Its number joins your
@@ -235,7 +311,7 @@ function HelpSheet({ flagLevel }: { flagLevel: number }) {
         <p className="reference-note">
           You are on level {flagLevel} — each matching die currently gets +{mul}.
         </p>
-        <div className="help-flag-grid">
+        <div className="help-flag-grid help-flag-grid-wide">
           {[1, 2, 3, 4, 5, 6].map((face) => {
             const detail = flagFaceDetail(face, flagLevel);
             return (

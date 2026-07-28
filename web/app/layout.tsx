@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og.png",
-        width: 1733,
-        height: 908,
+        url: "/fleet-dice-key-art.png",
+        width: 1024,
+        height: 640,
         alt: "Fleet Dice — Build the fleet. Break the flagship.",
       },
     ],
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: "Fleet Dice",
     description:
       "Build a fleet of dice, chase straights, and break the enemy flagship.",
-    images: ["/og.png"],
+    images: ["/fleet-dice-key-art.png"],
   },
 };
 

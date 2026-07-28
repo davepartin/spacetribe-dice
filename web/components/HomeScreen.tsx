@@ -13,6 +13,8 @@ import {
 } from "@/lib/firebase-match";
 import { withBasePath } from "@/lib/paths";
 
+const KEY_ART = withBasePath("/fleet-dice-key-art.png");
+
 export function HomeScreen() {
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -69,17 +71,27 @@ export function HomeScreen() {
         </a>
       </nav>
 
-      <section className="hero">
-        <p className="eyebrow">A DICE-BUILDING BATTLE</p>
-        <h1>
-          BUILD THE FLEET.
-          <br />
-          <span>BREAK THE FLAGSHIP.</span>
-        </h1>
-        <p className="hero-copy">
-          Upgrade your ships. Hunt the straight. Decide what to risk—and when
-          to put your fleet in the line of fire.
+      <section className="hero-billboard" aria-label="Fleet Dice">
+        <img
+          alt="Fleet Dice — Build the fleet. Break the flagship."
+          className="hero-key-art"
+          height={640}
+          src={KEY_ART}
+          width={1024}
+        />
+        <p className="hero-support">
+          Upgrade your ships. Hunt the straight. Decide what to risk.
         </p>
+        <div className="hero-cta-row">
+          <Link className="action-button light-action" href="/solo/">
+            Start solo
+            <span aria-hidden="true">→</span>
+          </Link>
+          <Link className="action-button red-action" href="/versus/">
+            Create match
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </section>
 
       {savedMatchId ? (
@@ -99,34 +111,22 @@ export function HomeScreen() {
         </section>
       ) : null}
 
-      <section className="mode-grid" aria-label="Choose a match">
-        <article className="mode-card solo-card">
-          <div className="mode-art" aria-hidden="true">
-            <span className="mini-die d4">4</span>
-            <span className="mini-die flag-die">3</span>
-            <span className="mini-die d8">8</span>
-          </div>
-          <p className="card-kicker">PLAY NOW</p>
-          <h2>Solo Command</h2>
-          <p>Build your fleet against the computer. The complete v83 game.</p>
+      <section className="mode-grid compact-modes" aria-label="Choose a match">
+        <article className="mode-card solo-card compact-mode">
+          <p className="card-kicker">SOLO COMMAND</p>
+          <h2>Play the computer</h2>
+          <p>The complete v83 game against AI on your phone.</p>
           <Link className="action-button light-action" href="/solo/">
             Start solo
-            <span aria-hidden="true">→</span>
           </Link>
         </article>
 
-        <article className="mode-card versus-card">
-          <div className="versus-mark" aria-hidden="true">
-            <span>YOU</span>
-            <b>VS</b>
-            <span>ENEMY</span>
-          </div>
-          <p className="card-kicker">PRIVATE MATCH</p>
-          <h2>Versus Command</h2>
-          <p>Create a room, text the invite, and play together from any phone.</p>
+        <article className="mode-card versus-card compact-mode">
+          <p className="card-kicker">VERSUS COMMAND</p>
+          <h2>Challenge a friend</h2>
+          <p>Private room, four-digit code, live rounds from any phone.</p>
           <Link className="action-button red-action" href="/versus/">
             Create match
-            <span aria-hidden="true">→</span>
           </Link>
         </article>
       </section>

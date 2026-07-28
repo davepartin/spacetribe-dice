@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "./Brand";
 import { commanderName, firebaseConfigured, rememberCommanderName } from "@/lib/firebase";
 import { enterLiveMatch, joinLiveMatch } from "@/lib/firebase-match";
+import { withBasePath } from "@/lib/paths";
 
 export function JoinMatch() {
   const searchParams = useSearchParams();
@@ -62,6 +63,14 @@ export function JoinMatch() {
       <main className="page-shell launcher-page">
         <SiteHeader />
         <section className="launcher-card enemy-launcher">
+          <img
+            alt=""
+            aria-hidden="true"
+            className="launcher-key-art"
+            height={640}
+            src={withBasePath("/fleet-dice-key-art.png")}
+            width={1024}
+          />
           <p className="eyebrow">OPENING YOUR ROOM</p>
           <h1>Checking this invite…</h1>
           <p>If you already created or joined this match, we will put you back in.</p>
@@ -74,11 +83,14 @@ export function JoinMatch() {
     <main className="page-shell launcher-page">
       <SiteHeader />
       <section className="launcher-card enemy-launcher">
-        <div className="versus-mark small-versus" aria-hidden="true">
-          <span>YOU</span>
-          <b>VS</b>
-          <span>ENEMY</span>
-        </div>
+        <img
+          alt=""
+          aria-hidden="true"
+          className="launcher-key-art"
+          height={640}
+          src={withBasePath("/fleet-dice-key-art.png")}
+          width={1024}
+        />
         <p className="eyebrow">YOU HAVE BEEN CHALLENGED</p>
         <h1>Enter the battlefield.</h1>
         <p>

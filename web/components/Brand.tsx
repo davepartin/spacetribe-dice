@@ -1,10 +1,23 @@
 import Link from "next/link";
+import { withBasePath } from "@/lib/paths";
+
+const KEY_ART = withBasePath("/fleet-dice-key-art.png");
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <Link className={`brand ${compact ? "brand-compact" : ""}`} href="/">
-      <span>FLEET DICE</span>
-      <small>ONLINE</small>
+      <img
+        alt=""
+        aria-hidden="true"
+        className="brand-mark"
+        height={40}
+        src={KEY_ART}
+        width={64}
+      />
+      <span className="brand-copy">
+        <span>FLEET DICE</span>
+        <small>ONLINE</small>
+      </span>
     </Link>
   );
 }

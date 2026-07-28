@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SiteHeader } from "./Brand";
 import { commanderName, firebaseConfigured, rememberCommanderName } from "@/lib/firebase";
 import { createLiveMatch } from "@/lib/firebase-match";
+import { withBasePath } from "@/lib/paths";
 
 export function VersusLauncher() {
   const router = useRouter();
@@ -38,9 +39,14 @@ export function VersusLauncher() {
     <main className="page-shell launcher-page">
       <SiteHeader />
       <section className="launcher-card">
-        <div className="launcher-icon" aria-hidden="true">
-          <span className="mini-die flag-die">6</span>
-        </div>
+        <img
+          alt=""
+          aria-hidden="true"
+          className="launcher-key-art"
+          height={640}
+          src={withBasePath("/fleet-dice-key-art.png")}
+          width={1024}
+        />
         <p className="eyebrow">VERSUS COMMAND</p>
         <h1>Open a private battlefield.</h1>
         <p>

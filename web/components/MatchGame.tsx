@@ -205,7 +205,10 @@ export function MatchGame() {
           <div className="confirm-card">
             <p className="eyebrow">LEAVE THE FIELD</p>
             <h2 id="cancel-title">Cancel this game?</h2>
-            <p>This ends the match for both commanders and removes it from the live board.</p>
+            <p>
+              Are you sure? This ends the match for both commanders and removes it
+              from the live board.
+            </p>
             {error ? <p className="form-error">{error}</p> : null}
             <div className="confirm-actions">
               <button
@@ -280,14 +283,16 @@ function MatchDock({
         {primary}
       </div>
       <div className="match-dock-links">
-        <button className="howto-btn" onClick={onHelp} type="button">
+        <button className="dock-btn howto-btn" onClick={onHelp} type="button">
           How to play
         </button>
         {onCancel ? (
-          <button className="dock-cancel" onClick={onCancel} type="button">
+          <button className="dock-btn dock-cancel" onClick={onCancel} type="button">
             Cancel game
           </button>
-        ) : null}
+        ) : (
+          <span className="dock-btn-spacer" aria-hidden="true" />
+        )}
       </div>
     </div>
   );
