@@ -31,9 +31,9 @@ import { FlagHull, ShipHull, flagFaceDetail } from "./DieArt";
 function friendlyFirebaseError(reason: unknown): string {
   const message = reason instanceof Error ? reason.message : String(reason || "The match did not load.");
   if (/Missing or insufficient permissions|permission-denied/i.test(message)) {
-    return "Firebase blocked that match action. If you were joining, the room rules needed an update — try again after rules deploy.";
+    return "That room already has two players. If you created the game, stay on your original game tab — you are already in.";
   }
-  if (/Open the invite link/i.test(message)) {
+  if (/Open the invite link|already has two players/i.test(message)) {
     return message;
   }
   return message;

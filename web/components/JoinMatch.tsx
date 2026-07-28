@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "./Brand";
 import { commanderName, firebaseConfigured, rememberCommanderName } from "@/lib/firebase";
-import { joinLiveMatch } from "@/lib/firebase-match";
+import { enterLiveMatch, joinLiveMatch } from "@/lib/firebase-match";
 
 export function JoinMatch() {
   const searchParams = useSearchParams();
@@ -12,7 +12,31 @@ export function JoinMatch() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [checking, setChecking] = useState(Boolean(matchId));
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!matchId || !firebaseConfigured) {
+      setChecking(false);
+      return;
+    }
+
+    (async () => {
+      try {
+        const existing = await enterLiveMatch(matchId);
+        if (!cancelled) {
+          router.replace(`/match/?id=${encodeURIComponent(existing.id)}`);
+        }
+      } catch {
+        if (!cancelled) setChecking(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [matchId, router]);
 
   async function join(event: React.FormEvent) {
     event.preventDefault();
@@ -28,16 +52,22 @@ export function JoinMatch() {
       const match = await joinLiveMatch(matchId, chosenName);
       router.replace(`/match/?id=${encodeURIComponent(match.id)}`);
     } catch (reason) {
-      const message = reason instanceof Error ? reason.message : "The battlefield did not open.";
-      if (/insufficient permissions|permission-denied/i.test(message)) {
-        setError(
-          "Firebase blocked joining this room. The host’s phase changes when you join, and the old security rules rejected that. Deploy the updated firestore.rules, then try again.",
-        );
-      } else {
-        setError(message);
-      }
+      setError(reason instanceof Error ? reason.message : "The battlefield did not open.");
       setBusy(false);
     }
+  }
+
+  if (checking) {
+    return (
+      <main className="page-shell launcher-page">
+        <SiteHeader />
+        <section className="launcher-card enemy-launcher">
+          <p className="eyebrow">OPENING YOUR ROOM</p>
+          <h1>Checking this invite…</h1>
+          <p>If you already created or joined this match, we will put you back in.</p>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -52,8 +82,9 @@ export function JoinMatch() {
         <p className="eyebrow">YOU HAVE BEEN CHALLENGED</p>
         <h1>Enter the battlefield.</h1>
         <p>
-          Choose the name your opponent will see. Your browser remembers this
-          match—there is no account or password.
+          Type the name your opponent will see, then join. If you are the one who
+          created the room, go back to your original game tab instead — you are
+          already in.
         </p>
         <form onSubmit={join}>
           <label htmlFor="join-commander">COMMANDER NAME</label>

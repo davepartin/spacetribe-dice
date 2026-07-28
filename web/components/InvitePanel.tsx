@@ -16,8 +16,8 @@ export function InvitePanel({
 }) {
   const [copied, setCopied] = useState(false);
   const url = useMemo(
-    () => absoluteAppUrl(`/join/?id=${encodeURIComponent(matchId)}`),
-    [matchId],
+    () => absoluteAppUrl(`/join/?id=${encodeURIComponent(matchId)}&code=${encodeURIComponent(code)}`),
+    [matchId, code],
   );
   const message = `Join my Fleet Dice match. Game code ${code}: ${url}`;
 
@@ -48,7 +48,10 @@ export function InvitePanel({
       </div>
       <p className="eyebrow">PRIVATE ROOM OPEN</p>
       <h1>Waiting for the Enemy.</h1>
-      <p>Send either the link or these four numbers. The match starts when they arrive.</p>
+      <p>
+        <b>Stay on this page</b> — you are already in the game. Send the link or
+        the four numbers to your friend. Only they should open the invite.
+      </p>
       <div className="room-code" aria-label={`Game code ${code}`}>
         {code.split("").map((number, index) => (
           <span key={`${number}-${index}`}>{number}</span>
@@ -79,7 +82,7 @@ export function InvitePanel({
         ) : null}
       </div>
       <p className="waiting-note">
-        Keep this page open. Your battlefield will appear automatically.
+        Keep this page open. When your friend joins with the code, the battle starts here automatically.
       </p>
     </section>
   );

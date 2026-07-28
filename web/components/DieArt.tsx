@@ -204,3 +204,36 @@ export function flagFaceDetail(value: number, flagLevel = 1) {
     short: face.short(mul),
   };
 }
+
+export function HullOutline({ sides }: { sides: DieSize | number }) {
+  const hull = HULLS[sides] || HULLS[6];
+  return (
+    <svg className="hull" viewBox="0 0 100 100" aria-hidden="true">
+      <polygon
+        points={hull.pts}
+        fill="var(--dim)"
+        fillOpacity={0.14}
+        stroke="var(--ink)"
+        strokeWidth={2.5}
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function MarkIcon({
+  kind,
+  className = "mark-icon",
+}: {
+  kind: "bolt" | "cross" | "chev";
+  className?: string;
+}) {
+  const glyph = kind === "bolt" ? BOLT : kind === "cross" ? CROSS : CHEV;
+  const colour =
+    kind === "bolt" ? "var(--energy)" : kind === "cross" ? "var(--repair)" : "var(--direct)";
+  return (
+    <svg className={className} viewBox="0 0 20 20" aria-hidden="true">
+      <path d={glyph} fill={colour} transform="translate(10,10) scale(1.15)" />
+    </svg>
+  );
+}

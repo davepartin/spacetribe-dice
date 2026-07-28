@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Brand } from "./Brand";
 import { LiveBattlesBoard } from "./LiveBattlesBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
-import { joinLiveMatchByCode } from "@/lib/firebase-match";
+import {
+  enterLiveMatch,
+  joinLiveMatchByCode,
+  rememberedActiveMatch,
+} from "@/lib/firebase-match";
 import { withBasePath } from "@/lib/paths";
 
 export function HomeScreen() {
@@ -14,7 +18,28 @@ export function HomeScreen() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [joining, setJoining] = useState(false);
+  const [resuming, setResuming] = useState(false);
   const [error, setError] = useState("");
+  const [savedMatchId, setSavedMatchId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSavedMatchId(rememberedActiveMatch());
+    setName(commanderName() === "Commander" ? "" : commanderName());
+  }, []);
+
+  async function resumeMatch() {
+    if (!savedMatchId) return;
+    setResuming(true);
+    setError("");
+    try {
+      const match = await enterLiveMatch(savedMatchId);
+      router.push(`/match/?id=${encodeURIComponent(match.id)}`);
+    } catch (reason) {
+      setSavedMatchId(null);
+      setError(reason instanceof Error ? reason.message : "That saved room did not open.");
+      setResuming(false);
+    }
+  }
 
   async function joinByCode(event: React.FormEvent) {
     event.preventDefault();
@@ -57,6 +82,23 @@ export function HomeScreen() {
         </p>
       </section>
 
+      {savedMatchId ? (
+        <section className="resume-strip">
+          <div>
+            <p className="card-kicker">PICK UP WHERE YOU LEFT OFF</p>
+            <h2>Return to your match</h2>
+          </div>
+          <button
+            className="action-button gold-action"
+            disabled={resuming}
+            onClick={resumeMatch}
+            type="button"
+          >
+            {resuming ? "Opening…" : "Continue match"}
+          </button>
+        </section>
+      ) : null}
+
       <section className="mode-grid" aria-label="Choose a match">
         <article className="mode-card solo-card">
           <div className="mode-art" aria-hidden="true">
@@ -93,6 +135,10 @@ export function HomeScreen() {
         <div>
           <p className="card-kicker">HAVE A GAME CODE?</p>
           <h2>Join your enemy</h2>
+          <p className="join-hint">
+            Like Jackbox: enter the four numbers your friend shows you. If you
+            created the room, stay on your game tab instead.
+          </p>
         </div>
         <form onSubmit={joinByCode}>
           <input

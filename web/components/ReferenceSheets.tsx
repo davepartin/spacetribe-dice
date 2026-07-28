@@ -6,8 +6,28 @@ import {
   slotPrice,
   type DieSize,
 } from "@/lib/game";
+import {
+  FlagHull,
+  HullOutline,
+  MarkIcon,
+  flagFaceDetail,
+} from "./DieArt";
 
 export type ReferenceKind = "help" | "costs";
+
+const SHAPES: { sides: DieSize; name: string; shape: string }[] = [
+  { sides: 4, name: "d4", shape: "triangle" },
+  { sides: 6, name: "d6", shape: "square" },
+  { sides: 8, name: "d8", shape: "diamond" },
+  { sides: 10, name: "d10", shape: "pentagon" },
+];
+
+const STRAIGHT_ROWS: { length: number; rewards: (string | null)[] }[] = [
+  { length: 5, rewards: ["6⚡", "9⚡", "12⚡", "15⚡"] },
+  { length: 6, rewards: ["8", "12", "16", "20"] },
+  { length: 7, rewards: [null, "18", "24", "30"] },
+  { length: 8, rewards: [null, null, "d8 +16", "d10 +20"] },
+];
 
 export function ReferenceSheets({
   kind,
@@ -29,7 +49,7 @@ export function ReferenceSheets({
   return (
     <div className="reference-overlay" role="dialog" aria-modal="true" aria-labelledby="reference-title">
       <div className="reference-sheet">
-        {kind === "help" ? <HelpSheet /> : (
+        {kind === "help" ? <HelpSheet flagLevel={flagLevel} /> : (
           <CostsSheet
             baseEnergy={baseEnergy}
             energy={energy}
@@ -46,69 +66,259 @@ export function ReferenceSheets({
   );
 }
 
-function HelpSheet() {
+function HelpSheet({ flagLevel }: { flagLevel: number }) {
+  const mul = Math.min(4, flagLevel + 1);
   return (
     <>
       <p className="eyebrow">HOW TO PLAY</p>
-      <h2 id="reference-title">Instructions</h2>
+      <h2 id="reference-title">How to play</h2>
       <p className="stage-copy">
         Every die is a ship. Your <b className="energy-text">flagship</b> sits in the
-        middle with 60 health. The match ends when one flagship is destroyed.
+        middle with <b className="repair-text">60</b> health, and the match ends the
+        moment one flagship is destroyed. There is no round limit — most matches run
+        8 to 17.
       </p>
 
       <article className="reference-card">
         <h3>A round, start to finish</h3>
         <ol className="reference-steps">
           <li>
-            <b>Roll.</b> Roll 1 rolls every available ship and your flagship. Before
-            rolls 2 and 3, tap only the dice you want to change. After three free
-            rolls you can lock orders, buy an extra reroll, or use your Flagship Token.
+            <b>1 · Roll.</b> The round opens with every available die <b>Ready</b>.
+            Roll 1 rolls everything. Before rolls 2 and 3, tap only the ship dice or
+            flagship you want to roll again. After the final free roll, either lock
+            orders, buy another reroll, or use your Flagship Token.
           </li>
           <li>
-            <b>Lock & wait.</b> When both fleets lock, rolls are revealed. Attack meets
-            the other side’s shields; leftover volley and Direct go toward the flagship.
+            <b>2 · Lock.</b> When both fleets lock, rolls are revealed. Your attack
+            meets Enemy shields; Enemy attack meets yours. Whatever is left over
+            lands on a flagship.
           </li>
           <li>
-            <b>Take the hit.</b> Put ships in front of the volley if you want. Each
-            blocks its size, then misses the next round. <b className="direct-text">Direct</b> always
-            reaches the flagship.
+            <b>3 · Take the hit.</b> You choose where Enemy damage goes — all on your
+            flagship, or put as many ships as you want in front of it. Every ship you
+            choose will miss the next round.
           </li>
           <li>
-            <b>Upgrade.</b> Between rounds, upgrade ships, open slots, buy ships, or
-            raise the flagship — then roll again. You do not wait on the opponent after
-            the reveal.
+            <b>4 · Spend.</b> Between rounds you upgrade ships, open slots, buy new
+            ships, or upgrade the flagship. Then it starts again. After the reveal you
+            do not wait on your opponent to brace or shop.
           </li>
         </ol>
       </article>
 
       <article className="reference-card">
-        <h3>How to read a die</h3>
-        <p>Even numbers attack. Odd numbers add shields. Printed marks also pay:</p>
-        <ul className="reference-list">
-          <li><b>1</b> — Energy</li>
-          <li><b>2</b> — Direct (cannot be blocked)</li>
-          <li><b>3</b> — Repair</li>
-          <li><b>4</b> — Energy + attack</li>
-          <li>Higher faces on upgraded ships add more repair or Direct</li>
-        </ul>
+        <h3>Ship shapes</h3>
+        <p>
+          The hull is the size. Once you know the silhouette, you can read the board
+          at a glance:
+        </p>
+        <div className="help-shape-grid">
+          {SHAPES.map((entry) => (
+            <div className="help-shape-card" key={entry.sides}>
+              <HullOutline sides={entry.sides} />
+              <strong>{entry.name}</strong>
+              <span>{entry.shape}</span>
+            </div>
+          ))}
+        </div>
       </article>
 
       <article className="reference-card">
-        <h3>Flagship</h3>
+        <h3>How to read a die</h3>
         <p>
-          It never attacks. Its number joins your straight, and its face boosts matching
-          ship results (exact 2 / 3 / 4, every odd on 5, every even on 6). Face 1 raises
-          standing Energy instead. Each fleet has one Flagship Token per match to rotate
-          the face ±1 after roll 3.
+          Every ship rolls one face. <b className="damage-text">Even numbers hit</b>,{" "}
+          <b className="shield-text">odd numbers block</b>. Printed marks do a second
+          job on top, and every mark always pays.
         </p>
+        <div className="help-mark-grid">
+          <div className="help-mark-card">
+            <MarkIcon kind="bolt" />
+            <div className="mark-copy">
+              <strong>Lightning bolt · Energy</strong>
+              <span>
+                Yellow bolts are Energy you can spend later on rerolls, ships, slots,
+                and flagship levels.
+              </span>
+            </div>
+          </div>
+          <div className="help-mark-card">
+            <MarkIcon kind="cross" />
+            <div className="mark-copy">
+              <strong>Green plus · Repair</strong>
+              <span>
+                Green crosses heal your flagship this round. A 3 always repairs; bigger
+                ships add more repair on 5 / 7 / 9.
+              </span>
+            </div>
+          </div>
+          <div className="help-mark-card">
+            <MarkIcon kind="chev" />
+            <div className="mark-copy">
+              <strong>Violet chevron · Direct</strong>
+              <span>
+                Chevrons fire Direct damage that cannot be blocked — not by shields,
+                not by a ship thrown in the way. It always reaches the enemy flagship.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="help-key-table" aria-label="Face reference">
+          <div className="help-key-row">
+            <b className="energy-text">1</b>
+            <span className="help-key-marks">
+              <MarkIcon kind="bolt" />
+              <MarkIcon kind="bolt" />
+            </span>
+            <span>
+              blocks for <b>1</b>, and pays <b className="energy-text">2 Energy</b>
+            </span>
+          </div>
+          <div className="help-key-row">
+            <b className="direct-text">2</b>
+            <span className="help-key-marks">
+              <MarkIcon kind="chev" />
+              <MarkIcon kind="chev" />
+            </span>
+            <span>
+              hits for <b>2</b>, and fires <b className="direct-text">2 Direct</b>
+            </span>
+          </div>
+          <div className="help-key-row">
+            <b className="repair-text">3</b>
+            <span className="help-key-marks">
+              <MarkIcon kind="cross" />
+              <MarkIcon kind="cross" />
+              <MarkIcon kind="cross" />
+            </span>
+            <span>
+              blocks for <b>3</b>, and <b className="repair-text">repairs 3</b>
+            </span>
+          </div>
+          <div className="help-key-row">
+            <b className="energy-text">4</b>
+            <span className="help-key-marks">
+              <MarkIcon kind="bolt" />
+            </span>
+            <span>
+              hits for <b>4</b>, and pays <b className="energy-text">1 Energy</b>
+            </span>
+          </div>
+          <div className="help-key-row">
+            <b>5+</b>
+            <span className="help-key-marks">
+              <MarkIcon kind="cross" />
+              <MarkIcon kind="chev" />
+            </span>
+            <span>
+              upgrading adds escalating repair on 5 / 7 / 9 and Direct on 6 / 8 / 10
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article className="reference-card">
+        <h3>Your flagship</h3>
+        <p>
+          It rolls like any other die, but it never fights. Its number joins your
+          straight, and whichever face it lands on <b>adds a bonus to the matching
+          ships</b> — 2, 3 and 4 match that exact number; 5 boosts every odd shield
+          and 6 boosts every even attack. Those dice get a thin ring in the
+          flagship&apos;s colour so you can see it happening. The <b>#1</b> face is
+          the exception: it raises your standing Energy for the rest of the match, so
+          it rings nothing.
+        </p>
+        <p className="reference-note">
+          <b>Both fleets receive one Flagship Token per match.</b> After the final
+          free roll, spend it to rotate the flagship one number up or down. The ends
+          wrap: #1 can turn down to #6, and #6 can turn up to #1.
+        </p>
+        <p className="reference-note">
+          You are on level {flagLevel} — each matching die currently gets +{mul}.
+        </p>
+        <div className="help-flag-grid">
+          {[1, 2, 3, 4, 5, 6].map((face) => {
+            const detail = flagFaceDetail(face, flagLevel);
+            return (
+              <div className="help-flag-card" key={face}>
+                <FlagHull value={face} />
+                <strong style={{ color: detail.fill }}>
+                  #{face} · {detail.label}
+                </strong>
+                <span>{detail.short}</span>
+              </div>
+            );
+          })}
+        </div>
       </article>
 
       <article className="reference-card">
         <h3>Straights</h3>
         <p>
-          Five or more consecutive numbers across the fleet (flagship counts). Length
-          picks the prize type; the biggest ship in the line sets the size. You may cash
-          a long straight as a shorter one.
+          Five or more numbers in a row across your whole fleet — and your
+          flagship&apos;s number counts toward the line. <b>Length</b> decides what
+          kind of prize you get; the <b>biggest ship</b> in the line decides how large
+          it is. You may always cash a long straight as a shorter one if you would
+          rather have the Energy than the hit.
+        </p>
+        <table className="straight-help-table">
+          <thead>
+            <tr>
+              <th>Biggest ship</th>
+              <th>d4</th>
+              <th>d6</th>
+              <th>d8</th>
+              <th>d10</th>
+            </tr>
+          </thead>
+          <tbody>
+            {STRAIGHT_ROWS.map((row) => (
+              <tr key={row.length}>
+                <td>{row.length} in a row</td>
+                {row.rewards.map((cell, index) => (
+                  <td className={cell ? undefined : "na"} key={`${row.length}-${index}`}>
+                    {cell ?? "—"}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="reference-note">
+          Length 6+ pays Attack (shown as a number). Length 8 also awards a free ship
+          of that size.
+        </p>
+      </article>
+
+      <article className="reference-card">
+        <h3>Taking damage</h3>
+        <p>
+          When the Enemy volley gets through you may put <b>as many available ships as
+          you want</b> in front of it. Each blocks damage equal to its own size — a
+          d10 blocks 10 — and is then <b>damaged</b> for the next round. Every ship
+          you use is one less die you will roll next round. It returns the round after
+          that.
+        </p>
+        <p className="reference-note">
+          <b className="direct-text">Direct</b> is the exception. A <b>2</b> fires 2
+          Direct, and upgrading ships add more chevrons on 6 / 8 / 10. Nothing stops
+          Direct — not shields, not a ship thrown in the way. It always reaches the
+          flagship.
+        </p>
+      </article>
+
+      <article className="reference-card">
+        <h3>Winning</h3>
+        <p>
+          Destroy the Enemy flagship. If both fall in the same round, the heavier
+          final volley wins; if those are level, damage across the whole match breaks
+          the tie.
+        </p>
+        <p className="reference-note">
+          <b>War escalation is the long-game timer.</b> It begins after round 8: both
+          fleets add <b className="damage-text">+4 attack in round 9</b>,{" "}
+          <b className="damage-text">+8 in round 10</b>, and another +4 each round
+          after that. It does not change your dice or Direct; it only makes ordinary
+          volleys hit harder so a defensive match cannot stall forever.
         </p>
       </article>
     </>

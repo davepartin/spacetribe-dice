@@ -30,6 +30,13 @@ type MatchDocument = {
   version: number;
 };
 
+type CodeDocument = {
+  matchId: string;
+  hostUid: string;
+  guestUid?: string | null;
+  status?: "waiting" | "active" | "finished";
+};
+
 export type LiveMatch = {
   id: string;
   side: SideId;
@@ -44,6 +51,24 @@ export type LiveBattleRow = {
   status: "waiting" | "active";
   round: number;
 };
+
+const ACTIVE_MATCH_KEY = "fleet-dice-active-match";
+
+export function rememberActiveMatch(matchId: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(ACTIVE_MATCH_KEY, matchId);
+}
+
+export function clearActiveMatch(matchId?: string) {
+  if (typeof window === "undefined") return;
+  const current = localStorage.getItem(ACTIVE_MATCH_KEY);
+  if (!matchId || current === matchId) localStorage.removeItem(ACTIVE_MATCH_KEY);
+}
+
+export function rememberedActiveMatch(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ACTIVE_MATCH_KEY);
+}
 
 export async function createLiveMatch(name: string): Promise<{
   match: LiveMatch;
@@ -66,7 +91,10 @@ export async function createLiveMatch(name: string): Promise<{
         transaction.set(codeRef, {
           matchId: matchRef.id,
           hostUid: user.uid,
+          guestUid: null,
+          status: "waiting",
           createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
         transaction.set(matchRef, {
           code,
@@ -89,6 +117,7 @@ export async function createLiveMatch(name: string): Promise<{
         });
       });
 
+      rememberActiveMatch(matchRef.id);
       return {
         match: {
           id: matchRef.id,
@@ -96,7 +125,7 @@ export async function createLiveMatch(name: string): Promise<{
           state,
           version: 1,
         },
-        invitePath: `/join/?id=${encodeURIComponent(matchRef.id)}`,
+        invitePath: `/join/?id=${encodeURIComponent(matchRef.id)}&code=${code}`,
       };
     } catch (error) {
       if (error instanceof CodeCollisionError) continue;
@@ -107,62 +136,122 @@ export async function createLiveMatch(name: string): Promise<{
   throw new Error("Every room code was busy. Try again.");
 }
 
+/** Re-open a match you already belong to (host or guest). */
+export async function enterLiveMatch(matchId: string): Promise<LiveMatch> {
+  const db = requireDb();
+  const user = await ensurePlayerIdentity();
+  try {
+    const snapshot = await getDoc(doc(db, "matches", matchId));
+    if (!snapshot.exists()) {
+      clearActiveMatch(matchId);
+      throw new Error("That match no longer exists.");
+    }
+    const data = snapshot.data() as MatchDocument;
+    const side = roleFor(data.state, user.uid);
+    if (!side) {
+      throw new Error(
+        data.status === "waiting"
+          ? "Open the invite link and tap Join match before entering the battlefield."
+          : ROOM_FULL_MESSAGE,
+      );
+    }
+    rememberActiveMatch(matchId);
+    return {
+      id: matchId,
+      side,
+      state: publicMatchView(data.state, side),
+      version: data.version,
+    };
+  } catch (error) {
+    throw friendlyJoinError(error);
+  }
+}
+
 export async function joinLiveMatch(matchId: string, name: string): Promise<LiveMatch> {
   const db = requireDb();
   const user = await ensurePlayerIdentity();
   const matchRef = doc(db, "matches", matchId);
   const boardRef = doc(db, "liveBattles", matchId);
 
-  return runTransaction(db, async (transaction) => {
-    const snapshot = await transaction.get(matchRef);
-    const boardSnap = await transaction.get(boardRef);
-    if (!snapshot.exists()) throw new Error("That match no longer exists.");
-    const data = snapshot.data() as MatchDocument;
-    const state = structuredClone(data.state);
-    const currentRole = roleFor(state, user.uid);
-    if (!currentRole) joinMatch(state, user.uid, name);
-    const side = roleFor(state, user.uid);
-    if (!side) throw new Error("This match already has two commanders.");
-    const version = data.version + (currentRole ? 0 : 1);
-    if (!currentRole) {
-      transaction.update(matchRef, {
-        guestUid: user.uid,
-        status: state.status,
-        state,
-        version,
-        updatedAt: serverTimestamp(),
-      });
-      const boardPayload = {
-        hostName: state.players.host.name,
-        guestName: state.players.guest?.name ?? name,
-        status: "active" as const,
-        round: state.round,
-        hostUid: data.hostUid,
-        guestUid: user.uid,
-        updatedAt: serverTimestamp(),
-      };
-      if (boardSnap.exists()) {
-        transaction.update(boardRef, boardPayload);
-      } else {
-        transaction.set(boardRef, boardPayload);
+  try {
+    const result = await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(matchRef);
+      const boardSnap = await transaction.get(boardRef);
+      if (!snapshot.exists()) throw new Error("That match no longer exists.");
+      const data = snapshot.data() as MatchDocument;
+      const state = structuredClone(data.state);
+      const currentRole = roleFor(state, user.uid);
+      if (!currentRole) joinMatch(state, user.uid, name);
+      const side = roleFor(state, user.uid);
+      if (!side) throw new Error(ROOM_FULL_MESSAGE);
+      const version = data.version + (currentRole ? 0 : 1);
+      if (!currentRole) {
+        const codeRef = doc(db, "codes", state.code);
+        const codeSnap = await transaction.get(codeRef);
+        transaction.update(matchRef, {
+          guestUid: user.uid,
+          status: state.status,
+          state,
+          version,
+          updatedAt: serverTimestamp(),
+        });
+        if (codeSnap.exists()) {
+          transaction.update(codeRef, {
+            guestUid: user.uid,
+            status: "active",
+            updatedAt: serverTimestamp(),
+          });
+        }
+        const boardPayload = {
+          hostName: state.players.host.name,
+          guestName: state.players.guest?.name ?? name,
+          status: "active" as const,
+          round: state.round,
+          hostUid: data.hostUid,
+          guestUid: user.uid,
+          updatedAt: serverTimestamp(),
+        };
+        if (boardSnap.exists()) {
+          transaction.update(boardRef, boardPayload);
+        } else {
+          transaction.set(boardRef, boardPayload);
+        }
       }
-    }
-    return {
-      id: matchId,
-      side,
-      state: publicMatchView(state, side),
-      version,
-    };
-  });
+      return {
+        id: matchId,
+        side,
+        state: publicMatchView(state, side),
+        version,
+      };
+    });
+    rememberActiveMatch(matchId);
+    return result;
+  } catch (error) {
+    throw friendlyJoinError(error);
+  }
 }
 
 export async function joinLiveMatchByCode(code: string, name: string): Promise<LiveMatch> {
   const db = requireDb();
-  await ensurePlayerIdentity();
+  const user = await ensurePlayerIdentity();
   const cleaned = code.replace(/\D/g, "").padStart(4, "0").slice(-4);
   const codeSnapshot = await getDoc(doc(db, "codes", cleaned));
   if (!codeSnapshot.exists()) throw new Error("That four-digit game code was not found.");
-  return joinLiveMatch(String(codeSnapshot.data().matchId), name);
+
+  const codeData = codeSnapshot.data() as CodeDocument;
+  const matchId = String(codeData.matchId);
+
+  // Already one of the two commanders — just reopen the board.
+  if (codeData.hostUid === user.uid || codeData.guestUid === user.uid) {
+    return enterLiveMatch(matchId);
+  }
+
+  // Room seating known on the code doc (new rooms).
+  if (codeData.guestUid || codeData.status === "active" || codeData.status === "finished") {
+    throw new Error(ROOM_FULL_MESSAGE);
+  }
+
+  return joinLiveMatch(matchId, name);
 }
 
 export async function playLiveAction(
@@ -184,6 +273,9 @@ export async function playLiveAction(
     if (!side) throw new Error("You are not a commander in this match.");
     applyAction(state, side, action);
     const version = data.version + 1;
+    const codeRef = doc(db, "codes", state.code);
+    const codeSnap = await transaction.get(codeRef);
+
     transaction.update(matchRef, {
       status: state.status,
       state,
@@ -191,7 +283,16 @@ export async function playLiveAction(
       updatedAt: serverTimestamp(),
     });
     if (state.status === "finished") {
+      clearActiveMatch(matchId);
       if (boardSnap.exists()) transaction.delete(boardRef);
+      if (codeSnap.exists() && data.hostUid === user.uid) {
+        transaction.delete(codeRef);
+      } else if (codeSnap.exists()) {
+        transaction.update(codeRef, {
+          status: "finished",
+          updatedAt: serverTimestamp(),
+        });
+      }
     } else if (boardSnap.exists()) {
       transaction.update(boardRef, {
         round: state.round,
@@ -245,6 +346,7 @@ export async function cancelLiveMatch(matchId: string): Promise<void> {
       transaction.delete(codeRef);
     }
   });
+  clearActiveMatch(matchId);
 }
 
 export async function watchLiveMatch(
@@ -262,6 +364,7 @@ export async function watchLiveMatch(
     (snapshot) => {
       try {
         if (!snapshot.exists()) {
+          clearActiveMatch(matchId);
           onError(new Error("That match no longer exists."));
           return;
         }
@@ -272,11 +375,12 @@ export async function watchLiveMatch(
             new Error(
               data.status === "waiting"
                 ? "Open the invite link and tap Join match before entering the battlefield."
-                : "You are not a commander in this match. Use the invite link from the host.",
+                : ROOM_FULL_MESSAGE,
             ),
           );
           return;
         }
+        rememberActiveMatch(matchId);
         onMatch({
           id: matchId,
           side,
@@ -290,11 +394,7 @@ export async function watchLiveMatch(
     (error) => {
       const code = "code" in error ? String(error.code) : "";
       if (code.includes("permission-denied") || /insufficient permissions/i.test(error.message)) {
-        onError(
-          new Error(
-            "Firebase blocked reading this match. Confirm you joined with the invite link, and that Firestore rules are deployed.",
-          ),
-        );
+        onError(new Error(ROOM_FULL_MESSAGE));
         return;
       }
       onError(error);
@@ -335,6 +435,17 @@ export function watchLiveBattles(
       onError(error instanceof Error ? error : new Error(String(error)));
     },
   );
+}
+
+const ROOM_FULL_MESSAGE =
+  "That room already has two players. If you created the game, stay on your original game tab — you are already in. Only your friend should use the invite link or room code.";
+
+function friendlyJoinError(error: unknown): Error {
+  if (!(error instanceof Error)) return new Error(String(error));
+  if (/Missing or insufficient permissions|permission-denied/i.test(error.message)) {
+    return new Error(ROOM_FULL_MESSAGE);
+  }
+  return error;
 }
 
 function requireDb() {
