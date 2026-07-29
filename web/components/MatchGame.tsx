@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SiteHeader } from "./Brand";
 import { InvitePanel } from "./InvitePanel";
 import { ReferenceSheets, type ReferenceKind } from "./ReferenceSheets";
@@ -852,12 +852,25 @@ function BraceFleet({
   onCancel: () => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const autoBraceSent = useRef(false);
   const pickable = new Set(activeShips(you, round).map((ship) => ship.id));
   const blocked = you.ships
     .filter((ship) => selected.includes(ship.id))
     .reduce((sum, ship) => sum + ship.sides, 0);
   const flagshipDamage = Math.max(0, you.incoming - blocked) + you.directIncoming;
   const volleyLeft = Math.max(0, you.incoming - blocked);
+  const maxSoak = [...pickable].reduce((sum, id) => {
+    const ship = you.ships.find((entry) => entry.id === id);
+    return sum + (ship?.sides ?? 0);
+  }, 0);
+  const bestHp = you.hp - Math.max(0, you.incoming - maxSoak) - you.directIncoming;
+  const doomed = bestHp <= 0;
+
+  useEffect(() => {
+    if (autoBraceSent.current || busy || pickable.size > 0) return;
+    autoBraceSent.current = true;
+    void play({ type: "brace", ships: [] });
+  }, [busy, pickable.size, play]);
 
   function toggleShip(id: string) {
     if (!pickable.has(id)) return;
@@ -872,11 +885,21 @@ function BraceFleet({
       <section className="stage stage-docked brace-stage">
         <header className="brace-header">
           <p className="eyebrow">ENEMY VOLLEY</p>
-          <h1 className="brace-title">Taking damage</h1>
+          <h1 className="brace-title">{doomed ? "Flagship will fall" : "Taking damage"}</h1>
           <p className="brace-lead">
-            Choose ships to protect your flagship. Each ship you tap blocks its size,
-            then is <b>damaged for one round</b>.{" "}
-            <b className="direct-text">Direct</b> cannot be blocked.
+            {doomed ? (
+              <>
+                Even if every ready ship blocks, this volley drops your flagship to 0.
+                Tap continue to finish the match — damaged ships cannot block.
+              </>
+            ) : (
+              <>
+                Choose ships to protect your flagship. Each ship you tap blocks its size,
+                then is <b>damaged for one round</b>.{" "}
+                <b className="direct-text">Direct</b> cannot be blocked.
+                Damaged ships are already out this round.
+              </>
+            )}
           </p>
         </header>
         <div className="tot three">
@@ -952,9 +975,11 @@ function BraceFleet({
               onClick={() => play({ type: "brace", ships: selected })}
               type="button"
             >
-              {flagshipDamage > 0
-                ? `Continue — Flagship takes ${flagshipDamage} Dmg`
-                : "Continue — Flagship is safe"}
+              {doomed
+                ? "Continue — flagship falls"
+                : flagshipDamage > 0
+                  ? `Continue — Flagship takes ${flagshipDamage} Dmg`
+                  : "Continue — Flagship is safe"}
             </button>
           </div>
         }
@@ -1009,7 +1034,8 @@ function RoundResult({
           <h1>{title}</h1>
           {enemyStillBracing ? (
             <p className="say">
-              {enemy.name} is still taking damage. Stay here — if their flagship falls, the match ends for both of you.
+              {enemy.name} still has a damage screen open. If that volley destroys
+              their flagship, the match will end for both of you as soon as it resolves.
             </p>
           ) : null}
         </div>
@@ -1104,12 +1130,12 @@ function RoundResult({
           primary={
             <button
               className="go-btn"
-              disabled={busy || enemyStillBracing || you.hp <= 0}
+              disabled={busy}
               onClick={() => play({ type: "continue" })}
               type="button"
             >
               {enemyStillBracing
-                ? `Waiting for ${enemy.name}…`
+                ? "Check for victory…"
                 : you.hp <= 0
                   ? "Match ending…"
                   : "Continue to upgrades"}

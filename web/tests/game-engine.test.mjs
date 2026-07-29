@@ -144,7 +144,50 @@ test("a commander continues to upgrades alone without waiting on the enemy", () 
   assert.equal(state.round, 2);
 });
 
-test("winner cannot continue while the enemy is still bracing a lethal volley", () => {
+test("winner cannot continue while the enemy can still survive the volley", () => {
+  const state = activeMatch();
+  const host = state.players.host;
+  const guest = state.players.guest;
+  assert.ok(guest);
+
+  applyAction(state, "host", { type: "roll", dice: [] });
+  applyAction(state, "guest", { type: "roll", dice: [] });
+
+  host.dice = [
+    { id: host.ships[0].id, sides: 4, value: 4 },
+    { id: host.ships[1].id, sides: 4, value: 2 },
+    { id: host.ships[2].id, sides: 4, value: 1 },
+    { id: host.ships[3].id, sides: 4, value: 1 },
+    { id: "flag", sides: 6, value: 1, flag: true },
+  ];
+  guest.dice = [
+    { id: guest.ships[0].id, sides: 4, value: 1 },
+    { id: guest.ships[1].id, sides: 4, value: 1 },
+    { id: guest.ships[2].id, sides: 4, value: 1 },
+    { id: guest.ships[3].id, sides: 4, value: 1 },
+    { id: "flag", sides: 6, value: 1, flag: true },
+  ];
+  guest.hp = 40;
+
+  applyAction(state, "host", { type: "submit" });
+  applyAction(state, "guest", { type: "submit" });
+  assert.equal(host.phase, "report");
+  assert.equal(guest.phase, "brace");
+  assert.equal(state.status, "active");
+
+  assert.throws(
+    () => applyAction(state, "host", { type: "continue" }),
+    /finish taking damage/,
+  );
+  assert.equal(host.phase, "report");
+  assert.equal(state.status, "active");
+
+  applyAction(state, "guest", { type: "brace", ships: [] });
+  assert.equal(guest.phase, "report");
+  assert.equal(state.status, "active");
+});
+
+test("an inescapable kill ends the match during resolve without waiting on the brace screen", () => {
   const state = activeMatch();
   const host = state.players.host;
   const guest = state.players.guest;
@@ -167,26 +210,15 @@ test("winner cannot continue while the enemy is still bracing a lethal volley", 
     { id: guest.ships[3].id, sides: 4, value: 1 },
     { id: "flag", sides: 6, value: 1, flag: true },
   ];
-  guest.hp = 10;
+  guest.hp = 5;
 
   applyAction(state, "host", { type: "submit" });
   applyAction(state, "guest", { type: "submit" });
-  assert.equal(host.phase, "report");
-  assert.equal(guest.phase, "brace");
-
-  assert.throws(
-    () => applyAction(state, "host", { type: "continue" }),
-    /finish taking damage/,
-  );
-  assert.equal(host.phase, "report");
-  assert.equal(state.status, "active");
-
-  applyAction(state, "guest", { type: "brace", ships: [] });
-  assert.equal(guest.hp <= 0, true);
   assert.equal(state.status, "finished");
   assert.equal(state.winner, "host");
   assert.equal(host.phase, "over");
   assert.equal(guest.phase, "over");
+  assert.ok(guest.hp <= 0);
 });
 
 test("a settled kill ends the match even if the winner already left the report screen", () => {
@@ -206,12 +238,21 @@ test("a settled kill ends the match even if the winner already left the report s
   assert.equal(host.phase, "shop");
 
   // Simulate an older client that continued while the enemy was bracing, then
-  // the enemy dies when they finally settle.
+  // any action re-checks finish and ends the match when death is certain.
   guest.phase = "brace";
   guest.incoming = 80;
   guest.directIncoming = 0;
   guest.hp = 5;
-  applyAction(state, "guest", { type: "brace", ships: [] });
+  guest.tally = {
+    attack: 0,
+    defense: 0,
+    energy: 0,
+    heal: 0,
+    direct: 0,
+    ones: 0,
+    run: null,
+  };
+  applyAction(state, "host", { type: "ready" });
   assert.equal(state.status, "finished");
   assert.equal(state.winner, "host");
   assert.equal(host.phase, "over");

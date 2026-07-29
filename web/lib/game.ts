@@ -192,6 +192,11 @@ export function applyAction(
 ): MatchState {
   if (state.status === "finished") throw new Error("This match is finished.");
   ensurePlayerRounds(state);
+  // Resolve decided kills before any further shopping/rolling so a soft-locked
+  // brace screen cannot leave the winner stranded in the next round.
+  finishIfNeeded(state);
+  if (state.status === "finished") return state;
+
   const player = getPlayer(state, side);
 
   switch (action.type) {
@@ -220,6 +225,7 @@ export function applyAction(
       break;
   }
 
+  finishIfNeeded(state);
   return state;
 }
 
@@ -485,28 +491,58 @@ function settlePlayer(_state: MatchState, player: PlayerState) {
   player.acknowledged = false;
 }
 
+/** True when even soaking with every available ship still leaves HP at 0 or below. */
+function inescapableDeath(player: PlayerState): boolean {
+  if (player.phase !== "brace") return false;
+  const maxSoak = activeShips(player, player.round).reduce((sum, ship) => sum + ship.sides, 0);
+  const damage = Math.max(0, player.incoming - maxSoak) + player.directIncoming;
+  const repair = player.tally?.heal ?? 0;
+  return player.hp - damage + repair <= 0;
+}
+
+function autoSettleBrace(state: MatchState, player: PlayerState) {
+  if (player.phase !== "brace") return;
+  // Use every available ship for soak so the report matches the best possible defense.
+  player.braceShips = activeShips(player, player.round).map((ship) => ship.id);
+  settlePlayer(state, player);
+}
+
 function finishIfNeeded(state: MatchState) {
   const guest = state.players.guest;
   if (!guest) return;
   const host = state.players.host;
-  // Mutual-kill window: if either flagship is already dead, end immediately so
-  // the winner cannot shop/roll into another round while the loser is bracing.
-  // If both are still bracing with unknown HP, wait for both to settle.
-  const hostDead = host.hp <= 0;
-  const guestDead = guest.hp <= 0;
-  if (!hostDead && !guestDead) return;
-  if ((host.phase === "brace" && !hostDead) || (guest.phase === "brace" && !guestDead)) {
-    return;
+
+  // Soft-lock fix: if one side is already resolved and the other is bracing,
+  // settle them when the match is already decided (enemy dead) or they cannot
+  // survive the volley. Both players then snap to the end screen.
+  if (host.phase === "brace" && guest.phase !== "brace") {
+    if (guest.hp <= 0 || inescapableDeath(host)) autoSettleBrace(state, host);
+  }
+  if (guest.phase === "brace" && host.phase !== "brace") {
+    if (host.hp <= 0 || inescapableDeath(guest)) autoSettleBrace(state, guest);
+  }
+  // Both still bracing and both are already doomed — settle both so mutual kills resolve.
+  if (host.phase === "brace" && guest.phase === "brace") {
+    if (inescapableDeath(host) && inescapableDeath(guest)) {
+      autoSettleBrace(state, host);
+      autoSettleBrace(state, guest);
+    }
   }
 
+  if (host.hp > 0 && guest.hp > 0) return;
+  if (host.phase === "brace" || guest.phase === "brace") return;
+
   state.status = "finished";
-  if (hostDead && guestDead) state.winner = "draw";
-  else state.winner = hostDead ? "guest" : "host";
+  if (host.hp <= 0 && guest.hp <= 0) state.winner = "draw";
+  else state.winner = host.hp <= 0 ? "guest" : "host";
   host.phase = "over";
   guest.phase = "over";
 }
 
 function handleContinue(state: MatchState, player: PlayerState) {
+  // Close out a decided kill before anyone shops into another round.
+  finishIfNeeded(state);
+
   if (player.phase === "over" || state.status === "finished" || player.hp <= 0) {
     player.phase = "over";
     player.acknowledged = true;
