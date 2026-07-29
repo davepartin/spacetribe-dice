@@ -25,6 +25,7 @@ export function HomeScreen() {
   const [loadingMatches, setLoadingMatches] = useState(true);
   const [error, setError] = useState("");
   const [savedMatches, setSavedMatches] = useState<RememberedMatchCard[]>([]);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     setName(commanderName() === "Commander" ? "" : commanderName());
@@ -91,6 +92,17 @@ export function HomeScreen() {
     }
   }
 
+  async function copyGameLink() {
+    const url = "https://davepartin.github.io/spacetribe-dice/";
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      setError("Could not copy the link. Select the address bar and copy it there.");
+    }
+  }
+
   return (
     <main className="home-shell">
       <nav className="home-nav home-nav-slim" aria-label="Site">
@@ -120,6 +132,13 @@ export function HomeScreen() {
               Create Versus Battle
               <span aria-hidden="true">→</span>
             </Link>
+            <button
+              className="action-button outline-action"
+              onClick={() => void copyGameLink()}
+              type="button"
+            >
+              {linkCopied ? "Link copied" : "Copy link to this game"}
+            </button>
           </div>
         </div>
       </section>

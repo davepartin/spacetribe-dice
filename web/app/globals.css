@@ -232,6 +232,15 @@ button {
     0 12px 28px -14px #050914cc;
 }
 
+.hero-cta-row .outline-action {
+  color: #f2fffc;
+  background: linear-gradient(180deg, #2f7a72 0%, #216059 100%);
+  border-color: #7ee0d2;
+  box-shadow:
+    inset 0 1px 0 #ffffff2a,
+    0 12px 28px -14px #050914cc;
+}
+
 .site-header {
   min-height: 54px;
   margin-bottom: 20px;
@@ -1312,38 +1321,6 @@ input:focus {
   max-height: 100svh;
   overflow: hidden;
   background: var(--bg);
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-.solo-topbar {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 44px;
-  width: min(1120px, calc(100% - 24px));
-  margin: 0 auto;
-  padding: 6px 0;
-}
-
-.solo-exit {
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 750;
-  letter-spacing: .04em;
-  padding: 8px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #111a2e;
-}
-
-.solo-topbar-label {
-  color: var(--dim);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .12em;
-  text-transform: uppercase;
 }
 
 .solo-game {
@@ -1351,6 +1328,7 @@ input:focus {
   flex: 1;
   min-height: 0;
   width: 100%;
+  height: 100%;
   border: 0;
   background: var(--bg);
   /* Let the game inside the iframe own vertical scrolling. */
@@ -1489,8 +1467,12 @@ input:focus {
 }
 
 .fleet-score.you-score {
+  margin: 4px 2px 4px 4px;
+  padding: 5px 8px;
   background: transparent;
-  box-shadow: inset 0 0 0 1.5px #fff;
+  border: 1.5px solid #fff;
+  border-radius: 10px;
+  box-shadow: none;
 }
 
 .fleet-score.you-score .who {
