@@ -443,9 +443,13 @@ function Shipyard({
     <>
       <HealthBoard enemy={enemy} you={you} />
       <section className="stage stage-docked">
-        <p className="say">
-          Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll.
-        </p>
+        <header className="brace-header">
+          <p className="eyebrow">SHIPYARD</p>
+          <h1 className="brace-title">Upgrade fleet</h1>
+          <p className="brace-lead">
+            Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll.
+          </p>
+        </header>
         <nav className="jump-nav" aria-label="Upgrade sections">
           <a href="#fleet-upgrades">Fleet</a>
           <a href="#buy-ships">Buy ships</a>
@@ -453,7 +457,7 @@ function Shipyard({
 
         <section className="upgrade-section" id="fleet-upgrades">
           <div className="section-heading">
-            <h2>Upgrade fleet</h2>
+            <h2>Your ships</h2>
             <span>{you.ships.length} / {you.slots} slots</span>
           </div>
           <FleetFormation

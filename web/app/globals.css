@@ -161,7 +161,56 @@ button {
 }
 
 .home-nav {
-  padding-bottom: 34px;
+  padding-bottom: 18px;
+}
+
+.home-nav-slim {
+  justify-content: flex-end;
+}
+
+.hero-billboard {
+  margin: 0 0 28px;
+}
+
+.hero-key-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--blue) 28%, var(--line));
+  box-shadow:
+    0 28px 70px -28px #050914,
+    0 0 40px -18px #45b6ff55;
+}
+
+.hero-support {
+  max-width: 640px;
+  margin: 18px 0 0;
+  color: var(--dim);
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.5;
+}
+
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.hero-cta-row .action-button {
+  min-width: 168px;
+  flex: 1 1 160px;
+}
+
+.hero-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 14px 0 0;
+  color: var(--faint);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .site-header {

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Brand } from "./Brand";
 import { LiveBattlesBoard } from "./LiveBattlesBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
 import {
@@ -94,8 +93,7 @@ export function HomeScreen() {
 
   return (
     <main className="home-shell">
-      <nav className="home-nav">
-        <Brand />
+      <nav className="home-nav home-nav-slim" aria-label="Site">
         <a className="nav-link" href={withBasePath("/fleet-dice-v84.html#ref")}>
           How to play
         </a>
@@ -122,6 +120,11 @@ export function HomeScreen() {
             <span aria-hidden="true">→</span>
           </Link>
         </div>
+        <p className="hero-modes">
+          <span>Solo — play the computer</span>
+          <span aria-hidden="true">·</span>
+          <span>Versus — private room with a friend</span>
+        </p>
       </section>
 
       {!loadingMatches && savedMatches.length ? (
@@ -177,26 +180,6 @@ export function HomeScreen() {
           </ul>
         </section>
       ) : null}
-
-      <section className="mode-grid compact-modes" aria-label="Choose a match">
-        <article className="mode-card solo-card compact-mode">
-          <p className="card-kicker">SOLO COMMAND</p>
-          <h2>Play the computer</h2>
-          <p>The complete v84 game against AI on your phone.</p>
-          <Link className="action-button light-action" href="/solo/">
-            Start solo
-          </Link>
-        </article>
-
-        <article className="mode-card versus-card compact-mode">
-          <p className="card-kicker">VERSUS COMMAND</p>
-          <h2>Challenge a friend</h2>
-          <p>Private room, four-digit code, live rounds from any phone.</p>
-          <Link className="action-button red-action" href="/versus/">
-            Create match
-          </Link>
-        </article>
-      </section>
 
       <section className="join-strip">
         <div>

@@ -18,8 +18,8 @@ test("static export includes the Fleet Dice home screen", () => {
   assert.match(html, /<title>Fleet Dice<\/title>/i);
   assert.match(html, /fleet-dice-key-art\.png/);
   assert.match(html, /Build the fleet\. Break the flagship/i);
-  assert.match(html, /SOLO COMMAND/);
-  assert.match(html, /VERSUS COMMAND/);
+  assert.match(html, /Start solo/);
+  assert.match(html, /Create match/);
   assert.match(html, /Join your enemy/);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape|chatgpt\.site/i);
 });
