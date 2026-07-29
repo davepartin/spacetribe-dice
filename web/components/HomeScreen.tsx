@@ -113,19 +113,14 @@ export function HomeScreen() {
           </p>
           <div className="hero-cta-row">
             <Link className="action-button light-action" href="/solo/">
-              Start solo
+              Solo Battle
               <span aria-hidden="true">→</span>
             </Link>
             <Link className="action-button red-action" href="/versus/">
-              Create match
+              Create Versus Battle
               <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <p className="hero-modes">
-            <span>Solo — play the computer</span>
-            <span aria-hidden="true">·</span>
-            <span>Versus — private room with a friend</span>
-          </p>
         </div>
       </section>
 
