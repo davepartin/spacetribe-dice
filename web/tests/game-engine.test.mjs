@@ -143,3 +143,77 @@ test("a commander continues to upgrades alone without waiting on the enemy", () 
   assert.equal(guest.round, 2);
   assert.equal(state.round, 2);
 });
+
+test("winner cannot continue while the enemy is still bracing a lethal volley", () => {
+  const state = activeMatch();
+  const host = state.players.host;
+  const guest = state.players.guest;
+  assert.ok(guest);
+
+  applyAction(state, "host", { type: "roll", dice: [] });
+  applyAction(state, "guest", { type: "roll", dice: [] });
+
+  host.dice = [
+    { id: host.ships[0].id, sides: 4, value: 4 },
+    { id: host.ships[1].id, sides: 4, value: 4 },
+    { id: host.ships[2].id, sides: 4, value: 4 },
+    { id: host.ships[3].id, sides: 4, value: 4 },
+    { id: "flag", sides: 6, value: 6, flag: true },
+  ];
+  guest.dice = [
+    { id: guest.ships[0].id, sides: 4, value: 1 },
+    { id: guest.ships[1].id, sides: 4, value: 1 },
+    { id: guest.ships[2].id, sides: 4, value: 1 },
+    { id: guest.ships[3].id, sides: 4, value: 1 },
+    { id: "flag", sides: 6, value: 1, flag: true },
+  ];
+  guest.hp = 10;
+
+  applyAction(state, "host", { type: "submit" });
+  applyAction(state, "guest", { type: "submit" });
+  assert.equal(host.phase, "report");
+  assert.equal(guest.phase, "brace");
+
+  assert.throws(
+    () => applyAction(state, "host", { type: "continue" }),
+    /finish taking damage/,
+  );
+  assert.equal(host.phase, "report");
+  assert.equal(state.status, "active");
+
+  applyAction(state, "guest", { type: "brace", ships: [] });
+  assert.equal(guest.hp <= 0, true);
+  assert.equal(state.status, "finished");
+  assert.equal(state.winner, "host");
+  assert.equal(host.phase, "over");
+  assert.equal(guest.phase, "over");
+});
+
+test("a settled kill ends the match even if the winner already left the report screen", () => {
+  const state = activeMatch();
+  const host = state.players.host;
+  const guest = state.players.guest;
+  assert.ok(guest);
+
+  applyAction(state, "host", { type: "roll", dice: [] });
+  applyAction(state, "guest", { type: "roll", dice: [] });
+  for (const player of [host, guest]) {
+    player.dice = player.dice.map((die) => ({ ...die, value: die.flag ? 1 : 1 }));
+  }
+  applyAction(state, "host", { type: "submit" });
+  applyAction(state, "guest", { type: "submit" });
+  applyAction(state, "host", { type: "continue" });
+  assert.equal(host.phase, "shop");
+
+  // Simulate an older client that continued while the enemy was bracing, then
+  // the enemy dies when they finally settle.
+  guest.phase = "brace";
+  guest.incoming = 80;
+  guest.directIncoming = 0;
+  guest.hp = 5;
+  applyAction(state, "guest", { type: "brace", ships: [] });
+  assert.equal(state.status, "finished");
+  assert.equal(state.winner, "host");
+  assert.equal(host.phase, "over");
+  assert.equal(guest.phase, "over");
+});

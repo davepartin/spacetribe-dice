@@ -338,6 +338,18 @@ function MatchStage({
   onHelp: () => void;
   onCancel: () => void;
 }) {
+  if (match.state.status === "finished" || you.phase === "over") {
+    return (
+      <RoundResult
+        busy={busy}
+        enemy={enemy}
+        match={match}
+        onHelp={onHelp}
+        play={play}
+        you={you}
+      />
+    );
+  }
   if (you.phase === "shop") {
     return (
       <Shipyard
@@ -377,13 +389,13 @@ function MatchStage({
       />
     );
   }
-  if (you.phase === "report" || you.phase === "over") {
+  if (you.phase === "report") {
     return (
       <RoundResult
         busy={busy}
         enemy={enemy}
         match={match}
-        onCancel={match.state.status === "active" ? onCancel : undefined}
+        onCancel={onCancel}
         onHelp={onHelp}
         play={play}
         you={you}
@@ -972,6 +984,7 @@ function RoundResult({
   const cancelled = Boolean(match.state.cancelledBy);
   const won = match.state.winner === match.side;
   const draw = match.state.winner === "draw";
+  const enemyStillBracing = !finished && enemy.phase === "brace";
   const title = finished
     ? cancelled
       ? `${match.state.cancelledBy} ended this game.`
@@ -994,6 +1007,11 @@ function RoundResult({
         <div className="report-title">
           <p className="eyebrow">{finished ? (cancelled ? "MATCH CANCELLED" : "MATCH OVER") : "BOTH FLEETS REVEALED"}</p>
           <h1>{title}</h1>
+          {enemyStillBracing ? (
+            <p className="say">
+              {enemy.name} is still taking damage. Stay here — if their flagship falls, the match ends for both of you.
+            </p>
+          ) : null}
         </div>
         {endArt ? (
           <img
@@ -1086,11 +1104,15 @@ function RoundResult({
           primary={
             <button
               className="go-btn"
-              disabled={busy}
+              disabled={busy || enemyStillBracing || you.hp <= 0}
               onClick={() => play({ type: "continue" })}
               type="button"
             >
-              Continue to upgrades
+              {enemyStillBracing
+                ? `Waiting for ${enemy.name}…`
+                : you.hp <= 0
+                  ? "Match ending…"
+                  : "Continue to upgrades"}
             </button>
           }
         />

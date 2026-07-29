@@ -201,8 +201,9 @@ export function HomeScreen() {
           <p className="card-kicker">HAVE A GAME CODE?</p>
           <h2>Join your enemy</h2>
           <p className="join-hint">
-            Like Jackbox: enter the four numbers your friend shows you. If you
-            created the room, stay on your game tab instead.
+            Enter the four numbers from your friend’s screen. Use the same phone
+            and browser you used to create a room if you need to reopen it —
+            Your matches keeps your seats. Only the second player should join by code.
           </p>
         </div>
         <form onSubmit={joinByCode}>

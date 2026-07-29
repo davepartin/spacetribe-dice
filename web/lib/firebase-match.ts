@@ -325,23 +325,43 @@ export async function joinLiveMatchByCode(code: string, name: string): Promise<L
   const db = requireDb();
   const user = await ensurePlayerIdentity();
   const cleaned = code.replace(/\D/g, "").padStart(4, "0").slice(-4);
+  if (cleaned.length !== 4) {
+    throw new Error("Enter all four numbers from the host’s screen.");
+  }
   const codeSnapshot = await getDoc(doc(db, "codes", cleaned));
-  if (!codeSnapshot.exists()) throw new Error("That four-digit game code was not found.");
+  if (!codeSnapshot.exists()) {
+    throw new Error("That four-digit game code was not found. Check the numbers on the host’s screen.");
+  }
 
   const codeData = codeSnapshot.data() as CodeDocument;
   const matchId = String(codeData.matchId);
 
-  // Already one of the two commanders — just reopen the board.
+  // Prefer the match document for seating — code docs can lag or get out of sync.
+  const matchSnapshot = await getDoc(doc(db, "matches", matchId));
+  if (!matchSnapshot.exists()) {
+    throw new Error("That room no longer exists. Ask the host to create a new match.");
+  }
+  const matchData = matchSnapshot.data() as MatchDocument;
+  const existingSide = roleFor(matchData.state, user.uid);
+  if (existingSide) {
+    return enterLiveMatch(matchId);
+  }
+
+  if (matchData.status === "finished" || matchData.state.status === "finished") {
+    throw new Error("That match is already over. Create or join a new room.");
+  }
+
+  if (matchData.status === "waiting" && !matchData.guestUid && !matchData.state.players.guest) {
+    return joinLiveMatch(matchId, name);
+  }
+
   if (codeData.hostUid === user.uid || codeData.guestUid === user.uid) {
     return enterLiveMatch(matchId);
   }
 
-  // Room seating known on the code doc (new rooms).
-  if (codeData.guestUid || codeData.status === "active" || codeData.status === "finished") {
-    throw new Error(ROOM_FULL_MESSAGE);
-  }
-
-  return joinLiveMatch(matchId, name);
+  throw new Error(
+    "That room already has two players. If you created the game, reopen it from Your matches on this same phone/browser — a new Safari tab or cleared data makes a new identity and looks like a third player.",
+  );
 }
 
 export async function playLiveAction(
@@ -532,7 +552,7 @@ export function watchLiveBattles(
 }
 
 const ROOM_FULL_MESSAGE =
-  "That room already has two players. If you created the game, stay on your original game tab — you are already in. Only your friend should use the invite link or room code.";
+  "That room already has two players. If you created the game, reopen it from Your matches on this same phone/browser — only your friend should use the invite code.";
 
 function friendlyJoinError(error: unknown): Error {
   if (!(error instanceof Error)) return new Error(String(error));

@@ -489,13 +489,19 @@ function finishIfNeeded(state: MatchState) {
   const guest = state.players.guest;
   if (!guest) return;
   const host = state.players.host;
-  // Let the other commander finish bracing so mutual kills can resolve.
-  if (host.phase === "brace" || guest.phase === "brace") return;
-  if (host.hp > 0 && guest.hp > 0) return;
+  // Mutual-kill window: if either flagship is already dead, end immediately so
+  // the winner cannot shop/roll into another round while the loser is bracing.
+  // If both are still bracing with unknown HP, wait for both to settle.
+  const hostDead = host.hp <= 0;
+  const guestDead = guest.hp <= 0;
+  if (!hostDead && !guestDead) return;
+  if ((host.phase === "brace" && !hostDead) || (guest.phase === "brace" && !guestDead)) {
+    return;
+  }
 
   state.status = "finished";
-  if (host.hp <= 0 && guest.hp <= 0) state.winner = "draw";
-  else state.winner = host.hp > 0 ? "host" : "guest";
+  if (hostDead && guestDead) state.winner = "draw";
+  else state.winner = hostDead ? "guest" : "host";
   host.phase = "over";
   guest.phase = "over";
 }
@@ -509,6 +515,14 @@ function handleContinue(state: MatchState, player: PlayerState) {
   }
   if (player.phase !== "report") {
     throw new Error("Finish the current round first.");
+  }
+
+  const opponent =
+    player === state.players.host ? state.players.guest : state.players.host;
+  if (opponent?.phase === "brace") {
+    throw new Error(
+      "Wait for the enemy to finish taking damage before you continue. The match may end here.",
+    );
   }
 
   player.round += 1;
