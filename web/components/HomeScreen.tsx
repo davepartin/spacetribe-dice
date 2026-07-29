@@ -107,24 +107,26 @@ export function HomeScreen() {
           src={KEY_ART}
           width={1024}
         />
-        <p className="hero-support">
-          Upgrade your ships. Hunt the straight. Decide what to risk.
-        </p>
-        <div className="hero-cta-row">
-          <Link className="action-button light-action" href="/solo/">
-            Start solo
-            <span aria-hidden="true">→</span>
-          </Link>
-          <Link className="action-button red-action" href="/versus/">
-            Create match
-            <span aria-hidden="true">→</span>
-          </Link>
+        <div className="hero-actions">
+          <p className="hero-support">
+            Upgrade your ships. Hunt the straight. Decide what to risk.
+          </p>
+          <div className="hero-cta-row">
+            <Link className="action-button light-action" href="/solo/">
+              Start solo
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="action-button red-action" href="/versus/">
+              Create match
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <p className="hero-modes">
+            <span>Solo — play the computer</span>
+            <span aria-hidden="true">·</span>
+            <span>Versus — private room with a friend</span>
+          </p>
         </div>
-        <p className="hero-modes">
-          <span>Solo — play the computer</span>
-          <span aria-hidden="true">·</span>
-          <span>Versus — private room with a friend</span>
-        </p>
       </section>
 
       {!loadingMatches && savedMatches.length ? (
@@ -181,18 +183,16 @@ export function HomeScreen() {
         </section>
       ) : null}
 
-      <section className="join-strip">
-        <div>
+      <section className="join-strip" aria-label="Join by code">
+        <header className="join-strip-head">
           <p className="card-kicker">HAVE A GAME CODE?</p>
           <h2>Join your enemy</h2>
           <p className="join-hint">
-            For the second player only: enter a display name and the four-number
-            code. The name is just a label — it does not unlock a seat. If you
-            created the room, use <b>Your matches</b> on this phone instead of
-            joining by code.
+            Second player: name + four-digit code. Hosts reopen from{" "}
+            <b>Your matches</b> — don’t join by code.
           </p>
-        </div>
-        <form onSubmit={joinByCode}>
+        </header>
+        <form className="join-form" onSubmit={joinByCode}>
           <input
             aria-label="Display name"
             autoComplete="nickname"
@@ -201,18 +201,20 @@ export function HomeScreen() {
             placeholder="Display name"
             value={name}
           />
-          <input
-            aria-label="Four digit game code"
-            className="code-input"
-            inputMode="numeric"
-            maxLength={4}
-            onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
-            placeholder="0000"
-            value={code}
-          />
-          <button className="action-button blue-action" disabled={joining} type="submit">
-            {joining ? "Opening…" : "Join match"}
-          </button>
+          <div className="join-form-row">
+            <input
+              aria-label="Four digit game code"
+              className="code-input"
+              inputMode="numeric"
+              maxLength={4}
+              onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+              placeholder="0000"
+              value={code}
+            />
+            <button className="action-button blue-action" disabled={joining} type="submit">
+              {joining ? "Opening…" : "Join match"}
+            </button>
+          </div>
         </form>
         {error ? <p className="form-error">{error}</p> : null}
       </section>
