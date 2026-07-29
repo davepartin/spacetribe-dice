@@ -134,8 +134,10 @@ export function HomeScreen() {
                 : `${savedMatches.length} games in progress`}
             </h2>
             <p className="your-matches-hint">
-              Jump between live rooms on this phone. Remove only forgets the
-              shortcut — use Cancel game inside a match to end it for both players.
+              These are your seats on this phone. Tap Open to jump back in —
+              you do not need the code or the same display name. Remove only
+              forgets the shortcut; Cancel game inside a match ends it for both
+              players.
             </p>
           </div>
           <ul className="your-matches-list">
@@ -201,18 +203,19 @@ export function HomeScreen() {
           <p className="card-kicker">HAVE A GAME CODE?</p>
           <h2>Join your enemy</h2>
           <p className="join-hint">
-            Enter the four numbers from your friend’s screen. Use the same phone
-            and browser you used to create a room if you need to reopen it —
-            Your matches keeps your seats. Only the second player should join by code.
+            For the second player only: enter a display name and the four-number
+            code. The name is just a label — it does not unlock a seat. If you
+            created the room, use <b>Your matches</b> on this phone instead of
+            joining by code.
           </p>
         </div>
         <form onSubmit={joinByCode}>
           <input
-            aria-label="Commander name"
+            aria-label="Display name"
             autoComplete="nickname"
             maxLength={24}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Your name"
+            placeholder="Display name"
             value={name}
           />
           <input

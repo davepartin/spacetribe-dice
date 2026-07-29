@@ -49,9 +49,10 @@ export function InvitePanel({
       <p className="eyebrow">PRIVATE ROOM OPEN</p>
       <h1>Waiting for the Enemy.</h1>
       <p>
-        <b>Stay on this page</b> — you are already in the game. Send the four
-        numbers (or the link) to your friend. Only they should join by code. If
-        you leave, reopen from <b>Your matches</b> on this same phone.
+        <b>Stay on this page</b> — you are already in. Send the four numbers to
+        your friend. Only they should join with the code. If you leave, come back
+        from <b>Your matches</b> on this same phone (the name field does not open
+        your seat).
       </p>
       <div className="room-code" aria-label={`Game code ${code}`}>
         {code.split("").map((number, index) => (

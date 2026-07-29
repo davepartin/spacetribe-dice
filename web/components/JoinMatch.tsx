@@ -94,19 +94,19 @@ export function JoinMatch() {
         <p className="eyebrow">YOU HAVE BEEN CHALLENGED</p>
         <h1>Enter the battlefield.</h1>
         <p>
-          Type the name your opponent will see, then join. If you are the one who
-          created the room, go back to your original game tab instead — you are
-          already in.
+          Pick a display name your opponent will see, then join with this invite.
+          The name is only a label. If you created the room, go to Your matches on
+          that same phone instead — joining here can look like a third player.
         </p>
         <form onSubmit={join}>
-          <label htmlFor="join-commander">COMMANDER NAME</label>
+          <label htmlFor="join-commander">DISPLAY NAME</label>
           <input
             autoComplete="nickname"
             autoFocus
             id="join-commander"
             maxLength={24}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Commander"
+            placeholder="Your name on the board"
             value={name}
           />
           <button

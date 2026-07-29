@@ -50,18 +50,18 @@ export function VersusLauncher() {
         <p className="eyebrow">VERSUS COMMAND</p>
         <h1>Open a private battlefield.</h1>
         <p>
-          Name your commander. We’ll make one invite link and a four-number
-          backup code for your opponent.
+          Pick a display name for this match. We’ll make a four-number code for
+          your friend. Stay on this phone — that’s how you get back into your seat.
         </p>
         <form onSubmit={createRoom}>
-          <label htmlFor="commander">COMMANDER NAME</label>
+          <label htmlFor="commander">DISPLAY NAME</label>
           <input
             autoComplete="nickname"
             autoFocus
             id="commander"
             maxLength={24}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Commander"
+            placeholder="Your name on the board"
             value={name}
           />
           <button
