@@ -166,17 +166,6 @@ export function HomeScreen() {
             src={KEY_ART}
             width={1024}
           />
-          <div className="home-rule-punch" aria-label="Core rules">
-            <span>
-              <b>EVEN</b> hits
-            </span>
-            <span>
-              <b>ODD</b> blocks
-            </span>
-            <span>
-              <b>5+</b> straight
-            </span>
-          </div>
         </div>
       </section>
 

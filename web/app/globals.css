@@ -3611,44 +3611,6 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
     0 0 54px -24px #45b6ff70;
 }
 
-.home-rule-punch {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  margin: 11px 13px 0;
-  overflow: hidden;
-  color: var(--faint);
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.home-rule-punch span {
-  padding: 10px 7px;
-  background: #0d1525;
-}
-
-.home-rule-punch b {
-  color: var(--ink);
-}
-
-.home-rule-punch span:first-child b {
-  color: var(--red);
-}
-
-.home-rule-punch span:nth-child(2) b {
-  color: var(--blue);
-}
-
-.home-rule-punch span:last-child b {
-  color: var(--gold);
-}
-
 .home-shell-v2 .your-matches {
   margin: 0 0 24px;
 }
@@ -3770,12 +3732,6 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
   .home-hero-art {
     border-radius: 18px;
-  }
-
-  .home-rule-punch {
-    margin-right: 5px;
-    margin-left: 5px;
-    font-size: 8px;
   }
 
   .home-hero-kicker {
