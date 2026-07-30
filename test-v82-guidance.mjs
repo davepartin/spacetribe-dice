@@ -14,14 +14,16 @@ await new Promise(r => setTimeout(r, 200));
 const w = dom.window, d = w.document;
 const check = (condition, message) => { if (!condition) bad.push(message); };
 
-try { w.localStorage.removeItem("fleet-dice-guided-v82"); } catch {}
+try { w.localStorage.removeItem("fleet-dice-guided-v84"); } catch {}
 w.newGame(true);
-check(w.VERSION === "82", "version is not v82");
+check(w.VERSION === "84", "version is not v84");
 check(w.G.guide === true, "guided first match did not start");
-check(/Start by rolling everything/i.test(d.body.textContent), "ready guidance is missing");
+check(/center die is your flagship/i.test(d.body.textContent), "ready guidance is missing");
+check(/How to play/i.test(d.body.textContent), "How to play tip is missing from ready guidance");
 check(w.G.you.flag.token && w.G.them.flag.token, "both fleets did not receive a Flagship Token");
 
 d.getElementById("reroll").click();
+check(/Choose which dice to reroll/i.test(d.body.textContent), "reroll coaching is missing");
 check(/d4 only rolls 1.4/i.test(d.body.textContent), "straight and d4 coaching is missing");
 for (let roll = 2; roll <= 3; roll++){
   d.querySelector("[data-die]").click();
