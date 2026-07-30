@@ -194,8 +194,7 @@ export function applyAction(
   ensurePlayerRounds(state);
   // Resolve decided kills before any further shopping/rolling so a soft-locked
   // brace screen cannot leave the winner stranded in the next round.
-  finishIfNeeded(state);
-  if (state.status === "finished") return state;
+  if (finishIfNeeded(state)) return state;
 
   const player = getPlayer(state, side);
 
@@ -507,9 +506,9 @@ function autoSettleBrace(state: MatchState, player: PlayerState) {
   settlePlayer(state, player);
 }
 
-function finishIfNeeded(state: MatchState) {
+function finishIfNeeded(state: MatchState): boolean {
   const guest = state.players.guest;
-  if (!guest) return;
+  if (!guest) return state.status === "finished";
   const host = state.players.host;
 
   // Soft-lock fix: if one side is already resolved and the other is bracing,
@@ -529,14 +528,15 @@ function finishIfNeeded(state: MatchState) {
     }
   }
 
-  if (host.hp > 0 && guest.hp > 0) return;
-  if (host.phase === "brace" || guest.phase === "brace") return;
+  if (host.hp > 0 && guest.hp > 0) return false;
+  if (host.phase === "brace" || guest.phase === "brace") return false;
 
   state.status = "finished";
   if (host.hp <= 0 && guest.hp <= 0) state.winner = "draw";
   else state.winner = host.hp <= 0 ? "guest" : "host";
   host.phase = "over";
   guest.phase = "over";
+  return true;
 }
 
 function handleContinue(state: MatchState, player: PlayerState) {
