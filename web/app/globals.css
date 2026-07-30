@@ -81,7 +81,7 @@ button {
 .home-shell,
 .page-shell,
 .match-shell {
-  width: min(1120px, calc(100% - 32px));
+  width: min(640px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -92,7 +92,7 @@ button {
 
 .page-shell,
 .match-shell {
-  width: min(1120px, calc(100% - 32px));
+  width: min(640px, calc(100% - 32px));
   margin: 0 auto;
   padding: 20px 0 calc(28px + env(safe-area-inset-bottom, 0px));
   touch-action: pan-y;
@@ -1337,7 +1337,7 @@ input:focus {
 }
 
 .solo-header {
-  width: min(1120px, calc(100% - 28px));
+  width: min(640px, calc(100% - 28px));
   height: 64px;
   margin: 0 auto;
 }
