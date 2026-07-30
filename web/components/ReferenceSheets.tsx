@@ -11,7 +11,6 @@ import {
 } from "@/lib/game";
 import {
   FlagHull,
-  HullOutline,
   MarkIcon,
   ShipHull,
   flagFaceDetail,
@@ -25,8 +24,6 @@ const SHAPES: { sides: DieSize; name: string; shape: string }[] = [
   { sides: 8, name: "d8", shape: "diamond" },
   { sides: 10, name: "d10", shape: "pentagon" },
 ];
-
-const DIE_SIZES: DieSize[] = [4, 6, 8, 10];
 
 const STRAIGHT_ROWS: { length: number; rewards: (string | null)[] }[] = [
   { length: 5, rewards: ["6⚡", "9⚡", "12⚡", "15⚡"] },
@@ -211,90 +208,28 @@ export function HelpSheet({
             </div>
           </div>
         </div>
-        <div className="help-key-table" aria-label="Face reference">
-          <div className="help-key-row">
-            <b className="energy-text">1</b>
-            <span className="help-key-marks">
-              <MarkIcon kind="bolt" />
-              <MarkIcon kind="bolt" />
-            </span>
-            <span>
-              blocks for <b>1</b>, and pays <b className="energy-text">2 Energy</b>
-            </span>
-          </div>
-          <div className="help-key-row">
-            <b className="direct-text">2</b>
-            <span className="help-key-marks">
-              <MarkIcon kind="chev" />
-              <MarkIcon kind="chev" />
-            </span>
-            <span>
-              hits for <b>2</b>, and fires <b className="direct-text">2 Direct</b>
-            </span>
-          </div>
-          <div className="help-key-row">
-            <b className="repair-text">3</b>
-            <span className="help-key-marks">
-              <MarkIcon kind="cross" />
-              <MarkIcon kind="cross" />
-              <MarkIcon kind="cross" />
-            </span>
-            <span>
-              blocks for <b>3</b>, and <b className="repair-text">repairs 3</b>
-            </span>
-          </div>
-          <div className="help-key-row">
-            <b className="energy-text">4</b>
-            <span className="help-key-marks">
-              <MarkIcon kind="bolt" />
-            </span>
-            <span>
-              hits for <b>4</b>, and pays <b className="energy-text">1 Energy</b>
-            </span>
-          </div>
-          <div className="help-key-row">
-            <b>5+</b>
-            <span className="help-key-marks">
-              <MarkIcon kind="cross" />
-              <MarkIcon kind="chev" />
-            </span>
-            <span>
-              upgrading adds escalating repair on 5 / 7 / 9 and Direct on 6 / 8 / 10
-            </span>
-          </div>
-        </div>
       </article>
 
       <article className="reference-card">
-        <h3>Every face on every die</h3>
+        <h3>What each number does</h3>
         <p>
-          The number always fights: even hits, odd blocks. The symbols beside it pay
-          an extra effect at the same time. These are the same ship pictures you see
-          on the board.
+          A <b>4</b> is a <b>4</b> on every ship — same hit or block, same marks.
+          Bigger ships just unlock higher numbers: d4 rolls 1–4, d6 rolls 1–6, d8
+          rolls 1–8, and d10 rolls 1–10.
         </p>
-        <div className="help-facebooks">
-          {DIE_SIZES.map((sides) => (
-            <div className="help-facebook" key={sides}>
-              <div className="help-facebook-head">
-                <HullOutline sides={sides} />
-                <div>
-                  <strong>d{sides}</strong>
-                  <span>faces 1 through {sides}</span>
-                </div>
+        <div className="help-key-table" aria-label="What each number does">
+          {Array.from({ length: 10 }, (_, index) => {
+            const value = index + 1;
+            return (
+              <div className="help-key-row" key={value}>
+                <b className={value % 2 === 0 ? "damage-text" : "shield-text"}>
+                  {value}
+                </b>
+                <FaceMarks value={value} />
+                <span>{faceEffectText(value)}</span>
               </div>
-              {Array.from({ length: sides }, (_, index) => {
-                const value = index + 1;
-                return (
-                  <div className="help-face-row" key={value}>
-                    <ShipHull sides={sides} value={value} />
-                    <b className={value % 2 === 0 ? "damage-text" : "shield-text"}>{value}</b>
-                    <FaceMarks value={value} />
-                    <span>{faceEffectText(value)}</span>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </article>
 

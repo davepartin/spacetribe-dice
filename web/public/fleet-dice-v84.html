@@ -1717,17 +1717,16 @@ function faceEffectText(value){
   return parts.join(' · ');
 }
 function allDiceFacesHtml(){
-  return '<div class="facebooks">' + [4,6,8,10].map(function(sides){
-    var rows = "";
-    for (var value = 1; value <= sides; value++){
-      rows += '<div class="faceentry"><b style="color:' +
-        (value % 2 === 0 ? 'var(--red)' : 'var(--blue)') + '">' + value + '</b>' +
-        '<span class="marks">' + faceMarksHtml(value) + '</span>' +
-        '<span>' + faceEffectText(value) + '</span></div>';
-    }
-    return '<div class="facebook"><h4>d' + sides + ' — faces 1 through ' +
-      sides + '</h4>' + rows + '</div>';
-  }).join("") + '</div>';
+  var rows = "";
+  for (var value = 1; value <= 10; value++){
+    rows += keyRow(
+      String(value),
+      value % 2 === 0 ? "var(--red)" : "var(--blue)",
+      faceMarksHtml(value),
+      faceEffectText(value)
+    );
+  }
+  return '<div class="ktab">' + rows + '</div>';
 }
 
 function hullSvg(size, value, kind){
@@ -2633,12 +2632,15 @@ function helpView(){
     '</div></div>' +
 
     '<div class="card">' + shopHead("red", "How to read a die", "One rule, then printed marks") +
-    legendHtml().replace('<h3 class="ktitle">How to read a die</h3>', '') + '</div>' +
+    '<p class="say">Every ship rolls one face. <span class="red">Even numbers hit</span>, ' +
+    '<span class="blue">odd numbers block</span>. Printed marks do a second job on top, ' +
+    'and every mark always pays.</p></div>' +
 
     '<div class="card">' +
-    shopHead("red", "Every face on every die", "The complete ship reference") +
-    '<p>The number always fights: even hits, odd blocks. The symbols beside it pay ' +
-    'an extra effect at the same time.</p>' +
+    shopHead("red", "What each number does", "Same number, same job on every ship") +
+    '<p>A <b>4</b> is a <b>4</b> on every ship — same hit or block, same marks. ' +
+    'Bigger ships just unlock higher numbers: d4 rolls 1–4, d6 rolls 1–6, d8 rolls ' +
+    '1–8, and d10 rolls 1–10.</p>' +
     allDiceFacesHtml() + '</div>' +
 
     '<div class="card">' +

@@ -1,9 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fleet Dice">
+  <!-- Black cube -->
   <rect width="64" height="64" rx="14" fill="#080c18"/>
-  <rect x="14" y="14" width="36" height="36" rx="5" fill="#122a48" stroke="#45b6ff" stroke-width="3.5"/>
-  <polygon points="32,24 40,32 32,40 24,32" fill="#45b6ff"/>
-  <circle cx="20" cy="20" r="2.2" fill="#72efa6"/>
-  <circle cx="44" cy="20" r="2.2" fill="#45b6ff"/>
-  <circle cx="20" cy="44" r="2.2" fill="#45b6ff"/>
-  <circle cx="44" cy="44" r="2.2" fill="#45b6ff"/>
+  <rect x="7" y="7" width="50" height="50" rx="10" fill="#101828" stroke="#1d2a44" stroke-width="1.5"/>
+  <!-- d4 #1 face: blue triangle, two Energy bolts -->
+  <g transform="translate(7 6) scale(0.5)">
+    <polygon
+      points="50,10 93,84 7,84"
+      fill="#45b6ff"
+      fill-opacity="0.16"
+      stroke="#45b6ff"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+    <text
+      x="50"
+      y="63"
+      text-anchor="middle"
+      fill="#45b6ff"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+      font-size="38"
+      font-weight="800"
+      style="font-variant-numeric:tabular-nums"
+    >1</text>
+    <!-- Two Energy bolts (game mark path) -->
+    <g fill="#ffe81f">
+      <path
+        d="M0,-6 L-3.4,1 L-0.6,1 L-2.4,6 L3.4,-1.4 L0.6,-1.4 Z"
+        transform="translate(45.05,73) scale(1.55)"
+      />
+      <path
+        d="M0,-6 L-3.4,1 L-0.6,1 L-2.4,6 L3.4,-1.4 L0.6,-1.4 Z"
+        transform="translate(54.95,73) scale(1.55)"
+      />
+    </g>
+  </g>
 </svg>
