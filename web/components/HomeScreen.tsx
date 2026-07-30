@@ -137,7 +137,7 @@ export function HomeScreen() {
               onClick={() => void copyGameLink()}
               type="button"
             >
-              {linkCopied ? "Link copied" : "Copy link to this game"}
+              {linkCopied ? "Link copied" : "Copy link to this site"}
             </button>
           </div>
         </div>
