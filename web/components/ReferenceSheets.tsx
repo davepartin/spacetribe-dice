@@ -29,7 +29,6 @@ const STRAIGHT_ROWS: { length: number; rewards: (string | null)[] }[] = [
   { length: 5, rewards: ["6⚡", "9⚡", "12⚡", "15⚡"] },
   { length: 6, rewards: ["8", "12", "16", "20"] },
   { length: 7, rewards: [null, "18", "24", "30"] },
-  { length: 8, rewards: [null, null, "d8 +16", "d10 +20"] },
 ];
 
 function faceEffectText(value: number) {
@@ -303,8 +302,7 @@ export function HelpSheet({
           </tbody>
         </table>
         <p className="reference-note">
-          Length 6+ pays Attack (shown as a number). Length 8 also awards a free ship
-          of that size.
+          Length 6+ pays Attack (shown as a number). Seven in a row is the top prize.
         </p>
       </article>
 

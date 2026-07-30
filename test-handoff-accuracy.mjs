@@ -30,7 +30,8 @@ const claims=[
  ["escalates after 8 by 4", w.K("escFrom")===8 && w.K("escPer")===4],
  ["botPace default 1", w.K("botPace")===1],
  ["5 in a row on d10 pays 15 Energy", w.straightReward(5,10).label==="15 Energy"],
- ["8 in a row on d10 gives a free d10 and 20 attack", w.straightReward(8,10).label==="a free d10 and 20 attack"],
+ ["7 in a row on d10 pays 30 attack", w.straightReward(7,10).label==="30 attack"],
+ ["8 in a row on d10 also pays as a 7", w.straightReward(8,10).label==="30 attack"],
 ];
 let bad=0;
 for(const [c,ok] of claims){ if(!ok){ bad++; console.log("  ✗ HANDOFF CLAIM WRONG:", c); } }

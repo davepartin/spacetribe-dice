@@ -594,9 +594,11 @@ function RollFleet({
   const [rolledIds, setRolledIds] = useState<Set<string>>(() => new Set());
   const [rollPulse, setRollPulse] = useState(0);
   const run = straightOptions(you);
-  const [straightTake, setStraightTake] = useState<number | undefined>(run?.length);
+  const [straightTake, setStraightTake] = useState<number | undefined>(
+    run ? Math.min(run.length, 7) : undefined,
+  );
   const chosenStraightTake = run
-    ? Math.min(straightTake ?? run.length, run.length)
+    ? Math.min(straightTake ?? run.length, run.length, 7)
     : undefined;
   const preview = you.dice.length ? previewTally(you, chosenStraightTake) : null;
   const earning = preview ? preview.energy + you.baseEnergy : 0;
@@ -735,7 +737,7 @@ function RollFleet({
               <h2>Choose how to cash it.</h2>
             </div>
             <div className="straight-options">
-              {Array.from({ length: run.length - 4 }, (_, index) => index + 5).map((length) => {
+              {Array.from({ length: Math.min(run.length, 7) - 4 }, (_, index) => index + 5).map((length) => {
                 const option = previewTally(you, length).run!;
                 return (
                   <button

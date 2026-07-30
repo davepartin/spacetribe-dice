@@ -915,21 +915,12 @@ function bestRun(dice){
 // LENGTH decides what KIND of prize you get; the biggest ship in the line decides
 // HOW BIG it is. The ladder as it stands, with runMin at 5:
 //
-//   5 in a row -> Energy        6 or 7 -> attack        8 -> a free ship, and attack
+//   5 in a row -> Energy        6 or 7 -> attack
 //
-// Paying attack at every length made straights 49% of all damage in a match,
-// which was too much of the game. Spreading the reward across Energy, damage and
-// a hull lands near 29%.
-//
-// Tiers stepped up two lengths in v12, because three rolls a round makes a
-// straight about two lengths easier to reach. Measured on a full eight-ship fleet
-// with three rolls: 6 in a row lands 40% of rounds, 7 lands 16%, 8 lands 3.7% -
-// almost exactly the odds 4, 5 and 6 had on a single roll.
+// Seven is the top rung. An eight-long line still pays as a seven.
 function straightReward(length, biggest){
   var m = K("runMult"), r;
-  if (length >= 8) r = { kind:"ship", ship: biggest, attack: Math.round(biggest * 2 * m),
-                         label: "a free d" + biggest + " and " + Math.round(biggest * 2 * m) + " attack" };
-  else if (length >= 7) r = { kind:"attack", attack: Math.round(biggest * 3 * m),
+  if (length >= 7) r = { kind:"attack", attack: Math.round(biggest * 3 * m),
                          label: Math.round(biggest * 3 * m) + " attack" };
   else if (length >= 6) r = { kind:"attack", attack: Math.round(biggest * 2 * m),
                          label: Math.round(biggest * 2 * m) + " attack" };
@@ -968,7 +959,9 @@ function tally(dice, flagFace, mul, pick){
   t.run = r;
   if (r){
     // pick is undefined for the bot, which always cashes at full length.
+    // Seven is the top cashable tier — longer lines still pay as a seven.
     var take = (pick !== null && pick !== undefined && pick <= r.length) ? pick : r.length;
+    take = Math.min(take, 7);
     r.taken = take;
     r.reward = straightReward(take, r.biggest);
     t.attack += r.reward.attack || 0;
@@ -1820,7 +1813,7 @@ function reachable(length, biggest){ return length <= biggest + 1; }
 function straightTableHtml(){
   var sizes = [4,6,8,10], rows = "";
   var lo = K("runMin");
-  for (var L = lo; L <= lo + 3; L++){
+  for (var L = lo; L <= lo + 2; L++){
     rows += '<tr><td>' + L + ' in a row</td>';
     for (var i = 0; i < sizes.length; i++){
       if (!reachable(L, sizes[i])){
@@ -1889,8 +1882,8 @@ function dockMetrics(){
 // control anywhere, so `straightPick` was never set by a human and the report's
 // "cashed as 5" branch was unreachable. This is that missing screen.
 function straightTiers(length){
-  var out = [], L;
-  for (L = K("runMin"); L <= length; L++) out.push(L);
+  var out = [], L, top = Math.min(length, 7);
+  for (L = K("runMin"); L <= top; L++) out.push(L);
   return out;
 }
 

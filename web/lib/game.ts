@@ -391,7 +391,7 @@ function handleSubmit(state: MatchState, player: PlayerState, straightTake?: num
   if (player.phase !== "rolling") throw new Error("Roll your fleet before submitting.");
   const run = tally(player.dice, player.flag.level).run;
   if (straightTake !== undefined) {
-    if (!run || straightTake < 5 || straightTake > run.length) {
+    if (!run || straightTake < 5 || straightTake > Math.min(run.length, 7)) {
       throw new Error("That straight reward is not available.");
     }
   }
@@ -664,7 +664,11 @@ function bestRun(dice: DieValue[], chosenTake?: number): Straight | null {
   }
 
   if (!best) return null;
-  const taken = Math.max(5, Math.min(chosenTake ?? best.length, best.length));
+  const maxTake = 7;
+  const taken = Math.max(
+    5,
+    Math.min(chosenTake ?? Math.min(best.length, maxTake), best.length, maxTake),
+  );
   return {
     ...best,
     taken,
@@ -673,14 +677,6 @@ function bestRun(dice: DieValue[], chosenTake?: number): Straight | null {
 }
 
 function straightReward(length: number, biggest: DieSize): StraightReward {
-  if (length >= 8) {
-    return {
-      kind: "ship",
-      ship: biggest,
-      attack: biggest * 2,
-      label: `free d${biggest} + ${biggest * 2} Attack`,
-    };
-  }
   if (length >= 7) {
     return {
       kind: "attack",
