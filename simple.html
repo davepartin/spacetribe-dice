@@ -1727,11 +1727,14 @@ function flagHtml(){
 }
 
 // A small reference so the payoffs are never a mystery.
-// How long a line a given biggest ship can head. Its own ships cover 1..N, and
-// the flagship contributes ONE more value on top - so the ceiling is N + 1.
-// Four d4s and a flagship 5 make five in a row at the d4 rate; six in a row is
-// beyond them, because the flagship only has one number to give.
-function reachable(length, biggest){ return length <= biggest + 1; }
+// How long a line a given biggest ship can head. Small ships (d4) can use the
+// flagship to stretch one number past their hull. The flagship only rolls 1–6,
+// so a d6 already covers the whole flagship range and cannot make seven in a
+// row — that needs a d8 or d10 to show a 7.
+function reachable(length, biggest){
+  var maxLen = biggest < 6 ? biggest + 1 : biggest;
+  return length <= maxLen;
+}
 function straightTableHtml(){
   var sizes = [4,6,8,10], rows = "";
   var lo = K("runMin");

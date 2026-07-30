@@ -28,7 +28,7 @@ const SHAPES: { sides: DieSize; name: string; shape: string }[] = [
 const STRAIGHT_ROWS: { length: number; rewards: (string | null)[] }[] = [
   { length: 5, rewards: ["6⚡", "9⚡", "12⚡", "15⚡"] },
   { length: 6, rewards: ["8", "12", "16", "20"] },
-  { length: 7, rewards: [null, "18", "24", "30"] },
+  { length: 7, rewards: [null, null, "24", "30"] },
 ];
 
 function faceEffectText(value: number) {
