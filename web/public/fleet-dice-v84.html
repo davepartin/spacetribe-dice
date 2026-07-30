@@ -2994,6 +2994,11 @@ function toast(msg){
 }
 
 newGame();
+if (/#(help|ref)$/i.test(location.hash || "")) {
+  G.resume = G.phase;
+  G.phase = "help";
+  render();
+}
 </script>
 </body>
 </html>

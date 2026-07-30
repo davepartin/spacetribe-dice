@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Brand } from "./Brand";
 import { LiveBattlesBoard } from "./LiveBattlesBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
 import {
@@ -104,41 +105,77 @@ export function HomeScreen() {
   }
 
   return (
-    <main className="home-shell">
-      <nav className="home-nav home-nav-slim" aria-label="Site">
-        <a className="nav-link" href={withBasePath("/fleet-dice-v84.html#ref")}>
-          How to play
-        </a>
+    <main className="home-shell home-shell-v2">
+      <nav className="home-nav-v2" aria-label="Site">
+        <Brand compact />
+        <div className="home-nav-actions">
+          <a className="home-nav-button" href="#how-title">
+            How to play
+          </a>
+          <button
+            className="home-nav-button home-share-button"
+            onClick={() => void copyGameLink()}
+            type="button"
+          >
+            {linkCopied ? "Link copied" : "Share game"}
+          </button>
+        </div>
       </nav>
 
-      <section className="hero-billboard" aria-label="Fleet Dice">
-        <img
-          alt="Fleet Dice — Build the fleet. Break the flagship."
-          className="hero-key-art"
-          height={640}
-          src={KEY_ART}
-          width={1024}
-        />
-        <div className="hero-actions">
-          <p className="hero-support">
-            Upgrade your ships. Hunt the straight. Decide what to risk.
+      <section className="home-hero-v2" aria-labelledby="home-title">
+        <div className="home-hero-copy">
+          <p className="home-hero-kicker">FAST DICE-BUILDING COMBAT</p>
+          <h1 id="home-title">
+            Build the fleet.
+            <span>Break the flagship.</span>
+          </h1>
+          <p className="home-hero-lead">
+            Every die is a ship. Roll for attack, shields, and energy, then
+            upgrade your fleet and hunt the perfect straight.
           </p>
-          <div className="hero-cta-row">
-            <Link className="action-button light-action" href="/solo/">
-              Solo Battle
-              <span aria-hidden="true">→</span>
+
+          <div className="home-mode-actions">
+            <Link className="home-mode-action home-mode-solo" href="/solo/">
+              <span className="home-mode-topline">
+                <span className="home-mode-label">Play solo</span>
+                <span aria-hidden="true">→</span>
+              </span>
+              <small>Learn the fleet against the enemy AI.</small>
             </Link>
-            <Link className="action-button red-action" href="/versus/">
-              Create Versus Battle
-              <span aria-hidden="true">→</span>
+            <Link className="home-mode-action home-mode-versus" href="/versus/">
+              <span className="home-mode-topline">
+                <span className="home-mode-label">Battle a friend</span>
+                <span aria-hidden="true">→</span>
+              </span>
+              <small>Create a private code and fight live.</small>
             </Link>
-            <button
-              className="action-button outline-action"
-              onClick={() => void copyGameLink()}
-              type="button"
-            >
-              {linkCopied ? "Link copied" : "Copy link to this site"}
-            </button>
+          </div>
+
+          <ul className="home-hero-facts" aria-label="Game details">
+            <li>1–2 commanders</li>
+            <li>10–15 minutes</li>
+            <li>No account</li>
+          </ul>
+        </div>
+
+        <div className="home-hero-visual">
+          <img
+            alt="Fleet Dice ships and dice crossing a battlefield in space."
+            className="home-hero-art"
+            height={640}
+            src={KEY_ART}
+            width={1024}
+          />
+          <div className="home-rule-punch" aria-label="Core rules">
+            <span>
+              <b>EVEN</b> hits
+            </span>
+            <span>
+              <b>ODD</b> blocks
+            </span>
+            <span>
+              <b>5+</b> straight
+            </span>
           </div>
         </div>
       </section>
@@ -149,14 +186,12 @@ export function HomeScreen() {
             <p className="card-kicker">YOUR MATCHES</p>
             <h2>
               {savedMatches.length === 1
-                ? "1 game in progress"
-                : `${savedMatches.length} games in progress`}
+                ? "Your battle is waiting"
+                : `${savedMatches.length} battles are waiting`}
             </h2>
             <p className="your-matches-hint">
-              These are your seats on this phone. Tap Open to jump back in —
-              you do not need the code or the same display name. Remove only
-              forgets the shortcut; Cancel game inside a match ends it for both
-              players.
+              Open a saved seat on this device. Remove only forgets the
+              shortcut; it does not end the match.
             </p>
           </div>
           <ul className="your-matches-list">
@@ -170,7 +205,9 @@ export function HomeScreen() {
                   </strong>
                   <span>
                     Game {card.code}
-                    {card.status === "waiting" ? " · waiting for opponent" : ` · Round ${card.round}`}
+                    {card.status === "waiting"
+                      ? " · waiting for opponent"
+                      : ` · Round ${card.round}`}
                   </span>
                 </div>
                 <div className="your-match-actions">
@@ -197,16 +234,16 @@ export function HomeScreen() {
         </section>
       ) : null}
 
-      <section className="join-strip" aria-label="Join by code">
-        <header className="join-strip-head">
-          <p className="card-kicker">HAVE A GAME CODE?</p>
-          <h2>Join your enemy</h2>
-          <p className="join-hint">
-            Second player: name + four-digit code. Hosts reopen from{" "}
-            <b>Your matches</b> — don’t join by code.
+      <section className="home-join-card" aria-labelledby="join-title">
+        <header className="home-join-copy">
+          <p className="card-kicker">HAVE A BATTLE CODE?</p>
+          <h2 id="join-title">Join the fight.</h2>
+          <p>
+            Enter your display name and the four numbers from your friend. Your
+            browser remembers your seat.
           </p>
         </header>
-        <form className="join-form" onSubmit={joinByCode}>
+        <form className="home-join-form" onSubmit={joinByCode}>
           <input
             aria-label="Display name"
             autoComplete="nickname"
@@ -215,29 +252,73 @@ export function HomeScreen() {
             placeholder="Display name"
             value={name}
           />
-          <div className="join-form-row">
+          <div className="home-join-form-row">
             <input
               aria-label="Four digit game code"
               className="code-input"
               inputMode="numeric"
               maxLength={4}
-              onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+              onChange={(event) =>
+                setCode(event.target.value.replace(/\D/g, ""))
+              }
               placeholder="0000"
               value={code}
             />
-            <button className="action-button blue-action" disabled={joining} type="submit">
+            <button
+              className="action-button blue-action"
+              disabled={joining}
+              type="submit"
+            >
               {joining ? "Opening…" : "Join match"}
             </button>
           </div>
+          {error ? <p className="form-error">{error}</p> : null}
         </form>
-        {error ? <p className="form-error">{error}</p> : null}
+      </section>
+
+      <section className="home-how" aria-labelledby="how-title">
+        <header className="home-how-head">
+          <div>
+            <p className="card-kicker">HOW BATTLE WORKS</p>
+            <h2 id="how-title">Every die is a ship.</h2>
+          </div>
+          <a href={withBasePath("/fleet-dice-v84.html#help")}>
+            Read the full rules <span aria-hidden="true">→</span>
+          </a>
+        </header>
+        <ol className="home-how-grid">
+          <li>
+            <span className="home-step-number">01</span>
+            <h3>Roll and read</h3>
+            <p>
+              Even numbers fire. Odd numbers raise shields. Marked faces charge
+              energy, repair, or deal direct damage.
+            </p>
+          </li>
+          <li>
+            <span className="home-step-number">02</span>
+            <h3>Build the fleet</h3>
+            <p>
+              Spend energy on more ships, larger dice, and a stronger flagship.
+              Every upgrade changes your odds.
+            </p>
+          </li>
+          <li>
+            <span className="home-step-number">03</span>
+            <h3>Hunt the straight</h3>
+            <p>
+              Line up five or more numbers for a powerful reward. Break the
+              enemy flagship before they break yours.
+            </p>
+          </li>
+        </ol>
       </section>
 
       <LiveBattlesBoard />
 
-      <footer className="home-footer">
-        <p>No account to create. No app download. Your browser remembers you.</p>
-        <span>2 commanders · private room · live rounds</span>
+      <footer className="home-footer home-footer-v2">
+        <p>Fleet Dice plays in your browser. Nothing to install.</p>
+        <span>BUILD · RISK · STRIKE</span>
       </footer>
     </main>
   );
