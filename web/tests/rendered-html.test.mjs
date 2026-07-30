@@ -21,6 +21,7 @@ test("static export includes the Fleet Dice home screen", () => {
   assert.match(html, /Play solo/);
   assert.match(html, /Battle a friend/);
   assert.match(html, /Join the fight/);
+  assert.match(html, /\/spacetribe-dice\/how-to-play\//);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape|chatgpt\.site/i);
 });
 
@@ -29,6 +30,7 @@ for (const [segments, expected] of [
   [["versus", "index.html"], "Create private match"],
   [["join", "index.html"], "Join a Match"],
   [["match", "index.html"], "Opening battlefield"],
+  [["how-to-play", "index.html"], "Back to Fleet Dice home"],
 ]) {
   test(`static export includes ${segments.join("/")}`, () => {
     assert.match(readPage(...segments), new RegExp(expected, "i"));

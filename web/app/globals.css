@@ -3672,8 +3672,7 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   margin-bottom: 8px;
 }
 
-.home-join-copy h2,
-.home-how-head h2 {
+.home-join-copy h2 {
   margin: 0;
   font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
   font-size: clamp(28px, 3.4vw, 41px);
@@ -3705,69 +3704,6 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 .home-join-form .form-error {
   margin: 2px 0 0;
   font-size: 13px;
-}
-
-.home-how {
-  padding: clamp(46px, 7vw, 76px) 0 8px;
-}
-
-.home-how-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 28px;
-}
-
-.home-how-head a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
-  padding-bottom: 4px;
-  color: var(--blue);
-  font-size: 12px;
-  font-weight: 850;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.home-how-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 25px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.home-how-grid li {
-  min-height: 228px;
-  padding: 23px;
-  background:
-    linear-gradient(155deg, #111b2f, #0b1221);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-}
-
-.home-step-number {
-  color: var(--blue);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .16em;
-}
-
-.home-how-grid h3 {
-  margin: 28px 0 10px;
-  font-size: 20px;
-  letter-spacing: -.025em;
-}
-
-.home-how-grid p {
-  margin: 0;
-  color: var(--dim);
-  font-size: 14px;
-  line-height: 1.55;
 }
 
 .home-shell-v2 .live-board {
@@ -3894,33 +3830,8 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
     border-radius: 20px;
   }
 
-  .home-join-copy h2,
-  .home-how-head h2 {
+  .home-join-copy h2 {
     font-size: 31px;
-  }
-
-  .home-how {
-    padding-top: 48px;
-  }
-
-  .home-how-head {
-    display: block;
-  }
-
-  .home-how-head a {
-    margin-top: 15px;
-  }
-
-  .home-how-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .home-how-grid li {
-    min-height: 0;
-  }
-
-  .home-how-grid h3 {
-    margin-top: 19px;
   }
 }
 
@@ -3940,5 +3851,57 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
   .home-mode-action {
     min-height: 94px;
+  }
+}
+
+.how-to-page {
+  width: min(760px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 20px 0 calc(34px + env(safe-area-inset-bottom, 0px));
+}
+
+.how-to-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 52px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.how-to-page-sheet {
+  width: 100%;
+  padding: clamp(20px, 4vw, 30px);
+}
+
+.how-to-page-sheet > .action-button:last-child {
+  margin-top: 18px;
+}
+
+@media (max-width: 520px) {
+  .how-to-page {
+    width: calc(100% - 20px);
+    padding-top: 12px;
+  }
+
+  .how-to-page-header {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+  }
+
+  .how-to-page-header .brand-mark {
+    display: none;
+  }
+
+  .how-to-page-header .brand-copy > span {
+    font-size: 15px;
+    letter-spacing: .1em;
+  }
+
+  .how-to-page-sheet {
+    padding: 18px 12px 14px;
+    border-radius: 16px;
   }
 }

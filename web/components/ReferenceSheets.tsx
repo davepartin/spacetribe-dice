@@ -105,7 +105,13 @@ export function ReferenceSheets({
   );
 }
 
-function HelpSheet({ flagLevel }: { flagLevel: number }) {
+export function HelpSheet({
+  flagLevel,
+  standalone = false,
+}: {
+  flagLevel: number;
+  standalone?: boolean;
+}) {
   const mul = Math.min(4, flagLevel + 1);
   return (
     <>
@@ -309,7 +315,9 @@ function HelpSheet({ flagLevel }: { flagLevel: number }) {
           wrap: #1 can turn down to #6, and #6 can turn up to #1.
         </p>
         <p className="reference-note">
-          You are on level {flagLevel} — each matching die currently gets +{mul}.
+          {standalone
+            ? "Your flagship starts at level 1, where each matching die gets +2. Upgrade it to raise that bonus."
+            : `You are on level ${flagLevel} — each matching die currently gets +${mul}.`}
         </p>
         <div className="help-flag-grid help-flag-grid-wide">
           {[1, 2, 3, 4, 5, 6].map((face) => {

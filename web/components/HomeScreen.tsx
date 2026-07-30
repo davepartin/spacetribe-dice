@@ -109,9 +109,9 @@ export function HomeScreen() {
       <nav className="home-nav-v2" aria-label="Site">
         <Brand compact />
         <div className="home-nav-actions">
-          <a className="home-nav-button" href="#how-title">
+          <Link className="home-nav-button" href="/how-to-play/">
             How to play
-          </a>
+          </Link>
           <button
             className="home-nav-button home-share-button"
             onClick={() => void copyGameLink()}
@@ -274,44 +274,6 @@ export function HomeScreen() {
           </div>
           {error ? <p className="form-error">{error}</p> : null}
         </form>
-      </section>
-
-      <section className="home-how" aria-labelledby="how-title">
-        <header className="home-how-head">
-          <div>
-            <p className="card-kicker">HOW BATTLE WORKS</p>
-            <h2 id="how-title">Every die is a ship.</h2>
-          </div>
-          <a href={withBasePath("/fleet-dice-v84.html#help")}>
-            Read the full rules <span aria-hidden="true">→</span>
-          </a>
-        </header>
-        <ol className="home-how-grid">
-          <li>
-            <span className="home-step-number">01</span>
-            <h3>Roll and read</h3>
-            <p>
-              Even numbers fire. Odd numbers raise shields. Marked faces charge
-              energy, repair, or deal direct damage.
-            </p>
-          </li>
-          <li>
-            <span className="home-step-number">02</span>
-            <h3>Build the fleet</h3>
-            <p>
-              Spend energy on more ships, larger dice, and a stronger flagship.
-              Every upgrade changes your odds.
-            </p>
-          </li>
-          <li>
-            <span className="home-step-number">03</span>
-            <h3>Hunt the straight</h3>
-            <p>
-              Line up five or more numbers for a powerful reward. Break the
-              enemy flagship before they break yours.
-            </p>
-          </li>
-        </ol>
       </section>
 
       <LiveBattlesBoard />
