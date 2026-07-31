@@ -1,37 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fleet Dice">
-  <!-- Black cube -->
-  <rect width="64" height="64" rx="14" fill="#080c18"/>
-  <rect x="7" y="7" width="50" height="50" rx="10" fill="#101828" stroke="#1d2a44" stroke-width="1.5"/>
-  <!-- d4 #1 face: blue triangle, two Energy bolts -->
-  <g transform="translate(7 6) scale(0.5)">
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Fleet Dice">
+  <!-- Full square canvas so home-screen icons keep proportions -->
+  <rect width="512" height="512" rx="96" fill="#080c18"/>
+  <rect x="40" y="40" width="432" height="432" rx="72" fill="#101828" stroke="#1d2a44" stroke-width="10"/>
+  <!-- Wide, centered d4 #1 — sized to fill the square without looking squeezed -->
+  <g transform="translate(256 268)">
     <polygon
-      points="50,10 93,84 7,84"
+      points="0,-168 188,148 -188,148"
       fill="#45b6ff"
       fill-opacity="0.16"
       stroke="#45b6ff"
-      stroke-width="5"
+      stroke-width="22"
       stroke-linejoin="round"
     />
     <text
-      x="50"
-      y="63"
+      x="0"
+      y="28"
       text-anchor="middle"
+      dominant-baseline="middle"
       fill="#45b6ff"
       font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
-      font-size="38"
+      font-size="168"
       font-weight="800"
       style="font-variant-numeric:tabular-nums"
     >1</text>
-    <!-- Two Energy bolts (game mark path) -->
-    <g fill="#ffe81f">
-      <path
-        d="M0,-6 L-3.4,1 L-0.6,1 L-2.4,6 L3.4,-1.4 L0.6,-1.4 Z"
-        transform="translate(45.05,73) scale(1.55)"
-      />
-      <path
-        d="M0,-6 L-3.4,1 L-0.6,1 L-2.4,6 L3.4,-1.4 L0.6,-1.4 Z"
-        transform="translate(54.95,73) scale(1.55)"
-      />
+    <g fill="#ffe81f" transform="translate(0 92)">
+      <path d="M0,-28 L-16,5 L-3,5 L-11,28 L16,-7 L3,-7 Z" transform="translate(-28 0)"/>
+      <path d="M0,-28 L-16,5 L-3,5 L-11,28 L16,-7 L3,-7 Z" transform="translate(28 0)"/>
     </g>
   </g>
 </svg>
