@@ -152,5 +152,54 @@ service cloud.firestore {
 
       allow delete: if boardParticipant();
     }
+
+    // Public, name-only history for the expandable home-page results list.
+    // The names must agree with a match that becomes finished in the same
+    // atomic write, and only one of that match's commanders may create it.
+    match /battleResults/{matchId} {
+      function finishedMatch() {
+        return getAfter(/databases/$(database)/documents/matches/$(matchId)).data;
+      }
+
+      function resultParticipant() {
+        let matchData = finishedMatch();
+        return signedIn()
+          && (
+            matchData.hostUid == request.auth.uid
+            || matchData.guestUid == request.auth.uid
+          );
+      }
+
+      function validResultNames() {
+        let state = finishedMatch().state;
+        return (
+            state.winner == "host"
+            && request.resource.data.winnerName == state.players.host.name
+            && request.resource.data.loserName == state.players.guest.name
+          )
+          || (
+            state.winner == "guest"
+            && request.resource.data.winnerName == state.players.guest.name
+            && request.resource.data.loserName == state.players.host.name
+          );
+      }
+
+      allow read: if true;
+      allow create: if resultParticipant()
+        && finishedMatch().status == "finished"
+        && request.resource.data.keys()
+          .hasAll(["winnerName", "loserName", "finishedAt"])
+        && request.resource.data.keys()
+          .hasOnly(["winnerName", "loserName", "finishedAt"])
+        && request.resource.data.winnerName is string
+        && request.resource.data.winnerName.size() > 0
+        && request.resource.data.winnerName.size() <= 40
+        && request.resource.data.loserName is string
+        && request.resource.data.loserName.size() > 0
+        && request.resource.data.loserName.size() <= 40
+        && request.resource.data.finishedAt == request.time
+        && validResultNames();
+      allow update, delete: if false;
+    }
   }
 }

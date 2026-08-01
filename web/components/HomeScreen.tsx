@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Brand } from "./Brand";
 import { LiveBattlesBoard } from "./LiveBattlesBoard";
+import { RecentResultsBoard } from "./RecentResultsBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
 import {
   clearActiveMatch,
@@ -266,6 +267,8 @@ export function HomeScreen() {
       </section>
 
       <LiveBattlesBoard />
+
+      <RecentResultsBoard />
 
       <footer className="home-footer home-footer-v2">
         <p>Fleet Dice plays in your browser. Nothing to install.</p>

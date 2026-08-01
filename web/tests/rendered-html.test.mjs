@@ -21,6 +21,7 @@ test("static export includes the Fleet Dice home screen", () => {
   assert.match(html, /Play solo/);
   assert.match(html, /Battle a friend/);
   assert.match(html, /Join the fight/);
+  assert.match(html, /Winners from the last 30 days/);
   assert.match(html, /\/spacetribe-dice\/how-to-play\//);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape|chatgpt\.site/i);
 });

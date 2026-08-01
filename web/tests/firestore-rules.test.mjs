@@ -50,7 +50,14 @@ beforeEach(async () => {
         hostUid,
         guestUid,
         status: "active",
-        state: { status: "active" },
+        state: {
+          status: "active",
+          winner: null,
+          players: {
+            host: { name: "Chris" },
+            guest: { name: "Korbin" },
+          },
+        },
         version: 159,
         updatedAt: new Date(0),
       }),
@@ -76,6 +83,7 @@ test("the guest can commit the final match action and finish its room code", asy
   const matchRef = doc(db, "matches", matchId);
   const boardRef = doc(db, "liveBattles", matchId);
   const codeRef = doc(db, "codes", code);
+  const resultRef = doc(db, "battleResults", matchId);
 
   await assertSucceeds(
     runTransaction(db, async (transaction) => {
@@ -86,11 +94,23 @@ test("the guest can commit the final match action and finish its room code", asy
       ]);
       transaction.update(matchRef, {
         status: "finished",
-        state: { status: "finished", winner: "guest" },
+        state: {
+          status: "finished",
+          winner: "guest",
+          players: {
+            host: { name: "Chris" },
+            guest: { name: "Korbin" },
+          },
+        },
         version: 160,
         updatedAt: serverTimestamp(),
       });
       transaction.delete(boardRef);
+      transaction.set(resultRef, {
+        winnerName: "Korbin",
+        loserName: "Chris",
+        finishedAt: serverTimestamp(),
+      });
       transaction.update(codeRef, {
         status: "finished",
         updatedAt: serverTimestamp(),
@@ -100,16 +120,65 @@ test("the guest can commit the final match action and finish its room code", asy
 
   await testEnvironment.withSecurityRulesDisabled(async (context) => {
     const verificationDb = context.firestore();
-    const [matchSnapshot, boardSnapshot, codeSnapshot] = await Promise.all([
+    const [matchSnapshot, boardSnapshot, codeSnapshot, resultSnapshot] = await Promise.all([
       getDoc(doc(verificationDb, "matches", matchId)),
       getDoc(doc(verificationDb, "liveBattles", matchId)),
       getDoc(doc(verificationDb, "codes", code)),
+      getDoc(doc(verificationDb, "battleResults", matchId)),
     ]);
     assert.equal(matchSnapshot.data().status, "finished");
     assert.equal(matchSnapshot.data().state.winner, "guest");
     assert.equal(boardSnapshot.exists(), false);
     assert.equal(codeSnapshot.data().status, "finished");
+    assert.equal(resultSnapshot.data().winnerName, "Korbin");
+    assert.equal(resultSnapshot.data().loserName, "Chris");
   });
+});
+
+test("a participant cannot publish winner names that disagree with the match", async () => {
+  const db = testEnvironment.authenticatedContext(guestUid).firestore();
+  const matchRef = doc(db, "matches", matchId);
+  const resultRef = doc(db, "battleResults", matchId);
+
+  await assertFails(
+    runTransaction(db, async (transaction) => {
+      await transaction.get(matchRef);
+      transaction.update(matchRef, {
+        status: "finished",
+        state: {
+          status: "finished",
+          winner: "guest",
+          players: {
+            host: { name: "Chris" },
+            guest: { name: "Korbin" },
+          },
+        },
+        version: 160,
+        updatedAt: serverTimestamp(),
+      });
+      transaction.set(resultRef, {
+        winnerName: "Chris",
+        loserName: "Korbin",
+        finishedAt: serverTimestamp(),
+      });
+    }),
+  );
+});
+
+test("recent name-only results are publicly readable", async () => {
+  await testEnvironment.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), "battleResults", matchId), {
+      winnerName: "Korbin",
+      loserName: "Chris",
+      finishedAt: new Date(),
+    });
+  });
+
+  const publicDb = testEnvironment.unauthenticatedContext().firestore();
+  const snapshot = await assertSucceeds(
+    getDoc(doc(publicDb, "battleResults", matchId)),
+  );
+  assert.equal(snapshot.data().winnerName, "Korbin");
 });
 
 test("a guest cannot alter room identity while finishing its code", async () => {
