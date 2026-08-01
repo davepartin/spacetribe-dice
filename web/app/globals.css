@@ -3594,6 +3594,124 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   margin-top: 22px;
 }
 
+.recent-results {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: #0a1220b8;
+}
+
+.recent-results-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 22px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.recent-results-toggle:hover {
+  background: #1320398f;
+}
+
+.recent-results-heading {
+  display: grid;
+  gap: 5px;
+}
+
+.recent-results-heading .card-kicker {
+  font-size: 9px;
+}
+
+.recent-results-heading strong {
+  font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 20px;
+  letter-spacing: -.025em;
+}
+
+.recent-results-action {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.recent-results-action > span {
+  font-size: 15px;
+}
+
+.recent-results-body {
+  padding: 0 22px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.recent-results-body .form-error,
+.recent-results-empty {
+  margin: 16px 0 0;
+  color: var(--dim);
+  font-size: 14px;
+}
+
+.recent-results-body .form-error {
+  color: #ff8d9c;
+}
+
+.recent-results-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-results-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.recent-results-list li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.recent-result-names {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.recent-result-names strong {
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.recent-result-names span,
+.recent-results-list time {
+  color: var(--dim);
+  font-size: 13px;
+}
+
+.recent-results-list time {
+  flex: none;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
 .home-footer.home-footer-v2 {
   padding: 28px 3px 0;
 }
@@ -3710,6 +3828,27 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
   .home-join-copy h2 {
     font-size: 31px;
+  }
+
+  .recent-results-toggle {
+    align-items: flex-end;
+    padding: 17px 16px;
+  }
+
+  .recent-results-heading strong {
+    font-size: 17px;
+  }
+
+  .recent-results-action {
+    font-size: 0;
+  }
+
+  .recent-results-action > span {
+    font-size: 18px;
+  }
+
+  .recent-results-body {
+    padding: 0 16px 16px;
   }
 }
 

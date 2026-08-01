@@ -5,8 +5,12 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  orderBy,
+  query,
   runTransaction,
   serverTimestamp,
+  Timestamp,
+  where,
   type Unsubscribe,
 } from "firebase/firestore";
 import { ensurePlayerIdentity, firestore } from "./firebase";
@@ -50,6 +54,13 @@ export type LiveBattleRow = {
   guestName: string | null;
   status: "waiting" | "active";
   round: number;
+};
+
+export type BattleResultRow = {
+  id: string;
+  winnerName: string;
+  loserName: string;
+  finishedAt: Date;
 };
 
 export type RememberedMatchCard = {
@@ -395,6 +406,17 @@ export async function playLiveAction(
     if (state.status === "finished") {
       clearActiveMatch(matchId);
       if (boardSnap.exists()) transaction.delete(boardRef);
+      if (
+        (state.winner === "host" || state.winner === "guest")
+        && state.players.guest
+      ) {
+        const loserSide: SideId = state.winner === "host" ? "guest" : "host";
+        transaction.set(doc(db, "battleResults", matchId), {
+          winnerName: state.players[state.winner]!.name,
+          loserName: state.players[loserSide]!.name,
+          finishedAt: serverTimestamp(),
+        });
+      }
       if (codeSnap.exists() && data.hostUid === user.uid) {
         transaction.delete(codeRef);
       } else if (codeSnap.exists()) {
@@ -543,6 +565,41 @@ export function watchLiveBattles(
           if (a.status !== b.status) return a.status === "active" ? -1 : 1;
           return a.hostName.localeCompare(b.hostName);
         });
+      onRows(rows);
+    },
+    (error) => {
+      onError(error instanceof Error ? error : new Error(String(error)));
+    },
+  );
+}
+
+/** Public, name-only results from completed versus matches in the last 30 days. */
+export function watchRecentBattleResults(
+  onRows: (rows: BattleResultRow[]) => void,
+  onError: (error: Error) => void,
+): Unsubscribe {
+  const db = requireDb();
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const recentResults = query(
+    collection(db, "battleResults"),
+    where("finishedAt", ">=", Timestamp.fromDate(cutoff)),
+    orderBy("finishedAt", "desc"),
+  );
+  return onSnapshot(
+    recentResults,
+    (snapshot) => {
+      const rows = snapshot.docs.flatMap((entry) => {
+        const data = entry.data();
+        const finishedAt = data.finishedAt?.toDate?.();
+        if (!(finishedAt instanceof Date)) return [];
+        return [{
+          id: entry.id,
+          winnerName: String(data.winnerName || "Commander"),
+          loserName: String(data.loserName || "Commander"),
+          finishedAt,
+        } satisfies BattleResultRow];
+      });
       onRows(rows);
     },
     (error) => {
