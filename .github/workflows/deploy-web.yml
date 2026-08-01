@@ -33,10 +33,14 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
       - name: Install
         run: pnpm install --frozen-lockfile
-      - name: Build static site
-        run: pnpm build
+      - name: Test and build static site
+        run: pnpm test
         env:
           BASE_PATH: /spacetribe-dice
       - name: Upload Pages artifact

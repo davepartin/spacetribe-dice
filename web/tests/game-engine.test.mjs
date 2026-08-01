@@ -210,7 +210,9 @@ test("an inescapable kill ends the match during resolve without waiting on the b
     { id: guest.ships[3].id, sides: 4, value: 1 },
     { id: "flag", sides: 6, value: 1, flag: true },
   ];
-  guest.hp = 5;
+  // The current four-ship maximum brace absorbs 16 of this 20-point hit.
+  // Four HP keeps this fixture genuinely inescapable.
+  guest.hp = 4;
 
   applyAction(state, "host", { type: "submit" });
   applyAction(state, "guest", { type: "submit" });
