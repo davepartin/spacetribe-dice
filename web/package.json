@@ -10,7 +10,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "next build && node --experimental-strip-types --test tests/*.test.mjs",
+    "test": "pnpm test:app && pnpm test:rules",
+    "test:app": "next build && node --experimental-strip-types --test tests/game-engine.test.mjs tests/rendered-html.test.mjs",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-fleet-dice-rules \"node --test tests/firestore-rules.test.mjs\"",
     "lint": "eslint . --ignore-pattern out --ignore-pattern .next"
   },
   "dependencies": {
@@ -20,12 +22,14 @@
     "react-dom": "19.2.6"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "5.0.1",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
+    "firebase-tools": "15.25.1",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3"
   },

@@ -25,6 +25,24 @@ service cloud.firestore {
             .hasOnly(["guestUid", "status", "updatedAt"]);
       }
 
+      // Either commander may close the public room code after the match ends.
+      // Guests can only make this exact active -> finished transition; they
+      // cannot change the room identity or seating fields.
+      function finishingActiveCode() {
+        return signedIn()
+          && resource.data.status == "active"
+          && (
+            resource.data.hostUid == request.auth.uid
+            || resource.data.guestUid == request.auth.uid
+          )
+          && request.resource.data.matchId == resource.data.matchId
+          && request.resource.data.hostUid == resource.data.hostUid
+          && request.resource.data.guestUid == resource.data.guestUid
+          && request.resource.data.status == "finished"
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["status", "updatedAt"]);
+      }
+
       allow get: if signedIn();
       allow list: if false;
       allow create: if signedIn()
@@ -35,6 +53,7 @@ service cloud.firestore {
         && (
           resource.data.hostUid == request.auth.uid
           || claimingCodeSeat()
+          || finishingActiveCode()
         );
       allow delete: if signedIn()
         && resource.data.hostUid == request.auth.uid;
