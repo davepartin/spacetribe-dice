@@ -7,7 +7,7 @@ Everything you need to be useful is either here or pointed at from here.
 
 | Track | What it is | Where |
 | --- | --- | --- |
-| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v86) — also shipped online at `/solo/` |
+| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v87) — also shipped online at `/solo/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -107,7 +107,7 @@ buttons, scoring colours, and how-to matter as much as balance.
 
 ---
 
-## The rules as they stand (v86)
+## The rules as they stand (v87)
 
 These rules are the truth for **solo**. Versus follows the same combat math.
 Versus UI differences are called out in [Online versus](#online-versus--what-we-learned).
@@ -267,10 +267,11 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 
 ### Solo balance (unchanged brief)
 
-v86 keeps the v85 roll layout and Enemy plans. Solo no longer shows guided
-first-match tips — the board stays quiet like versus, and **How to play** carries
-the teaching. You start with four open slots and must buy width; or you can spend
-small amounts upgrading the four ships already in formation.
+v87 keeps the quiet solo board, v85 roll layout, and Enemy plans. Solo now has
+**Quit game / Home** (online top bar) plus in-board **Quit** and a result-screen
+**Back home**, matching versus’s way out. You start with four open slots and must
+buy width; or you can spend small amounts upgrading the four ships already in
+formation.
 
 This is a **first balance pass, not proof of balance**. Five automated policies
 played the real game against the pace-1 opponent:
@@ -347,6 +348,7 @@ join a room without getting stuck.
 | Round report You panel | Same dark + white border treatment |
 | How to play with shapes, marks, every face, six flagship faces, straights table | Done in `ReferenceSheets.tsx` — keep it as deep as solo |
 | Dock: How to play left, Cancel right as real buttons | Done; Cancel asks "Are you sure?" |
+| Solo quit / back home | Done in v87 — online top bar + in-board Quit + result Back home |
 | Scrap in shipyard | **Removed from versus UI** (solo still has scrap) |
 | Upgrade labels readable on 3×3 cells | Done (stacked label + cost) |
 | Guided first-match tips | Removed — How to play carries the teaching |
@@ -383,7 +385,7 @@ join a room without getting stuck.
 | `web/components/ReferenceSheets.tsx` | How to play + upgrade costs |
 | `web/components/HomeScreen.tsx` | Landing + code join |
 | `web/public/fleet-dice-key-art.png` | Brand key art |
-| `web/public/fleet-dice-v86.html` | Solo file shipped inside the online app |
+| `web/public/fleet-dice-v87.html` | Solo file shipped inside the online app |
 | `.github/workflows/deploy-web.yml` | Push `main` → GitHub Pages |
 
 ---
@@ -437,8 +439,8 @@ pnpm dev
 
 | File | What it is |
 | --- | --- |
-| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v86). |
-| **`simple01.html` … `simple85.html`** | Frozen solo snapshots. Never edited again. |
+| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v87). |
+| **`simple01.html` … `simple86.html`** | Frozen solo snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
 | **`HANDOFF.md`** | This file. The entry point. |

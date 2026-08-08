@@ -1247,6 +1247,33 @@ input:focus {
   background: var(--bg);
 }
 
+.solo-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  width: min(640px, calc(100% - 20px));
+  min-height: 52px;
+  margin: 0 auto;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.solo-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.solo-quit-btn {
+  color: #ffd0d7;
+  border-color: color-mix(in srgb, var(--red) 40%, var(--line));
+  background: color-mix(in srgb, var(--red) 14%, #10182a99);
+}
+
 .solo-game {
   display: block;
   flex: 1;
