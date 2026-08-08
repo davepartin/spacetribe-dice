@@ -43,7 +43,20 @@ The three most useful settings for the current game:
 
 ## Versions
 
-### 84 — Enemy has a plan (current)
+### 85 — Fire up top, roll under the dice (current)
+
+The roll screen swaps the two main actions:
+
+- **Roll / reroll** sits **under the fleet** — a clean full-width button you hit
+  every round.
+- **Fire** appears **between the health scores** once you have rolled — a red
+  lock-in button. It replaces the old bottom-dock “Submit round” / “Lock orders”
+  control on this screen.
+
+The **Flagship Token** is available anytime after the first roll, not only after
+roll 3. Help copy, versus, and the solo file all match.
+
+### 84 — Enemy has a plan
 
 Solo Enemy no longer follows one invisible growth schedule. At the start of each
 match it picks **Width**, **Capital**, or **Command**, and spends its growth

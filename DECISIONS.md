@@ -43,9 +43,9 @@ can bridge a straight and boosts matching ship results. Keeping it is safer;
 rerolling can turn several existing dice into a much larger payout.
 
 **Do I spend my Flagship Token now, and which way do I turn it? — Strong.**
-After the final free roll, one step can complete a straight, activate a more
+Anytime after the first roll, one step can complete a straight, activate a more
 valuable face, or do both. It can happen only once per match, so every use gives
-up all later opportunities.
+up all later opportunities — including saving it for a later free roll.
 
 **Do I buy another reroll after the free rolls? — Good.** It costs 1 Energy per
 die, directly competing with permanent fleet growth. The decision is clearest

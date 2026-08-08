@@ -129,12 +129,12 @@ export function HelpSheet({
         <ol className="reference-steps">
           <li>
             <b>1 · Roll.</b> The round opens with every available die <b>Ready</b>.
-            Roll 1 rolls everything. Before rolls 2 and 3, tap only the ship dice or
-            flagship you want to roll again. After the final free roll, either lock
-            orders, buy another reroll, or use your Flagship Token.
+            Roll under the fleet. Before rolls 2 and 3, tap only the ship dice or
+            flagship you want to roll again. Anytime after the first roll you can use
+            your Flagship Token, buy another reroll, or press red <b>Fire</b> at the top.
           </li>
           <li>
-            <b>2 · Lock.</b> When both fleets lock, rolls are revealed. Your attack
+            <b>2 · Fire.</b> When both fleets fire, rolls are revealed. Your attack
             meets Enemy shields; Enemy attack meets yours. Whatever is left over
             lands on a flagship.
           </li>
@@ -244,8 +244,8 @@ export function HelpSheet({
           it rings nothing.
         </p>
         <p className="reference-note">
-          <b>Both fleets receive one Flagship Token per match.</b> After the final
-          free roll, spend it to rotate the flagship one number up or down. The ends
+          <b>Both fleets receive one Flagship Token per match.</b> Anytime after the
+          first roll, spend it to rotate the flagship one number up or down. The ends
           wrap: #1 can turn down to #6, and #6 can turn up to #1.
         </p>
         <p className="reference-note">

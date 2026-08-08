@@ -53,13 +53,10 @@ test("opponent dice remain hidden until you leave the lock-and-wait window", () 
   assert.ok((revealed.players.guest?.dice.length ?? 0) > 0);
 });
 
-test("flagship token rotates once after roll three and immediately changes the face", () => {
+test("flagship token rotates once after the first roll and immediately changes the face", () => {
   const state = activeMatch();
   const host = state.players.host;
   applyAction(state, "host", { type: "roll", dice: [] });
-  const ids = host.dice.map((die) => die.id);
-  applyAction(state, "host", { type: "roll", dice: ids });
-  applyAction(state, "host", { type: "roll", dice: ids });
   const before = host.flag.face;
   applyAction(state, "host", { type: "flag-token", direction: 1 });
   assert.equal(host.flag.face, before === 6 ? 1 : before + 1);

@@ -14,9 +14,9 @@ await new Promise(r => setTimeout(r, 200));
 const w = dom.window, d = w.document;
 const check = (condition, message) => { if (!condition) bad.push(message); };
 
-try { w.localStorage.removeItem("fleet-dice-guided-v84"); } catch {}
+try { w.localStorage.removeItem("fleet-dice-guided-v85"); } catch {}
 w.newGame(true);
-check(w.VERSION === "84", "version is not v84");
+check(w.VERSION === "85", "version is not v85");
 check(w.G.guide === true, "guided first match did not start");
 check(/center die is your flagship/i.test(d.body.textContent), "ready guidance is missing");
 check(/How to play/i.test(d.body.textContent), "How to play tip is missing from ready guidance");
@@ -25,17 +25,20 @@ check(w.G.you.flag.token && w.G.them.flag.token, "both fleets did not receive a 
 d.getElementById("reroll").click();
 check(/Choose which dice to reroll/i.test(d.body.textContent), "reroll coaching is missing");
 check(/d4 only rolls 1.4/i.test(d.body.textContent), "straight and d4 coaching is missing");
-for (let roll = 2; roll <= 3; roll++){
-  d.querySelector("[data-die]").click();
-  d.getElementById("reroll").click();
-}
-check(d.querySelectorAll("[data-flagturn]").length === 2, "Flagship Token turn buttons are missing");
+check(!!d.querySelector("#fire"), "Fire button is missing after the first roll");
+check(/Fire/i.test(d.querySelector("#fire")?.textContent || ""), "top lock button is not Fire");
+check(d.querySelectorAll("[data-flagturn]").length === 2,
+  "Flagship Token turn buttons are missing before roll 3");
 w.G.you.flag.face = 0;
 w.render();
 d.querySelector('[data-flagturn="-1"]').click();
 check(w.G.you.flag.face === 5, "Flagship Token did not wrap #1 down to #6");
 check(w.G.you.flag.token === false, "Flagship Token was not consumed");
 check(/Flagship Token used/i.test(d.body.textContent), "spent Flagship Token status is missing");
+for (let roll = 2; roll <= 3; roll++){
+  d.querySelector("[data-die]").click();
+  d.getElementById("reroll").click();
+}
 
 w.newGame(true);
 d.getElementById("guide-skip").click();

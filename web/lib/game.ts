@@ -376,8 +376,8 @@ function handleRoll(_state: MatchState, player: PlayerState, chosen: string[]) {
 }
 
 function handleFlagToken(player: PlayerState, direction: -1 | 1) {
-  if (player.phase !== "rolling" || player.rolls < 3) {
-    throw new Error("The Flagship Token unlocks after roll 3.");
+  if (player.phase !== "rolling" || player.rolls < 1) {
+    throw new Error("Roll your fleet before using the Flagship Token.");
   }
   if (!player.flag.token) throw new Error("Your Flagship Token is already spent.");
   const next = ((player.flag.face - 1 + direction + 6) % 6) + 1;

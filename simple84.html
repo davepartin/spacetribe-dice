@@ -57,28 +57,12 @@ h1{margin:0;font-size:21px;letter-spacing:.18em;text-transform:uppercase;font-we
 .board .mid{align-self:stretch;font-size:9px;letter-spacing:.1em;color:var(--faint);
   text-align:center;line-height:1.3;display:flex;align-items:center;justify-content:center}
 .board .r{text-align:right}
-/* Fire sits between the two scores once you have a roll to lock. */
+/* The reroll button, sitting between the two scores. */
 .mid-btn{width:100%;padding:8px 6px;line-height:1.15;font-size:14px;font-weight:800;
   border-radius:11px;display:flex;flex-direction:column;align-items:center;gap:1px}
-.board > .mid-btn,.board > .fire-btn{width:auto;margin:5px 7px}
-.mid-btn small,.fire-btn small,.roll-under small{font-size:9px;font-weight:700;
-  letter-spacing:.07em;text-transform:uppercase;opacity:.75}
-.mid-btn[disabled],.fire-btn[disabled],.roll-under[disabled]{opacity:.4}
-.fire-btn{width:100%;padding:10px 8px;line-height:1.1;font-size:18px;font-weight:900;
-  letter-spacing:.06em;text-transform:uppercase;border-radius:12px;color:#fff;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:1px;
-  background:linear-gradient(180deg,#ff4d4f,#c4102a);border:1px solid #ff7a7c;
-  box-shadow:0 0 22px -8px #ff3b3b}
-.fire-btn:active{transform:scale(.97)}
-/* Roll / reroll lives under the dice — the button you hit most. */
-.roll-slot{margin:2px 0 10px}
-.roll-under{width:100%;padding:14px 12px;line-height:1.15;font-size:17px;font-weight:800;
-  border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:2px;
-  color:var(--ink);cursor:pointer;background:linear-gradient(180deg,#243556,#15233a);
-  border:1px solid #6f8ec8;box-shadow:0 0 0 1px rgba(111,142,200,.18) inset}
-.roll-under.go{color:#fff;background:linear-gradient(180deg,#3573ff,#1c46c6);
-  border-color:#5182ff}
-.roll-under:active{transform:scale(.98)}
+.board > .mid-btn{width:auto;margin:5px 7px}
+.mid-btn small{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.75}
+.mid-btn[disabled]{opacity:.4}
 
 h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 2px 9px;font-weight:700}
 .say{font-size:15px;color:var(--dim);margin:0 2px 12px}
@@ -570,7 +554,7 @@ button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
 <script>
 "use strict";
 
-var VERSION = "85";   // bump this when saving a new simpleNN.html
+var VERSION = "84";   // bump this when saving a new simpleNN.html
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -950,7 +934,7 @@ var pending = null;          // the round, resolved but waiting on your brace ch
 var flagInLine = false;      // is the flagship's number part of your straight?
 var lastTally = null;        // what the current roll is worth, for the bottom bar
 var pageCheckpoint = null;   // lets a player reset only the choices on this page
-var GUIDE_KEY = "fleet-dice-guided-v85";
+var GUIDE_KEY = "fleet-dice-guided-v84";
 // The flagship is a d6 with a number on it, and it does BOTH: its boost fires AND
 // its number joins your straight. It used to be a choice between the two, and
 // making you pick was the wrong call - the moment worth building toward is your
@@ -1789,26 +1773,23 @@ function totalsHtml(t){
     '</div>';
 }
 
-// Fire locks the roll from the top of the board — red, obvious, hard to miss.
-// Roll / reroll lives under the dice, because that is the button you press most.
-function fireBtnHtml(){
-  if (G.phase !== "roll" || G.you.rolls === 0) return "";
-  return '<button class="fire-btn" id="fire">Fire<small>Lock this roll</small></button>';
-}
+// The reroll button lives in the middle of the health board. That centre column
+// was carrying a two-word label and nothing else, and this is the button you
+// press most - so it goes where your thumb already is, between the two scores.
 function rerollBtnHtml(){
   if (G.you.rolls === 0){
-    return '<button class="roll-under go" id="reroll">Roll 1 of ' +
+    return '<button class="go mid-btn" id="reroll">Roll 1 of ' +
       K("rollsPerRound") + '<small>Roll every ready die</small></button>';
   }
   var picked = pickedDice().length;
   var chosen = picked + (sel.flag ? 1 : 0);
   var payCost = chosen * K("rerollCost");
   if (G.you.rolls < K("rollsPerRound")){
-    return '<button class="roll-under go" id="reroll"' + (chosen ? '' : ' disabled') + '>' +
+    return '<button class="go mid-btn" id="reroll"' + (chosen ? '' : ' disabled') + '>' +
       'Roll ' + (G.you.rolls + 1) + ' of ' + K("rollsPerRound") +
       '<small>' + (chosen ? chosen + ' selected' : 'Select dice to reroll') + '</small></button>';
   }
-  return '<button class="roll-under" id="reroll"' +
+  return '<button class="mid-btn" id="reroll"' +
     (chosen && G.you.energy >= payCost ? '' : ' disabled') + '>' +
     'Energy reroll' +
     '<small>' + (payCost || K("rerollCost")) + '\u26a1</small></button>';
@@ -1876,9 +1857,8 @@ function guideHtml(stage){
       'want to roll again. Build a line, not merely the highest total — a d4 only ' +
       'rolls 1–4, so it is excellent at covering the low end of a straight. Keep one ' +
       'of each useful number and reroll duplicates or numbers outside your best line.',
-    token: '<b>Fire when you are ready.</b> The red Fire button locks this roll. Keep ' +
-      'rerolling below, buy Energy rerolls, or spend your once-per-game Flagship Token ' +
-      'anytime after the first roll.',
+    token: '<b>This is your final free result.</b> Submit it, buy Energy rerolls, or ' +
+      'spend your once-per-game Flagship Token to turn the flagship one number up or down.',
     brace: '<b>You control where the volley lands.</b> Every ship you put in the way ' +
       'protects health now but removes one die from your next round.',
     report: '<b>Read the two health stories first.</b> They show previous health, ' +
@@ -1892,8 +1872,7 @@ function guideHtml(stage){
 }
 
 function flagTokenHtml(){
-  // Available as soon as the fleet has rolled — not only after the third free roll.
-  if (G.you.rolls < 1) return "";
+  if (G.you.rolls < K("rollsPerRound")) return "";
   var enemyToken = G.them.flag.token ? "ready" : "used";
   if (!G.you.flag.token){
     return '<div class="flagtoken spent"><div class="tokencopy"><b>Flagship Token used</b>' +
@@ -1914,11 +1893,10 @@ function rollView(){
     return '<h2>Round ' + G.round + ' ready</h2>' +
       guideHtml("ready") +
       '<p class="say">Your available ships and flagship are ready. Press <b>Roll 1 of ' +
-      K("rollsPerRound") + '</b> under the fleet to roll them all.</p>' +
+      K("rollsPerRound") + '</b> to roll them all.</p>' +
       gridHtml() +
-      '<div class="roll-slot">' + rerollBtnHtml() + '</div>' +
-      '<div class="foot"><p class="hint">After the first roll, a red <b>Fire</b> button ' +
-      'appears at the top. Tap only the dice you want to roll again.</p></div>';
+      '<div class="foot"><p class="hint">After the first roll, tap only the dice you ' +
+      'want to roll again.</p></div>';
   }
   var live = runDice(G.you);
   var t = tally(live, flagFace(G.you), flagMul(G.you), straightPick);
@@ -1934,20 +1912,26 @@ function rollView(){
   }
   var rollsLeft = Math.max(0, K("rollsPerRound") - G.you.rolls);
 
-  // Totals and straights first, then the Flagship Token, then the dice, then the
-  // roll button under the slots. Fire lives in the health board above.
+  // Totals first, tucked under the health board, so the running answer to "how
+  // am I doing" is the first thing under the stakes. Then the roll controls, in
+  // the gap that used to be empty - and the dice directly beneath them, which is
+  // what matters: you have to see the grid at the moment the numbers change.
+  // No "Roll 1 of 3" heading - the reroll button already says how many you have
+  // left, and saying it twice is just furniture. Totals, then the controls, then
+  // the dice. Reference material goes to the bottom, where you can find it when
+  // you want it and it is out of the way when you don't.
   var h = guideHtml(G.you.rolls >= K("rollsPerRound") ? "token" : "straight") +
     totalsHtml(t) +
     straightBannerHtml(t) +
     flagTokenHtml() +
-    gridHtml() +
-    '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
+    gridHtml();
   var footer = '<div class="foot">' +
     legendHtml() +
     '<p class="hint">' + (rollsLeft
-      ? 'Tap the dice you want to change \u2014 they outline in <b>white</b>. Anything you send back gambles its attack. Press <b>Fire</b> at the top when this roll is the one.'
-      : 'Free rolls are gone. Rerolls below cost ' + K("rerollCost") +
-        ' Energy a die \u2014 or press <b>Fire</b> and put the Energy toward a ship.') + '</p></div>';
+      ? 'Tap the dice you want to change \u2014 they outline in <b>white</b>. Anything you send back gambles its attack.'
+      : 'Free rolls are gone. From here a reroll costs ' + K("rerollCost") +
+        ' Energy a die \u2014 or submit and put the Energy toward a ship.') + '</p></div>';
+
 
   h += footer;
 
@@ -2550,10 +2534,10 @@ function helpView(){
     shopHead("blue", "A round, start to finish", "Four steps, always the same") +
     '<div class="rep">' +
       '<div class="line"><b>1 · Roll.</b> The round opens with every available die ' +
-      '<b>Ready</b>. Roll under the fleet. Before rolls 2 and 3, tap only the ship ' +
-      'dice or flagship you want to roll again. Anytime after the first roll you can ' +
-      'use your Flagship Token, buy another reroll, or press red <b>Fire</b> at the top.</div>' +
-      '<div class="line"><b>2 · Fire.</b> Both fleets fire at once. Your attack meets ' +
+      '<b>Ready</b>. Roll 1 rolls everything. Before rolls 2 and 3, tap only the ship ' +
+      'dice or flagship you want to roll again. After the final free roll, either ' +
+      'submit, buy another reroll, or use your Flagship Token.</div>' +
+      '<div class="line"><b>2 · Submit.</b> Both fleets fire at once. Your attack meets ' +
       'Enemy shields; Enemy attack meets yours. Whatever is left over lands on a flagship.</div>' +
       '<div class="line"><b>3 · Take the hit.</b> You choose where Enemy damage goes — ' +
       'all on your flagship, or put as many ships as you want in front of it. Every ship ' +
@@ -2585,8 +2569,8 @@ function helpView(){
     'Those dice get a thin ring in the flagship\'s colour so you can see it happening. ' +
     'The <b>#1</b> face is the exception: it raises your standing Energy for the rest ' +
     'of the match, so it rings nothing.</p>' +
-    '<p><b>Both fleets receive one Flagship Token per match.</b> Anytime after the ' +
-    'first roll, spend it to rotate the flagship one number up or down. The ends wrap: ' +
+    '<p><b>Both fleets receive one Flagship Token per match.</b> After the final free ' +
+    'roll, spend it to rotate the flagship one number up or down. The ends wrap: ' +
     '#1 can turn down to #6, and #6 can turn up to #1.</p>' +
     allFlagshipFacesHtml() + '</div>' +
 
@@ -2710,13 +2694,9 @@ function render(){
            : G.phase === "report" ? reportView()
            : G.phase === "shop" ? shopView() : overView();
   var label = G.phase === "brace" ? ""
+            : G.phase === "roll" ? "Submit round"
             : G.phase === "report" ? (matchOver() ? "See result" : "Continue")
             : G.phase === "shop" ? "Go to round " + G.round : "";
-  var boardMid = G.phase === "roll" && G.you.rolls > 0
-    ? fireBtnHtml()
-    : '<div class="mid">FLAGSHIP<br>HEALTH</div>';
-  var dockPrimary = G.phase === "roll" || !label ? ""
-    : '<button class="go" id="next">' + label + '</button>';
 
   document.getElementById("app").innerHTML =
     '<div class="wrap"><header><h1>Fleet Dice <button class="ver" id="tune">v' + VERSION + '</button></h1>' +
@@ -2724,7 +2704,7 @@ function render(){
     '<span class="pill">' + (G.phase === "over" ? "Finished" : "Round " + G.round) + '</span></span></header>' +
     '<div class="board"><div class="score you-score"><div class="who">You</div>' +
     '<div class="val hp">' + Math.max(0, G.you.hp) + '</div></div>' +
-    boardMid +
+    (G.phase === "roll" ? rerollBtnHtml() : '<div class="mid">FLAGSHIP<br>HEALTH</div>') +
     '<div class="score enemy-score r"><div class="who">Enemy</div><div class="val hp">' +
       Math.max(0, G.them.hp) + '</div></div></div>' +
     body + '</div>' +
@@ -2732,7 +2712,9 @@ function render(){
       G.phase === "help" || G.phase === "brace" ? "" :
       '<div class="dock"><div class="dockin"><div class="met">' + dockMetrics() +
       '</div><button class="tiny howto" id="help">How<br>to play</button>' +
-      dockPrimary + '</div></div>');
+      '<button class="go" id="next"' +
+        (G.phase === "roll" && G.you.rolls === 0 ? ' disabled' : '') +
+        '>' + label + '</button></div></div>');
 
   wire();
   animate = {};        // consumed - a tap re-renders without replaying it
@@ -2741,11 +2723,10 @@ function render(){
 function wire(){
   var n = document.getElementById("next");
   if (n) n.onclick = function(){
-    if (G.phase === "report") nextRound();
+    if (G.phase === "roll") submit();
+    else if (G.phase === "report") nextRound();
     else if (G.phase === "shop") startRound();
   };
-  var fire = document.getElementById("fire");
-  if (fire) fire.onclick = function(){ if (G.phase === "roll") submit(); };
   Array.prototype.forEach.call(document.querySelectorAll("[data-take]"), function(el){
     el.onclick = function(){
       straightPick = +el.getAttribute("data-take");
@@ -2767,7 +2748,7 @@ function wire(){
 
   Array.prototype.forEach.call(document.querySelectorAll("[data-flagturn]"), function(el){
     el.onclick = function(){
-      if (G.phase !== "roll" || G.you.rolls < 1) return;
+      if (G.phase !== "roll" || G.you.rolls < K("rollsPerRound")) return;
       if (!useFlagToken(G.you, +el.getAttribute("data-flagturn"))) return;
       sel.flag = false;
       straightPick = null;

@@ -635,10 +635,10 @@ function RollFleet({
   }
 
   const canSubmit = you.phase === "rolling";
-  const midButton =
+  const rollButton =
     you.phase === "ready" ? (
       <button
-        className="go-btn mid-btn"
+        className="roll-under go"
         disabled={busy}
         onClick={rollOpening}
         type="button"
@@ -648,7 +648,7 @@ function RollFleet({
       </button>
     ) : you.rolls < 3 ? (
       <button
-        className="go-btn mid-btn"
+        className="roll-under go"
         disabled={busy || selected.length === 0}
         onClick={rollSelected}
         type="button"
@@ -658,7 +658,7 @@ function RollFleet({
       </button>
     ) : (
       <button
-        className="mid-btn"
+        className="roll-under"
         disabled={busy || selected.length === 0 || you.energy < selected.length}
         onClick={rollSelected}
         type="button"
@@ -667,25 +667,78 @@ function RollFleet({
         <small>{Math.max(1, selected.length)}⚡</small>
       </button>
     );
+  const fireButton = canSubmit ? (
+    <button
+      className="fire-btn"
+      disabled={busy}
+      onClick={() => play({ type: "submit", straightTake: chosenStraightTake })}
+      type="button"
+    >
+      Fire
+      <small>Lock this roll</small>
+    </button>
+  ) : undefined;
 
   return (
     <>
       <HealthBoard
         enemy={enemy}
         earning={you.phase === "rolling" ? earning : 0}
-        mid={midButton}
+        mid={fireButton}
         you={you}
       />
       <section className="stage stage-docked">
         <p className="say">
           {you.phase === "ready"
-            ? "Every available ship and your flagship will roll."
+            ? "Every available ship and your flagship will roll. Use the button under the fleet."
             : you.rolls < 3
-              ? "Tap only the dice you want to roll again. Everything else stays."
-              : "Free rolls are done. Lock orders, spend Energy to reroll, or use your Flagship Token."}
+              ? "Tap only the dice you want to roll again. Press red Fire at the top when this roll is the one."
+              : "Free rolls are done. Fire at the top, spend Energy to reroll below, or use your Flagship Token."}
         </p>
 
         {preview ? <LiveTally tally={preview} /> : null}
+
+        {run ? (
+          <section className="straight-panel">
+            <div>
+              <p className="eyebrow">STRAIGHT FOUND · {run.start}–{run.top}</p>
+              <h2>Choose how to cash it.</h2>
+            </div>
+            <div className="straight-options">
+              {Array.from({ length: Math.min(run.length, 7) - 4 }, (_, index) => index + 5).map((length) => {
+                const option = previewTally(you, length).run!;
+                return (
+                  <button
+                    className={chosenStraightTake === length ? "active" : ""}
+                    key={length}
+                    onClick={() => setStraightTake(length)}
+                    type="button"
+                  >
+                    <b>{length} straight</b>
+                    <span>{option.reward.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        ) : you.phase === "rolling" ? (
+          <p className="straight-reminder">No straight yet · five numbers in a row earns a reward.</p>
+        ) : null}
+
+        {you.phase === "rolling" ? (
+          <section className={`flag-token ${you.flag.token ? "" : "spent"}`}>
+            <div>
+              <span>FLAGSHIP TOKEN · ONCE PER MATCH</span>
+              <strong>{you.flag.token ? "Rotate the flagship one number." : "Token spent."}</strong>
+            </div>
+            {you.flag.token ? (
+              <div>
+                <button disabled={busy} onClick={() => play({ type: "flag-token", direction: -1 })} type="button">−1</button>
+                <button disabled={busy} onClick={() => play({ type: "flag-token", direction: 1 })} type="button">+1</button>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         <FleetFormation
           ships={you.ships}
@@ -730,64 +783,9 @@ function RollFleet({
           }}
         />
 
-        {run ? (
-          <section className="straight-panel">
-            <div>
-              <p className="eyebrow">STRAIGHT FOUND · {run.start}–{run.top}</p>
-              <h2>Choose how to cash it.</h2>
-            </div>
-            <div className="straight-options">
-              {Array.from({ length: Math.min(run.length, 7) - 4 }, (_, index) => index + 5).map((length) => {
-                const option = previewTally(you, length).run!;
-                return (
-                  <button
-                    className={chosenStraightTake === length ? "active" : ""}
-                    key={length}
-                    onClick={() => setStraightTake(length)}
-                    type="button"
-                  >
-                    <b>{length} straight</b>
-                    <span>{option.reward.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        ) : you.phase === "rolling" ? (
-          <p className="straight-reminder">No straight yet · five numbers in a row earns a reward.</p>
-        ) : null}
-
-        {you.phase === "rolling" && you.rolls >= 3 ? (
-          <section className={`flag-token ${you.flag.token ? "" : "spent"}`}>
-            <div>
-              <span>FLAGSHIP TOKEN · ONCE PER MATCH</span>
-              <strong>{you.flag.token ? "Rotate the flagship one number." : "Token spent."}</strong>
-            </div>
-            {you.flag.token ? (
-              <div>
-                <button disabled={busy} onClick={() => play({ type: "flag-token", direction: -1 })} type="button">−1</button>
-                <button disabled={busy} onClick={() => play({ type: "flag-token", direction: 1 })} type="button">+1</button>
-              </div>
-            ) : null}
-          </section>
-        ) : null}
+        <div className="roll-slot">{rollButton}</div>
       </section>
-      <MatchDock
-        onCancel={onCancel}
-        onHelp={onHelp}
-        primary={
-          you.phase === "rolling" ? (
-            <button
-              className="go-btn"
-              disabled={busy || !canSubmit}
-              onClick={() => play({ type: "submit", straightTake: chosenStraightTake })}
-              type="button"
-            >
-              Lock orders
-            </button>
-          ) : null
-        }
-      />
+      <MatchDock onCancel={onCancel} onHelp={onHelp} />
     </>
   );
 }

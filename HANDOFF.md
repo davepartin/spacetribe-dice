@@ -7,7 +7,7 @@ Everything you need to be useful is either here or pointed at from here.
 
 | Track | What it is | Where |
 | --- | --- | --- |
-| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v84) — also shipped online at `/solo/` |
+| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v85) — also shipped online at `/solo/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -107,7 +107,7 @@ buttons, scoring colours, and how-to matter as much as balance.
 
 ---
 
-## The rules as they stand (v84)
+## The rules as they stand (v85)
 
 These rules are the truth for **solo**. Versus follows the same combat math.
 Versus UI differences are called out in [Online versus](#online-versus--what-we-learned).
@@ -174,9 +174,9 @@ exception — it has no matching die, so it rings nothing.
 flagship on 6 is not a red die for "+2 per attack". This has been got wrong three
 separate times; if a total looks high, check this first.
 
-**Each fleet has one Flagship Token per match.** After the third free roll, its
-owner may rotate the flagship one number up or down; 1 and 6 wrap. The token is
-spent permanently, and turning the flagship immediately changes both its face
+**Each fleet has one Flagship Token per match.** Anytime after the first roll,
+its owner may rotate the flagship one number up or down; 1 and 6 wrap. The token
+is spent permanently, and turning the flagship immediately changes both its face
 bonus and the straight it may complete. The opponent evaluates and spends its
 own token by the same rule.
 
@@ -246,7 +246,7 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 | Ships you may feed a round | **as many as you want** | each misses the next round |
 | Flagship level | 1 of 3 | the bonus is 2, then 3, then 4 |
 | Flagship upgrades | 10⚡ then 16⚡ | one purchase raises all six faces |
-| Flagship Tokens | one per fleet, once per match | after roll 3, rotate the flagship ±1 |
+| Flagship Tokens | one per fleet, once per match | after first roll, rotate the flagship ±1 |
 | Reactor cap / overflow | 6 / 2⚡ | once base is capped it pays Energy instead |
 | War escalates after round | 8, by 4 a round | |
 | **How fast they grow** | **1** | a rate, not a chance |
@@ -267,11 +267,10 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 
 ### Solo balance (unchanged brief)
 
-v84 keeps v81's economy and multi-ship defense, guided first match tips, and one
-Flagship Token per fleet. Solo Enemy now picks **Width**, **Capital**, or
-**Command** for the match so its growth has a readable shape. You start with four
-open slots and must buy width; or you can spend small amounts upgrading the four
-ships already in formation.
+v85 keeps the v84 economy and Enemy plans. The roll screen puts **Fire** at the
+top and **Roll / reroll** under the fleet; the Flagship Token is available after
+the first roll. You start with four open slots and must buy width; or you can
+spend small amounts upgrading the four ships already in formation.
 
 This is a **first balance pass, not proof of balance**. Five automated policies
 played the real game against the pace-1 opponent:
@@ -384,7 +383,7 @@ join a room without getting stuck.
 | `web/components/ReferenceSheets.tsx` | How to play + upgrade costs |
 | `web/components/HomeScreen.tsx` | Landing + code join |
 | `web/public/fleet-dice-key-art.png` | Brand key art |
-| `web/public/fleet-dice-v84.html` | Solo file shipped inside the online app |
+| `web/public/fleet-dice-v85.html` | Solo file shipped inside the online app |
 | `.github/workflows/deploy-web.yml` | Push `main` → GitHub Pages |
 
 ---
@@ -438,8 +437,8 @@ pnpm dev
 
 | File | What it is |
 | --- | --- |
-| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v84). |
-| **`simple01.html` … `simple83.html`** | Frozen solo snapshots. Never edited again. |
+| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v85). |
+| **`simple01.html` … `simple84.html`** | Frozen solo snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
 | **`HANDOFF.md`** | This file. The entry point. |
