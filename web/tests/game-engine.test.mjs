@@ -257,3 +257,80 @@ test("a settled kill ends the match even if the winner already left the report s
   assert.equal(host.phase, "over");
   assert.equal(guest.phase, "over");
 });
+
+test("inescapable kill ends the match even when both sides still need to brace", () => {
+  const state = activeMatch();
+  const host = state.players.host;
+  const guest = state.players.guest;
+  assert.ok(guest);
+
+  applyAction(state, "host", { type: "roll", dice: [] });
+  applyAction(state, "guest", { type: "roll", dice: [] });
+
+  // Host lands a huge volley; guest lands a smaller one so BOTH open brace.
+  host.dice = [
+    { id: host.ships[0].id, sides: 4, value: 4 },
+    { id: host.ships[1].id, sides: 4, value: 4 },
+    { id: host.ships[2].id, sides: 4, value: 4 },
+    { id: host.ships[3].id, sides: 4, value: 4 },
+    { id: "flag", sides: 6, value: 6, flag: true },
+  ];
+  guest.dice = [
+    { id: guest.ships[0].id, sides: 4, value: 4 },
+    { id: guest.ships[1].id, sides: 4, value: 4 },
+    { id: guest.ships[2].id, sides: 4, value: 1 },
+    { id: guest.ships[3].id, sides: 4, value: 1 },
+    { id: "flag", sides: 6, value: 1, flag: true },
+  ];
+  // Guest incoming ≈ 18 after their small shields; four d4s soak 16 → 2 left.
+  guest.hp = 2;
+  host.hp = 40;
+
+  applyAction(state, "host", { type: "submit" });
+  applyAction(state, "guest", { type: "submit" });
+
+  assert.equal(state.status, "finished");
+  assert.equal(state.winner, "host");
+  assert.equal(host.phase, "over");
+  assert.equal(guest.phase, "over");
+  assert.ok(guest.hp <= 0);
+  assert.ok(host.hp > 0);
+});
+
+test("repair can keep a brace volley from counting as an inescapable kill", () => {
+  const state = activeMatch();
+  const host = state.players.host;
+  const guest = state.players.guest;
+  assert.ok(guest);
+
+  applyAction(state, "host", { type: "roll", dice: [] });
+  applyAction(state, "guest", { type: "roll", dice: [] });
+
+  // Host piles on Direct (unblockable). Guest's repair is the only thing that saves them.
+  host.dice = [
+    { id: host.ships[0].id, sides: 4, value: 2 },
+    { id: host.ships[1].id, sides: 4, value: 2 },
+    { id: host.ships[2].id, sides: 4, value: 2 },
+    { id: host.ships[3].id, sides: 4, value: 2 },
+    { id: "flag", sides: 6, value: 2, flag: true },
+  ];
+  guest.dice = [
+    { id: guest.ships[0].id, sides: 4, value: 3 },
+    { id: guest.ships[1].id, sides: 4, value: 1 },
+    { id: guest.ships[2].id, sides: 4, value: 1 },
+    { id: guest.ships[3].id, sides: 4, value: 1 },
+    { id: "flag", sides: 6, value: 3, flag: true },
+  ];
+  // Flag level 1 doubles face-2 Direct (8 from dice + 8 from the face) → 16.
+  // Guest heals 5 (ship 3 + face-3 bonus). At 12 HP that leftover is survivable
+  // only because of repair; without repair it would end the match.
+  guest.hp = 12;
+
+  applyAction(state, "host", { type: "submit" });
+  applyAction(state, "guest", { type: "submit" });
+
+  assert.equal(state.status, "active");
+  assert.equal(guest.phase, "brace");
+  assert.ok((guest.tally?.heal ?? 0) >= 5);
+  assert.ok(guest.directIncoming >= 16);
+});

@@ -2375,6 +2375,26 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   text-transform: uppercase;
 }
 
+.fleet-die.brace-flag-lethal {
+  border-color: color-mix(in srgb, var(--red) 55%, var(--line));
+  background: color-mix(in srgb, var(--red) 10%, #121c30);
+}
+
+.fleet-die.brace-flag-lethal .brace-flag-hp,
+.fleet-die.brace-flag-lethal .brace-flag-risk {
+  color: var(--red);
+}
+
+.brace-tot-lethal .n {
+  color: var(--red);
+}
+
+.go-btn-danger {
+  background: linear-gradient(180deg, #ff6a7c, #c6283d);
+  border-color: #ff8a98;
+  color: #fff7f8;
+}
+
 .brace-ship-die {
   min-height: 148px;
   gap: 6px;

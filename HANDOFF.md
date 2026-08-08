@@ -349,6 +349,7 @@ join a room without getting stuck.
 | How to play with shapes, marks, every face, six flagship faces, straights table | Done in `ReferenceSheets.tsx` — keep it as deep as solo |
 | Dock: How to play left, Cancel right as real buttons | Done; Cancel asks "Are you sure?" |
 | Solo quit / back home | Done in v87 — online top bar + in-board Quit + result Back home |
+| Versus brace endgame | Inescapable volleys auto-finish for both players; brace button warns when damage exceeds current HP |
 | Scrap in shipyard | **Removed from versus UI** (solo still has scrap) |
 | Upgrade labels readable on 3×3 cells | Done (stacked label + cost) |
 | Guided first-match tips | Removed — How to play carries the teaching |

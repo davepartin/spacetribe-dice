@@ -863,12 +863,17 @@ function BraceFleet({
     .reduce((sum, ship) => sum + ship.sides, 0);
   const flagshipDamage = Math.max(0, you.incoming - blocked) + you.directIncoming;
   const volleyLeft = Math.max(0, you.incoming - blocked);
+  const heal = you.tally?.heal ?? 0;
   const maxSoak = [...pickable].reduce((sum, id) => {
     const ship = you.ships.find((entry) => entry.id === id);
     return sum + (ship?.sides ?? 0);
   }, 0);
-  const bestHp = you.hp - Math.max(0, you.incoming - maxSoak) - you.directIncoming;
+  const bestHp =
+    you.hp - Math.max(0, you.incoming - maxSoak) - you.directIncoming + heal;
   const doomed = bestHp <= 0;
+  const projectedHp = you.hp - flagshipDamage + heal;
+  const lethalChoice = projectedHp <= 0;
+  const overHealth = flagshipDamage > you.hp;
 
   useEffect(() => {
     if (autoBraceSent.current || busy || pickable.size > 0) return;
@@ -889,12 +894,25 @@ function BraceFleet({
       <section className="stage stage-docked brace-stage">
         <header className="brace-header">
           <p className="eyebrow">ENEMY VOLLEY</p>
-          <h1 className="brace-title">{doomed ? "Flagship will fall" : "Taking damage"}</h1>
+          <h1 className="brace-title">
+            {doomed
+              ? "Flagship will fall"
+              : lethalChoice
+                ? "This choice destroys you"
+                : "Taking damage"}
+          </h1>
           <p className="brace-lead">
             {doomed ? (
               <>
                 Even if every ready ship blocks, this volley drops your flagship to 0.
-                Tap continue to finish the match — damaged ships cannot block.
+                The match ends for both commanders — you do not need to wait.
+              </>
+            ) : lethalChoice ? (
+              <>
+                With this block, the flagship takes <b className="damage-text">{flagshipDamage}</b>{" "}
+                and you only have <b>{you.hp}</b> health
+                {heal > 0 ? <> (plus <b className="repair-text">{heal}</b> repair)</> : null}.
+                Tap more ships to block, or continue and lose the match.
               </>
             ) : (
               <>
@@ -902,6 +920,17 @@ function BraceFleet({
                 then is <b>damaged for one round</b>.{" "}
                 <b className="direct-text">Direct</b> cannot be blocked.
                 Damaged ships are already out this round.
+                {overHealth ? (
+                  <>
+                    {" "}
+                    <b className="damage-text">
+                      Warning: {flagshipDamage} damage is more than your {you.hp} health
+                      {heal > 0
+                        ? ` — repair (${heal}) still keeps you alive if you continue.`
+                        : " — block more before you continue."}
+                    </b>
+                  </>
+                ) : null}
               </>
             )}
           </p>
@@ -909,18 +938,37 @@ function BraceFleet({
         <div className="tot three">
           <div className="a"><div className="n">{volleyLeft}</div><div className="l">Volley left</div></div>
           <div className="dir"><div className="n">{you.directIncoming}</div><div className="l">Direct</div></div>
-          <div className="h"><div className="n">{flagshipDamage}</div><div className="l">To flagship</div></div>
+          <div className={`h ${lethalChoice || overHealth ? "brace-tot-lethal" : ""}`}>
+            <div className="n">{flagshipDamage}</div>
+            <div className="l">
+              {lethalChoice
+                ? `To flagship (>${you.hp} HP)`
+                : overHealth
+                  ? `To flagship (>${you.hp} HP)`
+                  : "To flagship"}
+            </div>
+          </div>
         </div>
 
         <FleetFormation
           ships={you.ships}
           slots={you.slots}
           renderFlag={() => (
-            <div className="fleet-die brace-flag brace-flagship static">
+            <div
+              className={`fleet-die brace-flag brace-flagship static ${
+                lethalChoice || overHealth ? "brace-flag-lethal" : ""
+              }`}
+            >
               <div className="brace-flag-label">Flagship Health</div>
               <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
               <span className="brace-flag-risk">
-                {flagshipDamage > 0 ? `Takes ${flagshipDamage}` : "Safe"}
+                {flagshipDamage <= 0
+                  ? "Safe"
+                  : lethalChoice
+                    ? `Takes ${flagshipDamage} — falls`
+                    : overHealth
+                      ? `Takes ${flagshipDamage} (>${you.hp} HP)`
+                      : `Takes ${flagshipDamage}`}
               </span>
             </div>
           )}
@@ -974,16 +1022,20 @@ function BraceFleet({
               </button>
             ) : null}
             <button
-              className="go-btn"
+              className={`go-btn ${lethalChoice || doomed ? "go-btn-danger" : ""}`}
               disabled={busy}
               onClick={() => play({ type: "brace", ships: selected })}
               type="button"
             >
               {doomed
                 ? "Continue — flagship falls"
-                : flagshipDamage > 0
-                  ? `Continue — Flagship takes ${flagshipDamage} Dmg`
-                  : "Continue — Flagship is safe"}
+                : lethalChoice
+                  ? `Continue — ${flagshipDamage} dmg ends you (${you.hp} HP)`
+                  : overHealth
+                    ? `Continue — Flagship takes ${flagshipDamage} Dmg (>${you.hp} HP)`
+                    : flagshipDamage > 0
+                      ? `Continue — Flagship takes ${flagshipDamage} Dmg`
+                      : "Continue — Flagship is safe"}
             </button>
           </div>
         }
@@ -1038,8 +1090,9 @@ function RoundResult({
           <h1>{title}</h1>
           {enemyStillBracing ? (
             <p className="say">
-              {enemy.name} still has a damage screen open. If that volley destroys
-              their flagship, the match will end for both of you as soon as it resolves.
+              {enemy.name} is choosing whether to block with ships. If the hit is
+              bigger than every ship they have left can stop, both of you jump
+              straight to victory or defeat — no waiting.
             </p>
           ) : null}
         </div>

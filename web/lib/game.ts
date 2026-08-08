@@ -511,22 +511,15 @@ function finishIfNeeded(state: MatchState): boolean {
   if (!guest) return state.status === "finished";
   const host = state.players.host;
 
-  // Soft-lock fix: if one side is already resolved and the other is bracing,
-  // settle them when the match is already decided (enemy dead) or they cannot
-  // survive the volley. Both players then snap to the end screen.
-  if (host.phase === "brace" && guest.phase !== "brace") {
-    if (guest.hp <= 0 || inescapableDeath(host)) autoSettleBrace(state, host);
-  }
-  if (guest.phase === "brace" && host.phase !== "brace") {
-    if (host.hp <= 0 || inescapableDeath(guest)) autoSettleBrace(state, guest);
-  }
-  // Both still bracing and both are already doomed — settle both so mutual kills resolve.
-  if (host.phase === "brace" && guest.phase === "brace") {
-    if (inescapableDeath(host) && inescapableDeath(guest)) {
-      autoSettleBrace(state, host);
-      autoSettleBrace(state, guest);
-    }
-  }
+  // If a commander cannot survive even with every ready ship blocking, settle
+  // them immediately — do not leave either side staring at a brace screen.
+  if (inescapableDeath(host)) autoSettleBrace(state, host);
+  if (inescapableDeath(guest)) autoSettleBrace(state, guest);
+
+  // Match already decided (someone is at 0 HP). The living side does not need
+  // to pick blockers — settle with best soak so both snap to victory / defeat.
+  if (host.phase === "brace" && guest.hp <= 0) autoSettleBrace(state, host);
+  if (guest.phase === "brace" && host.hp <= 0) autoSettleBrace(state, guest);
 
   if (host.hp > 0 && guest.hp > 0) return false;
   if (host.phase === "brace" || guest.phase === "brace") return false;
