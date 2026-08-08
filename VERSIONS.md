@@ -43,7 +43,19 @@ The three most useful settings for the current game:
 
 ## Versions
 
-### 86 — quiet solo board (current)
+### 87 — quit game / back home (current)
+
+Solo can leave a match the same way versus can cancel one:
+
+- Online `/solo/` has a top bar with **Quit game** (asks first) and **Home**
+- Inside the board: **Quit** in the header, **Quit game** in the dock, and
+  **Back home** on the result screen
+- Quit returns to the site home; mid-match quit asks so you do not lose a game
+  by accident
+
+No combat numbers changed.
+
+### 86 — quiet solo board
 
 Solo drops the guided first-match tips and the long coaching copy under the
 dice, brace, and shipyard. The board stays as short as versus; **How to play**

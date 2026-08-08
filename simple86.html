@@ -366,10 +366,6 @@ button.ver{background:none;border:0;padding:0 0 0 4px;font-size:12px;font-weight
 button.ver:hover{color:var(--gold)}
 button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
   text-transform:uppercase;font-weight:800;padding:7px 9px;color:var(--dim)}
-button.tiny.quit{color:#ffd0d7;border-color:#5a3040}
-button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
-  border-radius:12px;font-size:13px;font-weight:800;letter-spacing:.04em;
-  text-transform:uppercase;color:#ffd0d7;border-color:#5a3040;background:#1a1018}
 .resetpage{flex:none;font-size:8.5px;line-height:1.15;letter-spacing:.03em;
   text-transform:uppercase;font-weight:800;padding:7px 8px;color:var(--faint)}
 .footreset{margin:16px 2px 4px;padding-top:12px;border-top:1px solid var(--line)}
@@ -574,7 +570,7 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 <script>
 "use strict";
 
-var VERSION = "87";   // bump this when saving a new simpleNN.html
+var VERSION = "86";   // bump this when saving a new simpleNN.html
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2611,42 +2607,7 @@ function overView(){
     '<p>' + sub + '</p>' +
     '<p class="say">You dealt <b>' + G.you.damage + '</b> damage across the match; Enemy dealt <b>' +
       G.them.damage + '</b>.</p>' +
-    '<button class="go" id="again">Play again</button>' +
-    '<button class="homeback" id="quit-home">Back home</button></div>';
-}
-
-/** Leave solo and return to the site home (iframe parent, or Pages root). */
-function homeUrl(){
-  try {
-    var topWin = window.top || window.parent;
-    if (topWin && topWin !== window) {
-      var path = topWin.location.pathname.replace(/\/solo\/?$/, "") || "";
-      if (!path || path === "/") return topWin.location.origin + "/";
-      return topWin.location.origin + path.replace(/\/+$/, "") + "/";
-    }
-  } catch (e) {}
-  if (/github\.io$/i.test(location.hostname)) {
-    return location.origin + "/spacetribe-dice/";
-  }
-  if (location.protocol === "file:") {
-    return "https://davepartin.github.io/spacetribe-dice/";
-  }
-  return location.origin + "/";
-}
-
-function quitToHome(ask){
-  if (ask && !confirm("Quit this game and go back home?\n\nYour current match will be lost.")) {
-    return;
-  }
-  var url = homeUrl();
-  try {
-    var topWin = window.top || window.parent;
-    if (topWin && topWin !== window) {
-      topWin.location.href = url;
-      return;
-    }
-  } catch (e) {}
-  location.href = url;
+    '<button class="go" id="again">Play again</button></div>';
 }
 
 function render(){
@@ -2668,8 +2629,7 @@ function render(){
 
   document.getElementById("app").innerHTML =
     '<div class="wrap"><header><h1>Fleet Dice <button class="ver" id="tune">v' + VERSION + '</button></h1>' +
-    '<span><button class="tiny quit" id="quit">Quit</button> ' +
-    '<button class="tiny nrg" id="costs">Upgrade costs</button> ' +
+    '<span><button class="tiny nrg" id="costs">Upgrade costs</button> ' +
     '<span class="pill">' + (G.phase === "over" ? "Finished" : "Round " + G.round) + '</span></span></header>' +
     '<div class="board"><div class="score you-score"><div class="who">You</div>' +
     '<div class="val hp">' + Math.max(0, G.you.hp) + '</div></div>' +
@@ -2680,8 +2640,7 @@ function render(){
     (G.phase === "over" || G.phase === "tune" || G.phase === "costs" ||
       G.phase === "help" || G.phase === "brace" ? "" :
       '<div class="dock"><div class="dockin"><div class="met">' + dockMetrics() +
-      '</div><button class="tiny quit" id="quit-dock">Quit<br>game</button>' +
-      '<button class="tiny howto" id="help">How<br>to play</button>' +
+      '</div><button class="tiny howto" id="help">How<br>to play</button>' +
       dockPrimary + '</div></div>');
 
   wire();
@@ -2708,14 +2667,6 @@ function wire(){
   if (pr) pr.onclick = resetPageChoices;
   var ag = document.getElementById("again");
   if (ag) ag.onclick = function(){ newGame(); };
-  var qh = document.getElementById("quit-home");
-  if (qh) qh.onclick = function(){ quitToHome(false); };
-  function bindQuit(id, ask){
-    var el = document.getElementById(id);
-    if (el) el.onclick = function(){ quitToHome(ask); };
-  }
-  bindQuit("quit", G.phase !== "over");
-  bindQuit("quit-dock", true);
 
   Array.prototype.forEach.call(document.querySelectorAll("[data-flagturn]"), function(el){
     el.onclick = function(){

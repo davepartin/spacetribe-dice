@@ -38,10 +38,20 @@ for (const [segments, expected] of [
   });
 }
 
+test("solo page has quit and home controls", () => {
+  const html = readPage("solo", "index.html");
+  assert.match(html, /Quit game/i);
+  assert.match(html, />Home</);
+  assert.match(html, /fleet-dice-v87\.html/);
+});
+
 test("static export includes the solo game asset", () => {
-  const solo = join(outDir, "fleet-dice-v86.html");
-  assert.ok(existsSync(solo), "missing fleet-dice-v86.html in out/");
-  assert.match(readFileSync(solo, "utf8"), /Fleet Dice|flagship/i);
+  const solo = join(outDir, "fleet-dice-v87.html");
+  assert.ok(existsSync(solo), "missing fleet-dice-v87.html in out/");
+  const html = readFileSync(solo, "utf8");
+  assert.match(html, /Fleet Dice|flagship/i);
+  assert.match(html, /quitToHome/);
+  assert.match(html, /Back home/);
 });
 
 test("asset paths use the GitHub Pages basePath", () => {
