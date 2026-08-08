@@ -145,8 +145,9 @@ export function HelpSheet({
           </li>
           <li>
             <b>4 · Spend.</b> Between rounds you upgrade ships, open slots, buy new
-            ships, or upgrade the flagship. Then it starts again. After the reveal you
-            do not wait on your opponent to brace or shop.
+            ships, or upgrade the flagship. Then it starts again. If a volley is bigger
+            than every ship they have can stop, both of you jump straight to victory
+            or defeat. Otherwise finish the damage screen before you leave the reveal.
           </li>
         </ol>
       </article>
