@@ -43,7 +43,13 @@ The three most useful settings for the current game:
 
 ## Versions
 
-### 85 — Fire up top, roll under the dice (current)
+### 86 — quiet solo board (current)
+
+Solo drops the guided first-match tips and the long coaching copy under the
+dice, brace, and shipyard. The board stays as short as versus; **How to play**
+is the teaching surface. No combat numbers changed.
+
+### 85 — Fire up top, roll under the dice
 
 The roll screen swaps the two main actions:
 

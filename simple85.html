@@ -570,7 +570,7 @@ button.howto{flex:none;font-size:9.5px;line-height:1.15;letter-spacing:.04em;
 <script>
 "use strict";
 
-var VERSION = "86";   // bump this when saving a new simpleNN.html
+var VERSION = "85";   // bump this when saving a new simpleNN.html
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -950,6 +950,7 @@ var pending = null;          // the round, resolved but waiting on your brace ch
 var flagInLine = false;      // is the flagship's number part of your straight?
 var lastTally = null;        // what the current roll is worth, for the bottom bar
 var pageCheckpoint = null;   // lets a player reset only the choices on this page
+var GUIDE_KEY = "fleet-dice-guided-v85";
 // The flagship is a d6 with a number on it, and it does BOTH: its boost fires AND
 // its number joins your straight. It used to be a choice between the two, and
 // making you pick was the wrong call - the moment worth building toward is your
@@ -961,12 +962,19 @@ var pageCheckpoint = null;   // lets a player reset only the choices on this pag
 //
 // It lends its NUMBER only. It never scores as attack or shields, or the flagship
 // would be doing three jobs off one roll.
-//
-// Guided first-match tips were removed in v86 — How to play carries the teaching,
-// and the solo board stays as quiet as versus.
 
-function newGame(){
+function guideWasSeen(){
+  try { return window.localStorage.getItem(GUIDE_KEY) === "1"; }
+  catch (e) { return false; }
+}
+function rememberGuide(){
+  try { window.localStorage.setItem(GUIDE_KEY, "1"); }
+  catch (e) {}
+}
+
+function newGame(guided){
   var startingSlots = Math.min(K("maxDice"), Math.max(K("startSlots"), K("startDice")));
+  var useGuide = guided === true || (guided !== false && !guideWasSeen());
   pending = null;
   pageCheckpoint = null;
   animate = {};
@@ -975,7 +983,7 @@ function newGame(){
   G = {
     round: 1,
     phase: "roll",
-    guide: false,
+    guide: useGuide,
     you:  { dice: startingDice(), values: [], slots: startingSlots, energy: 0, damage: 0, rolls: 0,
             hp: K("startHP"), base: 0,
             flag: { faces: starterFaces(), face: 0, lvl: 1, token: true, tokenMove: null } },
@@ -1314,6 +1322,10 @@ function nextRound(){
 }
 
 function startRound(){
+  if (G.guide && G.round > 1){
+    G.guide = false;
+    rememberGuide();
+  }
   G.you.rolls = 0;
   sel = {};
   straightPick = null;
@@ -1854,20 +1866,43 @@ function straightBannerHtml(t){
   return h + '</div>';
 }
 
-function guideHtml(){
-  // Guided tips removed — How to play is the teaching surface.
-  return "";
+function guideHtml(stage){
+  if (!G.guide) return "";
+  var copy = {
+    ready: '<b>The center die is your flagship.</b> It supports the other ships in ' +
+      'your fleet. Press Roll to start. After that, tap only the dice you want to ' +
+      'reroll. Open <b>How to play</b> anytime to see every side of every die.',
+    straight: '<b>Choose which dice to reroll.</b> Tap ship dice or the flagship you ' +
+      'want to roll again. Build a line, not merely the highest total — a d4 only ' +
+      'rolls 1–4, so it is excellent at covering the low end of a straight. Keep one ' +
+      'of each useful number and reroll duplicates or numbers outside your best line.',
+    token: '<b>Fire when you are ready.</b> The red Fire button locks this roll. Keep ' +
+      'rerolling below, buy Energy rerolls, or spend your once-per-game Flagship Token ' +
+      'anytime after the first roll.',
+    brace: '<b>You control where the volley lands.</b> Every ship you put in the way ' +
+      'protects health now but removes one die from your next round.',
+    report: '<b>Read the two health stories first.</b> They show previous health, ' +
+      'damage, repair and current health. The exact arithmetic stays below.',
+    shop: '<b>Choose a fleet direction.</b> Upgrade ships to become taller, open slots ' +
+      'and buy ships to become wider, or upgrade the flagship so matching dice pay more. ' +
+      'Read Enemy’s plan at the top — Width, Capital, or Command — and answer it.'
+  }[stage] || "";
+  return '<div class="coach"><div class="coachhead"><b>Guided first match</b>' +
+    '<button id="guide-skip">Skip guide</button></div><p>' + copy + '</p></div>';
 }
 
 function flagTokenHtml(){
   // Available as soon as the fleet has rolled — not only after the third free roll.
   if (G.you.rolls < 1) return "";
+  var enemyToken = G.them.flag.token ? "ready" : "used";
   if (!G.you.flag.token){
-    return '<div class="flagtoken spent"><div class="tokencopy"><b>Flagship Token</b>' +
-      '<small>Token spent.</small></div></div>';
+    return '<div class="flagtoken spent"><div class="tokencopy"><b>Flagship Token used</b>' +
+      '<small>You used your one turn this match · Enemy token is ' + enemyToken + '.</small>' +
+      '</div></div>';
   }
-  return '<div class="flagtoken"><div class="tokencopy"><b>Flagship Token · once per match</b>' +
-    '<small>Rotate the flagship one number.</small></div>' +
+  return '<div class="flagtoken"><div class="tokencopy"><b>Flagship Token · ready</b>' +
+    '<small>Once per match, turn #' + flagNumber(G.you) +
+      ' one number down or up · 1 and 6 wrap · Enemy token is ' + enemyToken + '.</small></div>' +
     '<div class="turns"><button data-flagturn="-1">−1</button>' +
       '<button data-flagturn="1">+1</button></div></div>';
 }
@@ -1876,9 +1911,14 @@ function rollView(){
   if (G.you.rolls === 0){
     flagInLine = false;
     lastTally = null;
-    return '<p class="say">Every available ship and your flagship will roll.</p>' +
+    return '<h2>Round ' + G.round + ' ready</h2>' +
+      guideHtml("ready") +
+      '<p class="say">Your available ships and flagship are ready. Press <b>Roll 1 of ' +
+      K("rollsPerRound") + '</b> under the fleet to roll them all.</p>' +
       gridHtml() +
-      '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
+      '<div class="roll-slot">' + rerollBtnHtml() + '</div>' +
+      '<div class="foot"><p class="hint">After the first roll, a red <b>Fire</b> button ' +
+      'appears at the top. Tap only the dice you want to roll again.</p></div>';
   }
   var live = runDice(G.you);
   var t = tally(live, flagFace(G.you), flagMul(G.you), straightPick);
@@ -1894,15 +1934,24 @@ function rollView(){
   }
   var rollsLeft = Math.max(0, K("rollsPerRound") - G.you.rolls);
 
-  return '<p class="say">' + (rollsLeft
-      ? 'Tap only the dice you want to roll again.'
-      : 'Free rolls are done. Fire, spend Energy to reroll, or use your Flagship Token.') +
-    '</p>' +
+  // Totals and straights first, then the Flagship Token, then the dice, then the
+  // roll button under the slots. Fire lives in the health board above.
+  var h = guideHtml(G.you.rolls >= K("rollsPerRound") ? "token" : "straight") +
     totalsHtml(t) +
     straightBannerHtml(t) +
     flagTokenHtml() +
     gridHtml() +
     '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
+  var footer = '<div class="foot">' +
+    legendHtml() +
+    '<p class="hint">' + (rollsLeft
+      ? 'Tap the dice you want to change \u2014 they outline in <b>white</b>. Anything you send back gambles its attack. Press <b>Fire</b> at the top when this roll is the one.'
+      : 'Free rolls are gone. Rerolls below cost ' + K("rerollCost") +
+        ' Energy a die \u2014 or press <b>Fire</b> and put the Energy toward a ship.') + '</p></div>';
+
+  h += footer;
+
+  return h;
 }
 
 // You have seen the number. Now: does it all land on the flagship, or do you
@@ -1913,14 +1962,15 @@ function braceView(){
   var total = left + p.direct;
 
   var h = '<h2>Enemy shot has landed</h2>' +
+    guideHtml("brace") +
     '<div class="tot three">' +
       '<div class="a"><div class="n">' + left + '</div><div class="l">Volley</div></div>' +
       '<div class="dir"><div class="n">' + p.direct + '</div><div class="l">Direct</div></div>' +
       '<div class="h"><div class="n">' + Math.max(0, G.you.hp + p.you.heal) + '</div>' +
         '<div class="l">Your flagship</div></div>' +
     '</div>' +
-    '<p class="say">Tap ships to block the <span class="red">volley</span>. ' +
-    '<b class="dir">Direct</b> always reaches your flagship.</p>';
+    '<p class="say">The <span class="red">volley</span> can be taken on a ship instead. ' +
+    '<b class="dir">Direct</b> cannot be stopped by anything \u2014 it always reaches your flagship.</p>';
 
   if (p.fed && p.fed.length){
     h += '<p class="say">' + p.fed.map(function(f){
@@ -1928,10 +1978,19 @@ function braceView(){
     }).join(' \u00b7 ') + '.</p>';
   }
 
-  if (left > 0 && room <= 0){
-    h += '<p class="hint">No more ships can step in — the rest lands on the flagship.</p>';
-  } else if (left > 0 && !canSoak(G.you)){
-    h += '<p class="hint">Every ship is damaged — this lands on the flagship.</p>';
+  if (left > 0 && room > 0 && canSoak(G.you)){
+    h += '<div class="choose">Choose as many ships as you want</div>' +
+      '<p class="hint">Each selected ship blocks damage equal to its size, then it is ' +
+      '<b>damaged</b> for the next round. Protect more health now, or keep more dice ' +
+      'rolling next round.</p>';
+  } else if (left > 0){
+    // Say WHICH limit you have hit. "No ship can take this one" blamed the fleet
+    // even when the real answer was that you had already used your one ship.
+    h += '<p class="hint">' + (room <= 0
+      ? 'That is your ' + (K("soakMax") === 1 ? 'one ship' : K("soakMax") + ' ships') +
+        ' for this round \u2014 the rest lands on the flagship.'
+      : 'Every ship is damaged, so nothing can step in \u2014 this lands on the flagship.') +
+      '</p>';
   }
 
   // The same 3x3 the roll screen uses, so the board never changes shape. Empty
@@ -2124,6 +2183,7 @@ function reportView(){
   }
 
   return '<h2>Round ' + G.round + ' result</h2>' +
+    guideHtml("report") +
     '<div class="report-sides">' +
       '<section class="reportside you">' +
         healthCard("you", "Your", r.youHpBefore, r.youHpAfter, r.themDealt, r.you.heal) +
@@ -2186,11 +2246,18 @@ function flagshipSectionHtml(){
     shopHead("gold", "Upgrade your flagship",
       lvl >= 3 ? "Fully upgraded \u2014 every matching die gets +4"
                : "One purchase raises the bonus on all six faces") +
+    '<p>Your flagship rolls one of its six faces each round. It adds a <b>bonus</b> ' +
+    'to the ships that match that face — a flagship <b>3</b> adds repair to each ' +
+    'of your 3s, while a flagship <b>6</b> adds attack to every even die. A level ' +
+    'raises that bonus on all six faces at once.</p>' +
+    '<p class="hint">The <b>#1</b> face is the exception: it does not match a die. ' +
+    'It raises your standing Energy instead, and a level raises that too.</p>' +
     '<div class="lvlbar">' + [1,2,3].map(function(n){
       return '<div class="lvl' + (n === lvl ? " now" : n < lvl ? " past" : "") + '">' +
         '<div class="ln">Level ' + n + '</div>' +
         '<div class="lp">each matching die<br>gets <b>+' + (n + 1) + '</b></div></div>';
     }).join("") + '</div>' +
+    '<div class="faceref">' + [1,2,3,4,5,6].map(flagFaceReferenceHtml).join("") + '</div>' +
     flagUpgradeHtml() + '</div>';
 }
 
@@ -2304,13 +2371,15 @@ function slotSectionHtml(){
   if (open >= K("maxDice")){
     return '<div class="card">' +
       shopHead("blue", "Open another fleet slot", "All " + K("maxDice") + " slots are open") +
-      '</div>';
+      '<p>Your formation is at full width. Spend Energy upgrading the ships already in it.</p></div>';
   }
   var cost = slotCost(next), can = G.you.energy >= cost;
   return '<div class="card">' +
     shopHead("blue", "Open another fleet slot", open + " of " + K("maxDice") + " slots open") +
+    '<p>Width is permanent: once a slot is open, any ship in it rolls every round. ' +
+    'Opening it does not include a ship.</p>' +
     '<div class="slotoffer"><div class="i"><b>Open slot ' + next + '</b>' +
-      '<small>Does not include a ship.</small></div>' +
+      '<small>Then buy any ship to fill it.</small></div>' +
       '<button data-unlock="1"' + (can ? '' : ' disabled') + '>' + cost + '⚡' +
       '</button></div></div>';
 }
@@ -2321,18 +2390,23 @@ function shopView(){
   var theirBig = Math.max.apply(null, G.them.dice.map(function(d){ return d.s; }));
   var plan = enemyPlanInfo(G.them.plan);
 
-  return '<h2>Upgrade fleet</h2>' +
+  return '<h2>Between rounds</h2>' +
+    guideHtml("shop") +
+
     '<div class="tot three purse">' +
       '<div class="e"><div class="n">' + G.you.energy + '</div><div class="l">Energy to spend</div></div>' +
       '<div><div class="n">' + filled + '/' + cap + '</div><div class="l">Ships / open slots</div></div>' +
       '<div><div class="n">' + G.them.dice.length + ' ships</div>' +
         '<div class="l">Enemy · ' + plan.short + ' · largest d' + theirBig + '</div></div>' +
     '</div>' +
-    '<p class="say">' + plan.line + '</p>' +
+    '<p class="say">' + plan.line + ' Every price is listed on the <b class="nrg">Upgrade costs</b> page.</p>' +
 
     '<div class="card">' +
-    shopHead("gold", "Your ships",
+    shopHead("gold", "Upgrade the ships you own",
       'Upgrade one step: d4 → d6 → d8 → d10') +
+    '<p>Upgrading keeps the same slot and costs <b>' + growCost(4) + '⚡, then ' +
+    growCost(6) + '⚡, then ' + growCost(8) + '⚡</b> at today’s prices. ' +
+    'Or scrap for ' + K("sellBack") + '% if you truly want the slot empty. A damaged ship must wait.</p>' +
     fleetGridHtml() + '</div>' +
 
     slotSectionHtml() +
@@ -2342,6 +2416,15 @@ function shopView(){
       full ? (cap < K("maxDice") ? 'Every open slot is full — open another or upgrade'
                                   : 'Every slot is full — upgrade or scrap instead')
            : (cap - filled) + ' of ' + cap + ' slots still free') +
+    '<p>A new ship makes you wider; upgrading a ship makes you taller. Wider fleets roll ' +
+    'more dice and cover more numbers. Taller fleets hit harder and lift straight prizes.</p>' +
+    '<div class="samefaces">Every ship begins with the same low marks — ' +
+      glyph(BOLT, "var(--nrg)", 0.6) + '<b class="nrg">1</b> ' +
+      glyph(CHEV, "var(--direct)", 0.62) + '<b class="dir">2</b> ' +
+      glyph(CROSS, "var(--hp)", 0.55) + '<b class="hp">3</b> ' +
+      glyph(BOLT, "var(--nrg)", 0.6) + '<b class="nrg">4</b>' +
+      '. Upgrades then add escalating marks: <b class="hp">5 / 7 / 9 repair 1 / 2 / 3</b>, ' +
+      'and <b class="dir">6 / 8 / 10 fire 1 / 2 / 3 Direct</b>.</div>' +
     '<div class="ships">' + [4,6,8,10].map(buyCardHtml).join("") + '</div></div>' +
 
     flagshipSectionHtml() +
@@ -2454,6 +2537,14 @@ function helpView(){
     'sits in the middle with <b class="hp">' + K("startHP") + '</b> health, and the ' +
     'match ends the moment one flagship is destroyed. There is no round limit — ' +
     'most matches run 8 to 17.</p>' +
+
+    '<div class="card">' +
+    shopHead("gold", "Guided first match", "Learn each decision when it appears") +
+    '<p>Guided tips explain rolling, straights, damage and upgrades on the screen ' +
+    'where you make that decision. They teach the game without changing the dice.</p>' +
+    '<button id="guide-start"' + (G.guide ? ' disabled' : '') + '>' +
+      (G.guide ? 'Guided tips are on' : 'Show guided tips in this match') +
+    '</button></div>' +
 
     '<div class="card">' +
     shopHead("blue", "A round, start to finish", "Four steps, always the same") +
@@ -2666,7 +2757,13 @@ function wire(){
   var pr = document.getElementById("page-reset");
   if (pr) pr.onclick = resetPageChoices;
   var ag = document.getElementById("again");
-  if (ag) ag.onclick = function(){ newGame(); };
+  if (ag) ag.onclick = function(){ newGame(false); };
+  var gs = document.getElementById("guide-skip");
+  if (gs) gs.onclick = function(){
+    G.guide = false;
+    rememberGuide();
+    render();
+  };
 
   Array.prototype.forEach.call(document.querySelectorAll("[data-flagturn]"), function(el){
     el.onclick = function(){
@@ -2737,6 +2834,11 @@ function wire(){
   };
   var bk = document.getElementById("back");
   if (bk) bk.onclick = returnFromReference;
+  var gst = document.getElementById("guide-start");
+  if (gst) gst.onclick = function(){
+    G.guide = true;
+    returnFromReference();
+  };
   Array.prototype.forEach.call(document.querySelectorAll("[data-jump]"), function(el){
     el.onclick = function(){
       var target = document.getElementById(el.getAttribute("data-jump"));

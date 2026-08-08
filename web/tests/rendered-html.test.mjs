@@ -39,8 +39,8 @@ for (const [segments, expected] of [
 }
 
 test("static export includes the solo game asset", () => {
-  const solo = join(outDir, "fleet-dice-v85.html");
-  assert.ok(existsSync(solo), "missing fleet-dice-v85.html in out/");
+  const solo = join(outDir, "fleet-dice-v86.html");
+  assert.ok(existsSync(solo), "missing fleet-dice-v86.html in out/");
   assert.match(readFileSync(solo, "utf8"), /Fleet Dice|flagship/i);
 });
 

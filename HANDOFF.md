@@ -7,7 +7,7 @@ Everything you need to be useful is either here or pointed at from here.
 
 | Track | What it is | Where |
 | --- | --- | --- |
-| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v85) — also shipped online at `/solo/` |
+| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v86) — also shipped online at `/solo/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -107,7 +107,7 @@ buttons, scoring colours, and how-to matter as much as balance.
 
 ---
 
-## The rules as they stand (v85)
+## The rules as they stand (v86)
 
 These rules are the truth for **solo**. Versus follows the same combat math.
 Versus UI differences are called out in [Online versus](#online-versus--what-we-learned).
@@ -267,10 +267,10 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 
 ### Solo balance (unchanged brief)
 
-v85 keeps the v84 economy and Enemy plans. The roll screen puts **Fire** at the
-top and **Roll / reroll** under the fleet; the Flagship Token is available after
-the first roll. You start with four open slots and must buy width; or you can
-spend small amounts upgrading the four ships already in formation.
+v86 keeps the v85 roll layout and Enemy plans. Solo no longer shows guided
+first-match tips — the board stays quiet like versus, and **How to play** carries
+the teaching. You start with four open slots and must buy width; or you can spend
+small amounts upgrading the four ships already in formation.
 
 This is a **first balance pass, not proof of balance**. Five automated policies
 played the real game against the pace-1 opponent:
@@ -349,7 +349,7 @@ join a room without getting stuck.
 | Dock: How to play left, Cancel right as real buttons | Done; Cancel asks "Are you sure?" |
 | Scrap in shipyard | **Removed from versus UI** (solo still has scrap) |
 | Upgrade labels readable on 3×3 cells | Done (stacked label + cost) |
-| Guided first-match tips | Solo only for now |
+| Guided first-match tips | Removed — How to play carries the teaching |
 
 ### Jackbox join / Firebase lessons
 
@@ -383,7 +383,7 @@ join a room without getting stuck.
 | `web/components/ReferenceSheets.tsx` | How to play + upgrade costs |
 | `web/components/HomeScreen.tsx` | Landing + code join |
 | `web/public/fleet-dice-key-art.png` | Brand key art |
-| `web/public/fleet-dice-v85.html` | Solo file shipped inside the online app |
+| `web/public/fleet-dice-v86.html` | Solo file shipped inside the online app |
 | `.github/workflows/deploy-web.yml` | Push `main` → GitHub Pages |
 
 ---
@@ -437,8 +437,8 @@ pnpm dev
 
 | File | What it is |
 | --- | --- |
-| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v85). |
-| **`simple01.html` … `simple84.html`** | Frozen solo snapshots. Never edited again. |
+| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v86). |
+| **`simple01.html` … `simple85.html`** | Frozen solo snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
 | **`HANDOFF.md`** | This file. The entry point. |
@@ -504,7 +504,7 @@ while (w.G.phase !== "over") { /* drive the phases */ }
 | `test-dump-roll.mjs`, `test-dump-round.mjs`, `test-dump-pages.mjs` | print every screen as plain text — read these when reviewing copy |
 | `test-v82-economy.mjs` | the current five-policy upgrade/slot/flagship win-rate table, with both tokens |
 | `test-v81-playtest.mjs` | every request from the first v80 phone playtest |
-| `test-v82-guidance.mjs` | guided match, upgrade jumps, both Flagship Tokens, and all six visual flagship faces |
+| `test-v82-guidance.mjs` | quiet solo board (no guided tips), upgrade jumps, both Flagship Tokens, six flagship faces |
 | `test-strategies.mjs` | historical pre-v80 economy comparison |
 | `test-fleet-output.mjs`, `test-fleet-value.mjs` | what a fleet of one size produces a round |
 | `test-head-to-head.mjs` | frozen fleets against each other |
@@ -590,7 +590,7 @@ because of a bug in the harness, not the game.
   the first mechanic that reaches across and touches an opponent's roll.
 - **Joint / 2v2 straights** — teammate dice combine into one line. Still future;
   basic 1v1 versus is live.
-- **Versus guided first-match tips** — solo has them; versus does not yet.
+- **Versus guided first-match tips** — neither track uses them; How to play is enough.
 - **Full Tune panel in versus** — solo only; versus constants are code defaults.
 
 ~~**Multiplayer**~~ — **built** as private 1v1 rooms with invite link + four-digit

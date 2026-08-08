@@ -64,7 +64,7 @@ w.G.you.rolls = 1;
 w.G.resume = "roll";
 w.G.phase = "help";
 w.render();
-check(d.querySelectorAll(".faceentry").length === 28, "instructions do not list all 28 die faces");
+check(d.querySelectorAll(".faceentry").length === 10, "instructions do not list faces 1 through 10");
 check(d.body.textContent.includes("War escalation is the long-game timer"),
   "instructions do not explain war escalation");
 check(d.body.textContent.includes("Each ship showing 4 earns +2 Energy"),
