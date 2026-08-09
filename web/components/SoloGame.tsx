@@ -30,7 +30,7 @@ export function SoloGame() {
 
       <iframe
         className="solo-game"
-        src={withBasePath("/fleet-dice-v87.html")}
+        src={withBasePath("/fleet-dice-v88.html")}
         title="Fleet Dice solo game"
         allow="fullscreen"
       />
