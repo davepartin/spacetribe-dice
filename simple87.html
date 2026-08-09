@@ -114,34 +114,13 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .hull polygon{transition:fill-opacity .15s}
 .die:hover .hull polygon{fill-opacity:.22}
 .die:active{transform:scale(.96)}
-/* Roll bump: a short shake so a reroll still feels real when the face
-   lands on the same number. The face dips out briefly, then pops back. */
-@keyframes dieBump{
-  0%{transform:translate3d(0,0,0) rotate(0deg) scale(1)}
-  16%{transform:translate3d(-7px,4px,0) rotate(-12deg) scale(.9)}
-  34%{transform:translate3d(8px,-3px,0) rotate(13deg) scale(1.08)}
-  52%{transform:translate3d(-5px,-4px,0) rotate(-8deg) scale(.95)}
-  70%{transform:translate3d(4px,3px,0) rotate(6deg) scale(1.05)}
-  100%{transform:translate3d(0,0,0) rotate(0deg) scale(1)}
+@keyframes tumble{
+  0%{transform:rotate(0) scale(1)}
+  30%{transform:rotate(-14deg) scale(.9)}
+  60%{transform:rotate(11deg) scale(1.06)}
+  100%{transform:rotate(0) scale(1)}
 }
-@keyframes dieFacePop{
-  0%{opacity:1;transform:scale(1)}
-  22%{opacity:.12;transform:scale(.82)}
-  55%{opacity:.12;transform:scale(.82)}
-  100%{opacity:1;transform:scale(1)}
-}
-.die.rolled{
-  animation:dieBump .55s cubic-bezier(.36,.07,.19,.97);
-}
-.die.rolled:active{transform:none}
-.die.rolled .hull text,
-.die.rolled .hull path.mk,
-.die.rolled .hull path.cr,
-.die.rolled .hull path.ch,
-.die.rolled .kind,
-.die.rolled .fcap{
-  animation:dieFacePop .55s ease;
-}
+.die.rolled{animation:tumble .32s ease}
 /* White is a thing you did: you tapped this die to reroll it.
    Gold is a thing the game did: this die is part of your straight.
    Keeping those two apart matters, because a straight lights up several dice at
@@ -595,7 +574,7 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 <script>
 "use strict";
 
-var VERSION = "88";   // bump this when saving a new simpleNN.html
+var VERSION = "87";   // bump this when saving a new simpleNN.html
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -826,13 +805,7 @@ function healOf(n){
   if (n === 3) return K("healThree");
   return { 5:1, 7:2, 9:3 }[n] || 0;
 }
-// Each ship uses its own size: d4 → 1–4, d6 → 1–6, d8 → 1–8, d10 → 1–10.
-// Math.random() is uniform in [0,1), so floor(r * sides) is 0..sides-1, then +1.
-function roll(sides){
-  sides = sides | 0;
-  if (sides < 1) return 0;
-  return 1 + Math.floor(Math.random() * sides);
-}
+function roll(sides){ return 1 + Math.floor(Math.random() * sides); }
 
 // A straight is runMin or more numbers in a row (5 today). Its strength comes from the
 // biggest SHIP taking part, not the highest number - so a d10 rolling a 3 still
@@ -977,8 +950,6 @@ var straightPick = null;      // which tier of your straight you are cashing in
 // rebuilds every die element from scratch, so a flag left set on the die itself
 // replays the animation every time anything re-renders - including a tap.
 var animate = {};
-var rollBusy = false;
-var ROLL_BUMP_MS = 560;
 var pending = null;          // the round, resolved but waiting on your brace choice
 var flagInLine = false;      // is the flagship's number part of your straight?
 var lastTally = null;        // what the current roll is worth, for the bottom bar
@@ -1123,33 +1094,13 @@ function pickedDice(){
     if (sel[i] && !G.you.values[i].dead) out.push(i);
   return out;
 }
-/** Play the bump on the dice that just changed, then unlock the board. */
-function playRollBump(moved){
-  animate = {};
-  (moved || []).forEach(function(i){ animate[i] = true; });
-  if (moved && moved.flag) animate.flag = true;
-  rollBusy = true;
-  render();
-  setTimeout(function(){
-    rollBusy = false;
-    // Re-render so Roll / Fire enable again; bump class is already consumed.
-    if (G.phase === "roll") render();
-  }, ROLL_BUMP_MS);
-}
-
 function doReroll(){
-  if (rollBusy) return;
   if (G.you.rolls === 0){
     rollAll(G.you);
     G.you.rolls = 1;
     sel = {};
     straightPick = null;
-    var first = [];
-    for (var i = 0; i < G.you.values.length; i++){
-      if (!G.you.values[i].dead) first.push(i);
-    }
-    first.flag = true;
-    return playRollBump(first);
+    return render();
   }
   var picked = pickedDice(), free = G.you.rolls < K("rollsPerRound");
   if (!picked.length && !sel.flag) return toast("Tap the dice you want to reroll");
@@ -1160,18 +1111,17 @@ function doReroll(){
   } else {
     G.you.rolls++;
   }
+  animate = {};
   picked.forEach(function(i){
-    // Always re-roll this die's own size (d4/d6/d8/d10), even if the face
-    // comes back the same — the bump below is what makes that feel real.
     G.you.values[i].value = roll(G.you.values[i].sides);
+    animate[i] = true;                       // only the dice that actually moved
   });
-  var moved = picked.slice();
-  if (sel.flag){ rollFlag(G.you); moved.flag = true; }
+  if (sel.flag){ rollFlag(G.you); animate.flag = true; }
   sel = {};
   // A prize chosen for the OLD roll must not silently apply to the new one - you
   // could pick 5, reroll into 7, and quietly cash the short tier.
   straightPick = null;
-  playRollBump(moved);
+  render();
 }
 
 // They hold whatever helps their longest straight, then top up on high numbers,
@@ -1206,7 +1156,6 @@ function botHolds(vals){
 
 function submit(){
   if (G.you.rolls === 0) return toast("Roll the dice before submitting");
-  if (rollBusy) return toast("Wait for the dice to finish rolling");
   playThem();
   useTheirFlagToken();
   var youRoll = runDice(G.you), themRoll = runDice(G.them);
@@ -1836,29 +1785,25 @@ function totalsHtml(t){
 // Roll / reroll lives under the dice, because that is the button you press most.
 function fireBtnHtml(){
   if (G.phase !== "roll" || G.you.rolls === 0) return "";
-  return '<button class="fire-btn" id="fire"' + (rollBusy ? ' disabled' : '') +
-    '>Fire<small>' + (rollBusy ? 'Dice are rolling…' : 'Lock this roll') + '</small></button>';
+  return '<button class="fire-btn" id="fire">Fire<small>Lock this roll</small></button>';
 }
 function rerollBtnHtml(){
   if (G.you.rolls === 0){
-    return '<button class="roll-under go" id="reroll"' + (rollBusy ? ' disabled' : '') +
-      '>Roll 1 of ' + K("rollsPerRound") +
-      '<small>' + (rollBusy ? 'Rolling…' : 'Roll every ready die') + '</small></button>';
+    return '<button class="roll-under go" id="reroll">Roll 1 of ' +
+      K("rollsPerRound") + '<small>Roll every ready die</small></button>';
   }
   var picked = pickedDice().length;
   var chosen = picked + (sel.flag ? 1 : 0);
   var payCost = chosen * K("rerollCost");
   if (G.you.rolls < K("rollsPerRound")){
-    return '<button class="roll-under go" id="reroll"' +
-      (chosen && !rollBusy ? '' : ' disabled') + '>' +
+    return '<button class="roll-under go" id="reroll"' + (chosen ? '' : ' disabled') + '>' +
       'Roll ' + (G.you.rolls + 1) + ' of ' + K("rollsPerRound") +
-      '<small>' + (rollBusy ? 'Rolling…' : chosen ? chosen + ' selected' : 'Select dice to reroll') +
-      '</small></button>';
+      '<small>' + (chosen ? chosen + ' selected' : 'Select dice to reroll') + '</small></button>';
   }
   return '<button class="roll-under" id="reroll"' +
-    (chosen && !rollBusy && G.you.energy >= payCost ? '' : ' disabled') + '>' +
+    (chosen && G.you.energy >= payCost ? '' : ' disabled') + '>' +
     'Energy reroll' +
-    '<small>' + (rollBusy ? 'Rolling…' : (payCost || K("rerollCost")) + '\u26a1') + '</small></button>';
+    '<small>' + (payCost || K("rerollCost")) + '\u26a1</small></button>';
 }
 
 // The bottom bar. Two different numbers on this screen were both called Energy -
@@ -2774,13 +2719,12 @@ function wire(){
 
   Array.prototype.forEach.call(document.querySelectorAll("[data-flagturn]"), function(el){
     el.onclick = function(){
-      if (rollBusy || G.phase !== "roll" || G.you.rolls < 1) return;
+      if (G.phase !== "roll" || G.you.rolls < 1) return;
       if (!useFlagToken(G.you, +el.getAttribute("data-flagturn"))) return;
       sel.flag = false;
       straightPick = null;
-      var moved = [];
-      moved.flag = true;
-      playRollBump(moved);
+      animate = { flag:true };
+      render();
     };
   });
 
@@ -2868,7 +2812,6 @@ function wire(){
 
   Array.prototype.forEach.call(document.querySelectorAll("[data-die]"), function(el){
     el.onclick = function(){
-      if (rollBusy) return;
       var i = el.getAttribute("data-die");
       sel[i] = !sel[i];
       render();
@@ -2876,7 +2819,6 @@ function wire(){
   });
   var fl = document.querySelector("[data-flag]");
   if (fl) fl.onclick = function(){
-    if (rollBusy) return;
     sel.flag = !sel.flag;
     render();
   };

@@ -42,16 +42,17 @@ test("solo page has quit and home controls", () => {
   const html = readPage("solo", "index.html");
   assert.match(html, /Quit game/i);
   assert.match(html, />Home</);
-  assert.match(html, /fleet-dice-v87\.html/);
+  assert.match(html, /fleet-dice-v88\.html/);
 });
 
 test("static export includes the solo game asset", () => {
-  const solo = join(outDir, "fleet-dice-v87.html");
-  assert.ok(existsSync(solo), "missing fleet-dice-v87.html in out/");
+  const solo = join(outDir, "fleet-dice-v88.html");
+  assert.ok(existsSync(solo), "missing fleet-dice-v88.html in out/");
   const html = readFileSync(solo, "utf8");
   assert.match(html, /Fleet Dice|flagship/i);
   assert.match(html, /quitToHome/);
   assert.match(html, /Back home/);
+  assert.match(html, /dieBump|playRollBump/);
 });
 
 test("asset paths use the GitHub Pages basePath", () => {

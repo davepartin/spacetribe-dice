@@ -43,7 +43,16 @@ The three most useful settings for the current game:
 
 ## Versions
 
-### 87 — quit game / back home (current)
+### 88 — dice roll bump (current)
+
+Tapping **Roll** gives the dice a short shake and a face pop, so a reroll still
+feels like a roll even when the same number comes back. Each ship keeps its own
+randomizer: d4 → 1–4, d6 → 1–6, d8 → 1–8, d10 → 1–10. Versus will get the same
+motion once this feels right in solo.
+
+No combat numbers changed.
+
+### 87 — quit game / back home
 
 Solo can leave a match the same way versus can cancel one:
 
