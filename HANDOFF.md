@@ -508,6 +508,7 @@ while (w.G.phase !== "over") { /* drive the phases */ }
 | `test-v82-economy.mjs` | the current five-policy upgrade/slot/flagship win-rate table, with both tokens |
 | `test-v81-playtest.mjs` | every request from the first v80 phone playtest |
 | `test-v82-guidance.mjs` | quiet solo board (no guided tips), upgrade jumps, both Flagship Tokens, six flagship faces |
+| `test-v88-roll.mjs` | each die size stays inside its own face range (d4/d6/d8/d10 + flag) |
 | `test-strategies.mjs` | historical pre-v80 economy comparison |
 | `test-fleet-output.mjs`, `test-fleet-value.mjs` | what a fleet of one size produces a round |
 | `test-head-to-head.mjs` | frozen fleets against each other |
