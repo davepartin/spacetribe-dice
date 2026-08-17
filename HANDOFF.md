@@ -8,7 +8,7 @@ Everything you need to be useful is either here or pointed at from here.
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.08) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.09) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -204,7 +204,8 @@ own token by the same rule.
    across the bottom of the slot** (solo and versus). **Fleet Dice 2 also pays
    formation lines:** three same-size dice showing the same number. Across pays
    Energy, down pays Attack. The flagship is a d6, so the centre row and column
-   count when the ships beside it are d6s too.
+   count when the ships beside it are d6s too. Prize is half the die, squared
+   (d4 = 4, d6 = 9, d8 = 16, d10 = 25) so rare big-dice lines pay more.
 4. **Submit / lock.** Both fleets fire once both sides have locked. Your **volley**
    is `your attack − their shields`. **Direct** is tracked separately and
    **nothing stops it** — not shields, not a ship thrown in front of it.
@@ -268,6 +269,14 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 | **6 in a row** | 8 attack | 12 | 16 | 20 |
 | **7 in a row** | 12 attack | 18 | 24 | 30 |
 | **8 in a row** | free d4 + 8 | free d6 + 12 | free d8 + 16 | free d10 + 20 |
+
+**Fleet Dice 2 formation lines** (three same-size, same number). Prize is half
+the die, squared — matching is rarer on bigger dice:
+
+| | d4 | d6 | d8 | d10 |
+| --- | --- | --- | --- | --- |
+| **Across · Energy** | 4⚡ | 9⚡ | 16⚡ | 25⚡ |
+| **Down · Attack** | 4 | 9 | 16 | 25 |
 
 ---
 
