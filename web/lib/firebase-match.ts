@@ -10,6 +10,7 @@ import {
   runTransaction,
   serverTimestamp,
   Timestamp,
+  updateDoc,
   where,
   type Unsubscribe,
 } from "firebase/firestore";
@@ -54,6 +55,7 @@ export type LiveBattleRow = {
   guestName: string | null;
   status: "waiting" | "active";
   round: number;
+  updatedAt: Date | null;
 };
 
 export type BattleResultRow = {
@@ -76,6 +78,8 @@ export type RememberedMatchCard = {
 const ACTIVE_MATCH_KEY = "fleet-dice-active-match";
 const ACTIVE_MATCHES_KEY = "fleet-dice-active-matches";
 const MAX_REMEMBERED_MATCHES = 6;
+/** Empty waiting rooms drop off the public board after this long with no heartbeat. */
+const WAITING_STALE_MS = 45 * 60 * 1000;
 
 function readRememberedMatchIds(): string[] {
   if (typeof window === "undefined") return [];
@@ -137,6 +141,7 @@ export async function createLiveMatch(name: string): Promise<{
   invitePath: string;
 }> {
   const db = requireDb();
+  await cancelRememberedWaitingMatches();
   const user = await ensurePlayerIdentity();
 
   for (let attempt = 0; attempt < 20; attempt += 1) {
@@ -481,6 +486,32 @@ export async function cancelLiveMatch(matchId: string): Promise<void> {
   clearActiveMatch(matchId);
 }
 
+/** Close every empty waiting room this phone still remembers, so starting over is one tap. */
+export async function cancelRememberedWaitingMatches(): Promise<void> {
+  const cards = await loadRememberedMatchCards();
+  for (const card of cards) {
+    if (card.status !== "waiting") continue;
+    try {
+      await cancelLiveMatch(card.id);
+    } catch {
+      clearActiveMatch(card.id);
+    }
+  }
+}
+
+/** Keep a waiting room on the public board while the host is still on the page. */
+export async function touchWaitingBattle(matchId: string): Promise<void> {
+  const db = requireDb();
+  await ensurePlayerIdentity();
+  try {
+    await updateDoc(doc(db, "liveBattles", matchId), {
+      updatedAt: serverTimestamp(),
+    });
+  } catch {
+    // Room already gone or we are not seated — ignore.
+  }
+}
+
 export async function watchLiveMatch(
   matchId: string,
   onMatch: (match: LiveMatch) => void,
@@ -552,15 +583,27 @@ export function watchLiveBattles(
           const data = entry.data();
           const status: LiveBattleRow["status"] =
             data.status === "active" ? "active" : "waiting";
+          const updatedAt =
+            data.updatedAt instanceof Timestamp
+              ? data.updatedAt.toDate()
+              : data.updatedAt instanceof Date
+                ? data.updatedAt
+                : null;
           return {
             id: entry.id,
             hostName: String(data.hostName || "Commander"),
             guestName: data.guestName ? String(data.guestName) : null,
             status,
             round: Number(data.round) || 1,
+            updatedAt,
           } satisfies LiveBattleRow;
         })
-        .filter((row) => row.status === "waiting" || row.status === "active")
+        .filter((row) => {
+          if (row.status === "active") return true;
+          if (row.status !== "waiting") return false;
+          if (!row.updatedAt) return false;
+          return Date.now() - row.updatedAt.getTime() < WAITING_STALE_MS;
+        })
         .sort((a, b) => {
           if (a.status !== b.status) return a.status === "active" ? -1 : 1;
           return a.hostName.localeCompare(b.hostName);

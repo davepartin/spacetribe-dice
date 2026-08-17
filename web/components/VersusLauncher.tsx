@@ -52,6 +52,7 @@ export function VersusLauncher() {
         <p>
           Pick a display name for this match. We’ll make a four-number code for
           your friend. Stay on this phone — that’s how you get back into your seat.
+          If you already have an empty room waiting, this closes it and opens a new one.
         </p>
         <form onSubmit={createRoom}>
           <label htmlFor="commander">DISPLAY NAME</label>

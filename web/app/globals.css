@@ -1363,7 +1363,8 @@ input:focus {
   gap: 10px;
 }
 
-.invite-actions a:last-child {
+.invite-actions a,
+.invite-cancel {
   grid-column: 1 / -1;
 }
 

@@ -43,6 +43,14 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Versus — cancel an empty room from home
+
+If a friend never joins, the old **Remove** button on home only forgot the
+shortcut — the empty room stayed on **Now on the field**. **Cancel game** now
+ends it. Creating a new match also closes an empty waiting room on this phone.
+Waiting names drop off the public board after 45 minutes if nobody is still on
+the waiting page.
+
 ### Fleet Dice 2 · 2.05 — token above the totals (prototype)
 
 The Flagship Token sits **above** the totals (Attack / Shields / Energy / Repair /

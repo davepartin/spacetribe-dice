@@ -8,6 +8,7 @@ import { LiveBattlesBoard } from "./LiveBattlesBoard";
 import { RecentResultsBoard } from "./RecentResultsBoard";
 import { commanderName, rememberCommanderName } from "@/lib/firebase";
 import {
+  cancelLiveMatch,
   clearActiveMatch,
   enterLiveMatch,
   joinLiveMatchByCode,
@@ -24,6 +25,7 @@ export function HomeScreen() {
   const [name, setName] = useState("");
   const [joining, setJoining] = useState(false);
   const [openingId, setOpeningId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [loadingMatches, setLoadingMatches] = useState(true);
   const [error, setError] = useState("");
   const [savedMatches, setSavedMatches] = useState<RememberedMatchCard[]>([]);
@@ -70,9 +72,23 @@ export function HomeScreen() {
     }
   }
 
-  function removeMatch(matchId: string) {
-    clearActiveMatch(matchId);
-    setSavedMatches((current) => current.filter((card) => card.id !== matchId));
+  async function cancelMatch(matchId: string, waiting: boolean) {
+    const ok = window.confirm(
+      waiting
+        ? "Cancel this game? Your friend will not be able to join with the old code."
+        : "Cancel this game? This ends the match for both commanders.",
+    );
+    if (!ok) return;
+    setCancellingId(matchId);
+    setError("");
+    try {
+      await cancelLiveMatch(matchId);
+      setSavedMatches((current) => current.filter((card) => card.id !== matchId));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "That match could not be cancelled.");
+    } finally {
+      setCancellingId(null);
+    }
   }
 
   async function joinByCode(event: React.FormEvent) {
@@ -187,8 +203,8 @@ export function HomeScreen() {
                 : `${savedMatches.length} battles are waiting`}
             </h2>
             <p className="your-matches-hint">
-              Open a saved seat on this device. Remove only forgets the
-              shortcut; it does not end the match.
+              Open takes you back in. Cancel ends the room so you can start a
+              new one. Creating a new match also closes an empty room you left waiting.
             </p>
           </div>
           <ul className="your-matches-list">
@@ -210,15 +226,15 @@ export function HomeScreen() {
                 <div className="your-match-actions">
                   <button
                     className="action-button light-action"
-                    disabled={openingId === card.id}
-                    onClick={() => removeMatch(card.id)}
+                    disabled={Boolean(openingId || cancellingId)}
+                    onClick={() => cancelMatch(card.id, card.status === "waiting")}
                     type="button"
                   >
-                    Remove
+                    {cancellingId === card.id ? "Cancelling…" : "Cancel game"}
                   </button>
                   <button
                     className="action-button gold-action"
-                    disabled={Boolean(openingId)}
+                    disabled={Boolean(openingId || cancellingId)}
                     onClick={() => openMatch(card.id)}
                     type="button"
                   >

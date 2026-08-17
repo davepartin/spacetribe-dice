@@ -25,6 +25,7 @@ import {
   clearActiveMatch,
   enterLiveMatch,
   playLiveAction,
+  touchWaitingBattle,
   watchLiveMatch,
   type LiveMatch,
 } from "@/lib/firebase-match";
@@ -100,6 +101,16 @@ export function MatchGame() {
       unsubscribe?.();
     };
   }, [matchId]);
+
+  useEffect(() => {
+    if (!match || match.state.status !== "waiting") return;
+    const id = match.id;
+    void touchWaitingBattle(id);
+    const beat = window.setInterval(() => {
+      void touchWaitingBattle(id);
+    }, 60000);
+    return () => window.clearInterval(beat);
+  }, [match?.id, match?.state.status]);
 
   async function play(action: MatchAction) {
     if (!match || busy) return;
