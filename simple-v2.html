@@ -208,6 +208,11 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .die.inrun::before{content:"";position:absolute;left:12px;right:12px;bottom:0;height:4px;
   border-radius:3px 3px 0 0;background:var(--orange);box-shadow:0 0 10px -1px var(--orange)}
 .die.inrun.sel::before{left:8px;right:8px}
+.nrg-line,.atk-line{position:absolute;pointer-events:none;z-index:2}
+.nrg-line{left:10px;right:10px;top:0;height:4px;border-radius:0 0 3px 3px;
+  background:var(--nrg);box-shadow:0 0 8px -1px var(--nrg)}
+.atk-line{top:10px;bottom:10px;right:0;width:4px;border-radius:3px 0 0 3px;
+  background:var(--red);box-shadow:0 0 8px -1px var(--red)}
 
 .rolls{padding:11px 12px 9px}
 .rr{display:flex;align-items:center;gap:9px}
@@ -727,7 +732,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.05";   // token above totals; tiny straight hint in the token
+var VERSION = "2.06";   // formation lines: same-size 3 across = Energy, 3 down = Attack
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -793,6 +798,8 @@ var C = {
                   note:"Prizes step up by length; see the table on the roll screen." },
   runMult:      { v:1,  min:0,  max:3,  label:"Straight bonus multiplier", step:0.25,
                   note:"Scales the whole straight table." },
+  linePay:      { v:1,  min:0,  max:3,  label:"Formation line multiplier", step:0.25,
+                  note:"Three same-size ships showing the same number. Across pays Energy, down pays Attack. The prize is the die size times this." },
   priceD4:      { v:4,  min:1,  max:20, label:"Price of a d4" },
   priceD6:      { v:6,  min:1,  max:20, label:"Price of a d6" },
   priceD8:      { v:9,  min:1,  max:30, label:"Price of a d8" },
@@ -1048,7 +1055,7 @@ function straightBonus(length, biggest){
 // A longer straight may always be scored as a shorter one - take the Energy
 // instead of the hit when you would rather build than fight.
 
-function tally(dice, flagFace, mul, pick){
+function tally(dice, flagFace, mul, pick, slots){
   var t = { attack: 0, defense: 0, energy: 0, heal: 0, direct: 0, rerolls: 0, face: flagFace || null };
   for (var i = 0; i < dice.length; i++){
     // The flagship lends its NUMBER to the straight and nothing else. Letting it
@@ -1073,8 +1080,57 @@ function tally(dice, flagFace, mul, pick){
     t.energy += r.reward.energy || 0;
     t.shipPrize = r.reward.ship || 0;
   }
+  t.lines = findLines(slots);
+  for (i = 0; i < t.lines.length; i++){
+    t.attack += t.lines[i].attack;
+    t.energy += t.lines[i].energy;
+  }
   if (flagFace) applyFace(flagFace, t, dice, mul || 2);
   return t;
+}
+
+// Four possible 3-ship lines around the flagship. The flagship sits in the
+// middle, so the centre row and centre column never count — it is not a d4/d6/
+// d8/d10. Same hull size, same face. Across pays Energy, down pays Attack.
+// The prize is the die size (Tune: linePay). Measured: a d4 row you hunt for
+// three rolls hits ~28% of rounds; while you still hunt straights it falls in
+// your lap ~3%. Paying the die size keeps expected value similar across sizes
+// IF you hunt the line. Do not fatten d4 or Width farms this from round 1.
+var FLEET_LINES = [
+  { kind:"row", idx:[0,1,2] },
+  { kind:"row", idx:[5,6,7] },
+  { kind:"col", idx:[0,3,5] },
+  { kind:"col", idx:[2,4,7] }
+];
+function linePrize(sides){
+  return Math.round(sides * K("linePay"));
+}
+function findLines(slots){
+  slots = slots || [];
+  var hits = [], L, j, d, sides, value, ok, pay;
+  for (var i = 0; i < FLEET_LINES.length; i++){
+    L = FLEET_LINES[i];
+    ok = true;
+    sides = 0;
+    value = 0;
+    for (j = 0; j < 3; j++){
+      d = slots[L.idx[j]];
+      if (!d || d.dead || d.flag || !d.value){ ok = false; break; }
+      if (!sides){ sides = d.sides; value = d.value; }
+      else if (d.sides !== sides || d.value !== value){ ok = false; break; }
+    }
+    if (!ok) continue;
+    pay = linePrize(sides);
+    hits.push({
+      kind: L.kind,
+      idx: L.idx.slice(),
+      sides: sides,
+      value: value,
+      energy: L.kind === "row" ? pay : 0,
+      attack: L.kind === "col" ? pay : 0
+    });
+  }
+  return hits;
 }
 
 // Upkeep, fuel and "docked" were all removed in v11 - price was already doing
@@ -1218,7 +1274,7 @@ function useFlagToken(side, direction){
 function tokenTallyScore(side, face){
   var old = side.flag.face;
   side.flag.face = face;
-  var t = tally(runDice(side), flagFace(side), flagMul(side), null);
+  var t = tally(runDice(side), flagFace(side), flagMul(side), null, side.values);
   side.flag.face = old;
   return t.attack + t.defense * 0.7 + t.direct * 1.8 + t.heal * 0.7 +
     t.energy * 1.2 + (t.shipPrize ? priceOf(t.shipPrize) : 0);
@@ -1350,8 +1406,8 @@ function submit(){
   playThem();
   useTheirFlagToken();
   var youRoll = runDice(G.you), themRoll = runDice(G.them);
-  var you = tally(youRoll, flagFace(G.you), flagMul(G.you), straightPick);
-  var them = tally(themRoll, flagFace(G.them), flagMul(G.them), null);
+  var you = tally(youRoll, flagFace(G.you), flagMul(G.you), straightPick, G.you.values);
+  var them = tally(themRoll, flagFace(G.them), flagMul(G.them), null, G.them.values);
 
   var bump = escalation();
   // Direct is added AFTER shields have done their work, which is the whole point
@@ -1956,6 +2012,8 @@ function dieHtml(d, i, clickable){
   return '<div class="die fleet-die ' + cls + (sel[i] ? " sel selected" : "") + extra + '"' +
     (clickable ? ' data-die="' + i + '"' : '') + '>' +
     (sel[i] ? '<span class="reroll-mark">REROLL</span>' : '') +
+    (d.inline ? '<i class="nrg-line" aria-hidden="true"></i>' : '') +
+    (d.incol ? '<i class="atk-line" aria-hidden="true"></i>' : '') +
     '<span class="slotno">' + (i + 1) + '</span>' +
     die3d(hullSvg(d.sides, d.value, k), animate[i] ? delay : 0) +
     '<div class="kind die-caption">' + label + '</div></div>';
@@ -2147,17 +2205,33 @@ function rollView(){
       '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
   }
   var live = runDice(G.you);
-  var t = tally(live, flagFace(G.you), flagMul(G.you), straightPick);
-  var vals = live.map(function(d){ return d.value; });
+  var t = tally(live, flagFace(G.you), flagMul(G.you), straightPick, G.you.values);
   lastTally = t;
   var fn = flagNumber(G.you);
   flagInLine = !!(t.run && fn >= t.run.start && fn <= t.run.top);
+  for (var si = 0; si < G.you.values.length; si++){
+    G.you.values[si].inrun = false;
+    G.you.values[si].inline = false;
+    G.you.values[si].incol = false;
+  }
   if (t.run){
     for (var v = t.run.start; v <= t.run.top; v++){
-      var ix = vals.indexOf(v);
-      if (ix >= 0) live[ix].inrun = true;
+      for (si = 0; si < G.you.values.length; si++){
+        if (!G.you.values[si].dead && G.you.values[si].value === v){
+          G.you.values[si].inrun = true;
+          break;
+        }
+      }
     }
   }
+  (t.lines || []).forEach(function(L){
+    L.idx.forEach(function(ix){
+      if (G.you.values[ix]){
+        if (L.kind === "row") G.you.values[ix].inline = true;
+        else G.you.values[ix].incol = true;
+      }
+    });
+  });
   return flagTokenHtml(t) +
     straightBannerHtml(t) +
     totalsHtml(t) +
@@ -2327,6 +2401,13 @@ function reportView(){
   var yourNotes = "", enemyNotes = "";
   if (r.you.run) yourNotes += '<div class="line">Your <b>' + r.you.run.taken +
     ' in a row</b> paid ' + rewardEffect(r.you.run) + '.</div>';
+  if (r.you.lines && r.you.lines.length){
+    yourNotes += r.you.lines.map(function(L){
+      return '<div class="line">Your <b>d' + L.sides + 's</b> showing <b>' + L.value +
+        '</b> ' + (L.kind === "row" ? 'across paid <b class="nrg">+' + L.energy + ' Energy</b>'
+          : 'down paid <b class="red">+' + L.attack + ' Attack</b>') + '.</div>';
+    }).join("");
+  }
   if (r.shipBuilt) yourNotes += '<div class="line">Your straight built a free <b>d' +
     r.shipBuilt + '</b>.</div>';
   if (tWasted) yourNotes += '<div class="line"><b class="blue">' + tWasted +
@@ -2343,6 +2424,13 @@ function reportView(){
 
   if (r.them.run) enemyNotes += '<div class="line">Enemy <b>' + r.them.run.taken +
     ' in a row</b> paid ' + rewardEffect(r.them.run) + '.</div>';
+  if (r.them.lines && r.them.lines.length){
+    enemyNotes += r.them.lines.map(function(L){
+      return '<div class="line">Enemy <b>d' + L.sides + 's</b> showing <b>' + L.value +
+        '</b> ' + (L.kind === "row" ? 'across paid <b class="nrg">+' + L.energy + ' Energy</b>'
+          : 'down paid <b class="red">+' + L.attack + ' Attack</b>') + '.</div>';
+    }).join("");
+  }
   if (yWasted) enemyNotes += '<div class="line"><b class="blue">' + yWasted +
     ' Shields</b> went to waste — Enemy over-defended.</div>';
   if (r.themFed && r.themFed.length) enemyNotes += '<div class="line">Enemy put ' +
@@ -2690,6 +2778,8 @@ function costsView(){
           'The flagship\'s <b>#1</b> face raises this for the rest of the match.') +
       row('A straight of ' + K("runMin"), 'Energy',
           'That tier pays Energy instead of damage — see How to play.') +
+      row('Three same-size ships across', 'd4 +' + linePrize(4) + '⚡ · d10 +' + linePrize(10) + '⚡',
+          'Same number, top or bottom row. Down the side pays Attack instead.') +
     '</div></div>' +
 
     '<div class="card"><div class="rep"><div class="line">' +
@@ -2758,6 +2848,17 @@ function helpView(){
     'you get; the <b>biggest ship</b> in the line decides how large it is. You may ' +
     'always cash a long straight as a shorter one if you would rather have the Energy ' +
     'than the hit.</p>' + straightTableHtml() + '</div>' +
+
+    '<div class="card">' +
+    shopHead("nrg", "Formation lines", "Same size, same number, three in a row") +
+    '<p>The flagship sits in the middle, so only the <b>top row, bottom row, left ' +
+    'column, and right column</b> can line up. Three ships of the <b>same size</b> ' +
+    'showing the <b>same number</b> pay a bonus equal to that die size.</p>' +
+    '<p><b class="nrg">Across</b> (top or bottom) pays Energy — a yellow bar on top of ' +
+    'the cards. <b class="red">Down</b> (left or right) pays Attack — a red bar on the ' +
+    'right. The orange bar on the bottom is still a straight. You can have more than ' +
+    'one at once. You start with three d4s across the top, so a d4 row can happen from ' +
+    'round one; a column needs more ships.</p></div>' +
 
     '<div class="card">' +
     shopHead("red", "Taking damage", "The defender always chooses") +

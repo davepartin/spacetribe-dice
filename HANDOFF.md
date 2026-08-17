@@ -8,7 +8,7 @@ Everything you need to be useful is either here or pointed at from here.
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same rules, versus layout + new dice — prototype | `simple-v2.html` (2.05) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same rules, versus layout + new dice — prototype | `simple-v2.html` (2.06) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /

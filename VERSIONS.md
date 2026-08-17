@@ -43,6 +43,15 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.06 — formation lines (prototype)
+
+Three ships of the **same size** showing the **same number**:
+- **Across** (top or bottom row) pays **Energy** equal to the die size. Yellow bar on top.
+- **Down** (left or right column) pays **Attack** equal to the die size. Red bar on the right.
+- Orange bar on the bottom is still a straight. The flagship sits in the middle, so it is never in a line.
+
+Measured before building: one roll of three d4s matches ~6%; if you hunt that line for three rolls it hits ~28%. While you still hunt straights it falls in your lap ~3%. d6/d8/d10 are rarer, so paying the die size keeps the expected bonus similar if you chase it. You start with three d4s across the top — if Width starts farming this instead of straights, drop `linePay` in Tune.
+
 ### Versus — cancel an empty room from home
 
 If a friend never joins, the old **Remove** button on home only forgot the
