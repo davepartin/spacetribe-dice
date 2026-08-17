@@ -45,7 +45,7 @@ test("versus launcher explains empty rooms get closed", () => {
 });
 
 test("solo-v2 iframe cache-busts the prototype file", () => {
-  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.07/);
+  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.08/);
 });
 
 test("solo page has quit and home controls", () => {
@@ -71,7 +71,7 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   const html = readFileSync(file, "utf8");
   assert.match(html, /Fleet Dice 2/);
   assert.match(html, /dieTumble0/);
-  assert.match(html, /VERSION = "2\.07"/);
+  assert.match(html, /VERSION = "2\.08"/);
   assert.match(html, /live-tot/);
   assert.match(html, /Turn flagship/);
   assert.match(html, /Straights earn a bonus/);
@@ -79,6 +79,8 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   assert.match(html, /atk-line/);
   assert.match(html, /linePay/);
   assert.match(html, /Formation lines/);
+  assert.match(html, /Across · Energy/);
+  assert.match(html, /Down · Attack/);
   assert.match(html, /flagship is a <b>d6<\/b>/);
   assert.match(html, /Centre lines only work with/);
   assert.match(html, /idx:\[3,4,5\]/);

@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.08 — formation line chart in How to play (prototype)
+
+How to play now has a chart for three-of-a-kind lines, the same shape as the
+straight table: d4 / d6 / d8 / d10, Across = Energy, Down = Attack. Prize is
+the die size. The face number does not change it.
+
 ### Fleet Dice 2 · 2.07 — flagship counts in formation lines (prototype)
 
 The flagship is a **d6**, so it counts. The centre row and centre column can now

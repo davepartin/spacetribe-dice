@@ -595,6 +595,8 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 .stab td:first-child,.stab th:first-child{text-align:left;padding-left:11px;color:var(--faint)}
 .stab tr+tr{border-top:1px solid #1a2440}
 .stab td:not(:first-child){color:var(--red);font-weight:700;font-variant-numeric:tabular-nums}
+.stab td.pay-nrg{color:var(--nrg)}
+.stab td.pay-atk{color:var(--red)}
 .stab td.na{color:#33405e;font-weight:600}
 .hint{font-size:13px;color:var(--faint);margin:0 2px 14px}
 /* The symbol key. Each glyph is the real path from the dice, so the two can
@@ -732,7 +734,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.07";   // flagship counts as a d6 in formation lines
+var VERSION = "2.08";   // formation line chart in How to play
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2100,6 +2102,17 @@ function straightTableHtml(){
     sizes.map(function(s){ return '<th>d' + s + '</th>'; }).join("") + '</tr>' + rows +
     '</table>';
 }
+function lineTableHtml(){
+  var sizes = [4,6,8,10], nrg = '<tr><td>Across · Energy</td>', atk = '<tr><td>Down · Attack</td>', i, p;
+  for (i = 0; i < sizes.length; i++){
+    p = linePrize(sizes[i]);
+    nrg += '<td class="pay-nrg">' + p + '\u26a1</td>';
+    atk += '<td class="pay-atk">' + p + '</td>';
+  }
+  return '<table class="stab"><tr><th>die size</th>' +
+    sizes.map(function(s){ return '<th>d' + s + '</th>'; }).join("") + '</tr>' +
+    nrg + '</tr>' + atk + '</tr></table>';
+}
 
 // What this roll is currently worth. It belongs at the top, under the health,
 // because it is the answer to "how am I doing" - and you want that before you
@@ -2804,8 +2817,9 @@ function costsView(){
           'The flagship\'s <b>#1</b> face raises this for the rest of the match.') +
       row('A straight of ' + K("runMin"), 'Energy',
           'That tier pays Energy instead of damage — see How to play.') +
-      row('Three same-size ships across', 'd4 +' + linePrize(4) + '⚡ · d10 +' + linePrize(10) + '⚡',
-          'Same number, top or bottom row. Down the side pays Attack instead.') +
+      row('Three same-size dice in a line',
+          'd4 ' + linePrize(4) + ' · d6 ' + linePrize(6) + ' · d8 ' + linePrize(8) + ' · d10 ' + linePrize(10),
+          'Across pays Energy. Down pays Attack. The number on the face does not change the prize.') +
     '</div></div>' +
 
     '<div class="card"><div class="rep"><div class="line">' +
@@ -2877,8 +2891,9 @@ function helpView(){
 
     '<div class="card">' +
     shopHead("nrg", "Formation lines", "Same size, same number, three in a row") +
-    '<p>The flagship is a <b>d6</b> in the middle of the board, so it counts. Three dice of the <b>same size</b> showing the <b>same number</b> — including the flagship in the centre row or centre column — pay a bonus equal to that die size. Centre lines only work with <b>d6s</b>, because that is what the flagship is.</p>' +
-    '<p><b class="nrg">Across</b> pays Energy — a yellow bar on top of the cards. <b class="red">Down</b> pays Attack — a red bar on the right. The orange bar on the bottom is still a straight. You can have more than one at once. You start with three d4s across the top, so a d4 row can happen from round one.</p></div>' +
+    '<p>The flagship is a <b>d6</b> in the middle of the board, so it counts. Three dice of the <b>same size</b> showing the <b>same number</b> — including the flagship in the centre row or centre column — pay a bonus equal to that die size. The face number does not change the prize: three 2s on d4s pay the same as three 4s. Centre lines only work with <b>d6s</b>, because that is what the flagship is.</p>' +
+    '<p><b class="nrg">Across</b> pays Energy — a yellow bar on top of the cards. <b class="red">Down</b> pays Attack — a red bar on the right. The orange bar on the bottom is still a straight. You can have more than one at once. You start with three d4s across the top, so a d4 row can happen from round one.</p>' +
+    lineTableHtml() + '</div>' +
 
     '<div class="card">' +
     shopHead("red", "Taking damage", "The defender always chooses") +
