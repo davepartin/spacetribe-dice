@@ -3,11 +3,12 @@
 This is the single entry point for anyone new to the project, human or AI.
 Everything you need to be useful is either here or pointed at from here.
 
-**There are two ways to play now:**
+**There are three ways to play now:**
 
 | Track | What it is | Where |
 | --- | --- | --- |
-| **Solo (design file)** | The complete single-player game against the computer | `simple.html` (v88) — also shipped online at `/solo/` |
+| **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
+| **Solo (Fleet Dice 2)** | Same rules, new dice look — prototype | `simple-v2.html` (2.01) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -386,7 +387,8 @@ join a room without getting stuck.
 | `web/components/ReferenceSheets.tsx` | How to play + upgrade costs |
 | `web/components/HomeScreen.tsx` | Landing + code join |
 | `web/public/fleet-dice-key-art.png` | Brand key art |
-| `web/public/fleet-dice-v88.html` | Solo file shipped inside the online app |
+| `web/public/fleet-dice-v88.html` | Fleet Dice 1 solo file shipped inside the online app |
+| `web/public/fleet-dice-2.html` | Fleet Dice 2 prototype (same rules, new dice) |
 | `.github/workflows/deploy-web.yml` | Push `main` → GitHub Pages |
 
 ---
@@ -440,8 +442,9 @@ pnpm dev
 
 | File | What it is |
 | --- | --- |
-| **`simple.html`** | Solo design game. One file, no dependencies, opens by double-click. Always newest (v88). |
-| **`simple01.html` … `simple87.html`** | Frozen solo snapshots. Never edited again. |
+| **`simple.html`** | Fleet Dice 1. One file, no dependencies. Always newest (v88). Do not use this file for Version 2 experiments. |
+| **`simple-v2.html`** | Fleet Dice 2 prototype. Same rules; new dice look. Bump 2.xx here. |
+| **`simple01.html` … `simple87.html`** | Frozen Fleet Dice 1 snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
 | **`HANDOFF.md`** | This file. The entry point. |

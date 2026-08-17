@@ -6,7 +6,13 @@ import { useState } from "react";
 import { Brand } from "@/components/Brand";
 import { withBasePath } from "@/lib/paths";
 
-export function SoloGame() {
+export function SoloGame({
+  gameSrc = "/fleet-dice-v88.html",
+  title = "Fleet Dice solo game",
+}: {
+  gameSrc?: string;
+  title?: string;
+}) {
   const router = useRouter();
   const [confirmQuit, setConfirmQuit] = useState(false);
 
@@ -30,8 +36,8 @@ export function SoloGame() {
 
       <iframe
         className="solo-game"
-        src={withBasePath("/fleet-dice-v88.html")}
-        title="Fleet Dice solo game"
+        src={withBasePath(gameSrc)}
+        title={title}
         allow="fullscreen"
       />
 

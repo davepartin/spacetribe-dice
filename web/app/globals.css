@@ -3560,6 +3560,16 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   border-color: #ff8798;
 }
 
+.home-mode-v2 {
+  grid-column: 1 / -1;
+  min-height: 88px;
+  color: #f5f8ff;
+  background:
+    radial-gradient(circle at 0 0, #ffe81f22, transparent 46%),
+    linear-gradient(145deg, #1d2e24, #121c18);
+  border-color: #4a7a58;
+}
+
 .home-mode-topline {
   display: flex;
   align-items: center;

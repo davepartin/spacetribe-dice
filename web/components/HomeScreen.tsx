@@ -150,6 +150,13 @@ export function HomeScreen() {
               </span>
               <small>Create a private code and fight live.</small>
             </Link>
+            <Link className="home-mode-action home-mode-v2" href="/solo-v2/">
+              <span className="home-mode-topline">
+                <span className="home-mode-label">Fleet Dice 2</span>
+                <span aria-hidden="true">→</span>
+              </span>
+              <small>Prototype — same rules, new dice. Solo only for now.</small>
+            </Link>
           </div>
 
           <ul className="home-hero-facts" aria-label="Game details">
