@@ -472,6 +472,7 @@ function Shipyard({
             <span>{you.ships.length} / {you.slots} slots</span>
           </div>
           <FleetFormation
+            compact
             ships={you.ships}
             slots={you.slots}
             renderFlag={() => (
@@ -532,7 +533,7 @@ function Shipyard({
                       onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
                       type="button"
                     >
-                      {damaged ? "Damaged" : `Upgrade to d${next} ${cost}⚡`}
+                      {damaged ? "Damaged" : `To d${next} ${cost}⚡`}
                     </button>
                   ) : (
                     <span className="ship-act ship-act-maxed">{damaged ? "Damaged" : "Max d10"}</span>
@@ -803,12 +804,14 @@ function RollFleet({
 function FleetFormation({
   ships,
   slots,
+  compact,
   renderShip,
   renderFlag,
   renderLocked,
 }: {
   ships: { id: string }[];
   slots?: number;
+  compact?: boolean;
   renderShip: (index: number) => ReactNode;
   renderFlag: () => ReactNode;
   renderLocked?: (index: number) => ReactNode;
@@ -845,7 +848,7 @@ function FleetFormation({
       </div>,
     );
   }
-  return <div className="fleet-formation">{cells}</div>;
+  return <div className={compact ? "fleet-formation shop-grid" : "fleet-formation"}>{cells}</div>;
 }
 
 function BraceFleet({

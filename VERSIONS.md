@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.12 — compact shipyard rows (prototype)
+
+The locked and unlock slots had a tall minimum height, so rows 2 and 3 stretched
+even when they only held a word or two. All three rows are now short and even:
+smaller hulls, tighter buttons, no 118px floor on empty cells.
+
 ### Fleet Dice 2 · 2.11 — shipyard flagship matches the ship cards (prototype)
 
 The centre row was taller because the flagship card had no hull, a two-line

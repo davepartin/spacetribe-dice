@@ -682,7 +682,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 .jump-nav{display:flex;gap:8px;margin:18px 0 14px;overflow-x:auto}
 .jump-nav a,.jump-nav button{flex:0 0 auto;padding:9px 13px;color:var(--dim);border:1px solid var(--line);
   border-radius:999px;font-size:11px;font-weight:800;background:transparent;cursor:pointer}
-.upgrade-section{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:17px;background:#0c1324}
+.upgrade-section{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:17px;background:#0c1324}
 .section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:12px}
 .section-heading h2{margin:0;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)}
 .section-heading span{color:var(--faint);font-size:9px;font-weight:800;letter-spacing:.12em}
@@ -700,10 +700,18 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
   border-color:color-mix(in srgb,var(--blue) 55%,var(--line))}
 .flagship-upgrade-act{color:#fff8e8;background:color-mix(in srgb,var(--nrg) 22%,#1a1520);
   border-color:color-mix(in srgb,var(--nrg) 65%,var(--line))}
-.die.shop-ship,.die.shop-flagship{height:100%;cursor:default;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px}
-.die.shop-ship .hull,.die.shop-flagship .hull{max-height:64px}
-.die.shop-ship .ship-act,.die.shop-flagship .ship-act{width:100%;margin-top:2px}
+.shop-grid{gap:6px;margin:6px 0 0;grid-auto-rows:1fr}
+.shop-grid .die,.shop-grid .empty-slot{height:100%;min-height:0;padding:4px 4px 5px}
+.shop-grid .die.shop-ship,.shop-grid .die.shop-flagship{cursor:default;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px}
+.shop-grid .hull{max-height:40px}
+.shop-grid .die-caption{margin-top:0;font-size:8px}
+.shop-grid .ship-act{min-height:26px;margin-top:2px;padding:3px 2px;font-size:9px;line-height:1.15}
+.shop-grid .empty-slot{gap:2px}
+.shop-grid .empty-slot span,.shop-grid .empty-slot .slotno{font-size:14px}
+.shop-grid button.empty-slot.unlock-slot{height:100%;padding:6px 6px;gap:3px}
+.shop-grid .unlock-slot-label{max-width:8em;font-size:11px}
+.shop-grid .unlock-slot-cost{font-size:13px}
 .report-title{margin:0 0 16px}
 .report-title h1{margin:4px 0 0;font-size:clamp(28px,5vw,40px);letter-spacing:-.04em}
 .go-btn{width:100%;min-height:48px;padding:10px 14px;color:#fff;
@@ -738,7 +746,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 <script>
 "use strict";
 
-var VERSION = "2.11";   // shipyard flagship matches the ship cards
+var VERSION = "2.12";   // compact shipyard rows
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2685,11 +2693,11 @@ function fleetGridHtml(){
       (next
         ? '<button class="ship-act ship-upgrade-act" data-grow="' + ix + '"' +
           (hurt || G.you.energy < cost ? ' disabled' : '') + '>' +
-          (hurt ? 'Damaged' : 'Upgrade to d' + next + ' ' + cost + '⚡') + '</button>'
+          (hurt ? 'Damaged' : 'To d' + next + ' ' + cost + '⚡') + '</button>'
         : '<span class="ship-act">' + (hurt ? 'Damaged' : 'Max d10') + '</span>') +
       '</div>');
   }
-  return '<div class="grid fleet-formation">' + cells.join("") + '</div>';
+  return '<div class="grid fleet-formation shop-grid">' + cells.join("") + '</div>';
 }
 
 function slotSectionHtml(){

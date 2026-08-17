@@ -1962,8 +1962,8 @@ input:focus {
 }
 
 .upgrade-section {
-  margin-top: 14px;
-  padding: 20px;
+  margin-top: 10px;
+  padding: 12px;
   border: 1px solid var(--line);
   border-radius: 17px;
   background: #0c1324;
@@ -2226,32 +2226,78 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   opacity: 1;
 }
 
-.fleet-die.shop-ship,
-.fleet-die.shop-flag {
+.fleet-formation.shop-grid,
+.shop-grid {
+  gap: 6px;
+  margin: 6px 0 0;
+  grid-auto-rows: 1fr;
+}
+
+.shop-grid .fleet-cell .fleet-die,
+.shop-grid .fleet-cell .empty-slot {
+  min-height: 0;
+  height: 100%;
+  padding: 4px 4px 5px;
+}
+
+.shop-grid .empty-slot {
+  min-height: 0;
+  gap: 2px;
+}
+
+.shop-grid .empty-slot span {
+  font-size: 14px;
+}
+
+.shop-grid .fleet-die.shop-ship,
+.shop-grid .fleet-die.shop-flag {
   min-height: 0;
   height: 100%;
   cursor: default;
-  gap: 4px;
+  gap: 1px;
   padding-left: 4px;
   padding-right: 4px;
 }
 
-.fleet-die.shop-flagship {
+.shop-grid .fleet-die.shop-flagship {
   min-height: 0;
   border-color: color-mix(in srgb, var(--gold) 70%, var(--line));
   box-shadow: none;
   background: linear-gradient(180deg, var(--panel), #0d1425);
 }
 
-.fleet-die.shop-ship .hull,
-.fleet-die.shop-flagship .hull {
-  max-height: 64px;
+.shop-grid .fleet-die.shop-ship .hull,
+.shop-grid .fleet-die.shop-flagship .hull {
+  max-height: 40px;
 }
 
-.fleet-die.shop-ship .ship-act,
-.fleet-die.shop-flagship .ship-act {
+.shop-grid .die-caption {
+  margin-top: 0;
+  font-size: 8px;
+}
+
+.shop-grid .ship-act {
+  min-height: 26px;
   margin-top: 2px;
-  width: 100%;
+  padding: 3px 2px;
+  font-size: 9px;
+  line-height: 1.15;
+}
+
+.shop-grid button.empty-slot.unlock-slot {
+  height: 100%;
+  min-height: 0;
+  padding: 6px;
+  gap: 3px;
+}
+
+.shop-grid .unlock-slot-label {
+  max-width: 8em;
+  font-size: 11px;
+}
+
+.shop-grid .unlock-slot-cost {
+  font-size: 13px;
 }
 
 .ship-act {
