@@ -701,12 +701,9 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 .flagship-upgrade-act{color:#fff8e8;background:color-mix(in srgb,var(--nrg) 22%,#1a1520);
   border-color:color-mix(in srgb,var(--nrg) 65%,var(--line))}
 .die.shop-ship,.die.shop-flagship{height:100%;cursor:default;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-.die.shop-ship .ship-act,.die.shop-flagship .ship-act{margin-top:auto;width:100%}
-.shop-flag-label{color:var(--gold);font-size:9px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
-.shop-flag-lvl{color:var(--gold);font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.05;text-align:center}
-.shop-flag-lvl span{display:block;margin-bottom:2px;color:var(--faint);font-size:9px;font-weight:800;
-  letter-spacing:.08em;text-transform:uppercase}
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px}
+.die.shop-ship .hull,.die.shop-flagship .hull{max-height:64px}
+.die.shop-ship .ship-act,.die.shop-flagship .ship-act{width:100%;margin-top:2px}
 .report-title{margin:0 0 16px}
 .report-title h1{margin:4px 0 0;font-size:clamp(28px,5vw,40px);letter-spacing:-.04em}
 .go-btn{width:100%;min-height:48px;padding:10px 14px;color:#fff;
@@ -741,7 +738,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 <script>
 "use strict";
 
-var VERSION = "2.10";   // compact shipyard flagship card
+var VERSION = "2.11";   // shipyard flagship matches the ship cards
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2651,12 +2648,12 @@ function fleetGridHtml(){
   for (i = 0; i < 9; i++){
     if (i === 4){
       cells.push('<div class="die fleet-die flag shop-flagship static">' +
-        '<div class="shop-flag-label">Flagship</div>' +
-        '<strong class="shop-flag-lvl"><span>Level</span>' + lvl + '</strong>' +
+        die3d(flagHullSvg("", null)) +
+        '<div class="kind die-caption">Level ' + lvl + '</div>' +
         (flagCost
           ? '<button class="ship-act flagship-upgrade-act" data-flagup="1"' +
-            (G.you.energy < flagCost ? ' disabled' : '') + '>Upgrade to level ' + (lvl + 1) + ' ' + flagCost + '⚡</button>'
-          : '<span class="ship-act">Level 3 maximum</span>') +
+            (G.you.energy < flagCost ? ' disabled' : '') + '>Level ' + (lvl + 1) + ' · ' + flagCost + '⚡</button>'
+          : '<span class="ship-act">Max level</span>') +
         '</div>');
       continue;
     }

@@ -2243,9 +2243,14 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   background: linear-gradient(180deg, var(--panel), #0d1425);
 }
 
+.fleet-die.shop-ship .hull,
+.fleet-die.shop-flagship .hull {
+  max-height: 64px;
+}
+
 .fleet-die.shop-ship .ship-act,
 .fleet-die.shop-flagship .ship-act {
-  margin-top: auto;
+  margin-top: 2px;
   width: 100%;
 }
 
@@ -2293,33 +2298,6 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   background: transparent;
   border-style: dashed;
   cursor: default;
-}
-
-.shop-flag-label {
-  color: var(--gold);
-  font-size: 9px;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.shop-flag-lvl {
-  color: var(--gold);
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  text-align: center;
-}
-
-.shop-flag-lvl span {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--faint);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .slot-badge {
