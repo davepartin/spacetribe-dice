@@ -328,6 +328,7 @@ function handleShop(
   if (!ship) throw new Error("That ship is no longer in your fleet.");
 
   if (action.operation === "scrap") {
+    if (player.ships.length <= 1) throw new Error("You need at least one ship.");
     player.energy += Math.floor(priceOf(ship.sides) / 2);
     player.ships = player.ships.filter((candidate) => candidate.id !== ship.id);
     return;

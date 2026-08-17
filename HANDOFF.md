@@ -8,7 +8,7 @@ Everything you need to be useful is either here or pointed at from here.
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.13) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.14) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -367,7 +367,7 @@ join a room without getting stuck.
 | Dock: How to play left, Cancel right as real buttons | Done; Cancel asks "Are you sure?" |
 | Solo quit / back home | Done in v87 — online top bar + in-board Quit + result Back home |
 | Versus brace endgame | Inescapable volleys auto-finish for both players; brace button warns when damage exceeds current HP |
-| Scrap in shipyard | **Removed from versus UI** (solo still has scrap) |
+| Scrap in shipyard | Done — sell button with an “Are you sure you want to sell?” confirm |
 | Upgrade labels readable on 3×3 cells | Done (stacked label + cost) |
 | Guided first-match tips | Removed — How to play carries the teaching |
 
