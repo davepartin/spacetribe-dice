@@ -732,7 +732,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.06";   // formation lines: same-size 3 across = Energy, 3 down = Attack
+var VERSION = "2.07";   // flagship counts as a d6 in formation lines
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -799,7 +799,7 @@ var C = {
   runMult:      { v:1,  min:0,  max:3,  label:"Straight bonus multiplier", step:0.25,
                   note:"Scales the whole straight table." },
   linePay:      { v:1,  min:0,  max:3,  label:"Formation line multiplier", step:0.25,
-                  note:"Three same-size ships showing the same number. Across pays Energy, down pays Attack. The prize is the die size times this." },
+                  note:"Three same-size dice showing the same number. The flagship counts as a d6. Across pays Energy, down pays Attack. Prize is the die size times this." },
   priceD4:      { v:4,  min:1,  max:20, label:"Price of a d4" },
   priceD6:      { v:6,  min:1,  max:20, label:"Price of a d6" },
   priceD8:      { v:9,  min:1,  max:30, label:"Price of a d8" },
@@ -1080,7 +1080,7 @@ function tally(dice, flagFace, mul, pick, slots){
     t.energy += r.reward.energy || 0;
     t.shipPrize = r.reward.ship || 0;
   }
-  t.lines = findLines(slots);
+  t.lines = findLines(slots, flagDieFrom(dice));
   for (i = 0; i < t.lines.length; i++){
     t.attack += t.lines[i].attack;
     t.energy += t.lines[i].energy;
@@ -1089,23 +1089,33 @@ function tally(dice, flagFace, mul, pick, slots){
   return t;
 }
 
-// Four possible 3-ship lines around the flagship. The flagship sits in the
-// middle, so the centre row and centre column never count — it is not a d4/d6/
-// d8/d10. Same hull size, same face. Across pays Energy, down pays Attack.
-// The prize is the die size (Tune: linePay). Measured: a d4 row you hunt for
-// three rolls hits ~28% of rounds; while you still hunt straights it falls in
-// your lap ~3%. Paying the die size keeps expected value similar across sizes
-// IF you hunt the line. Do not fatten d4 or Width farms this from round 1.
+// Six possible 3-dice lines on the 3×3. The flagship sits in the middle and
+// counts as a d6, so the centre row and centre column only pay when the ships
+// beside it are also d6s showing the same number. Across pays Energy, down pays
+// Attack. Prize is the die size (Tune: linePay). Indices are board cells 0–8
+// with 4 = flagship, not fleet-slot numbers.
 var FLEET_LINES = [
   { kind:"row", idx:[0,1,2] },
-  { kind:"row", idx:[5,6,7] },
-  { kind:"col", idx:[0,3,5] },
-  { kind:"col", idx:[2,4,7] }
+  { kind:"row", idx:[3,4,5] },
+  { kind:"row", idx:[6,7,8] },
+  { kind:"col", idx:[0,3,6] },
+  { kind:"col", idx:[1,4,7] },
+  { kind:"col", idx:[2,5,8] }
 ];
 function linePrize(sides){
   return Math.round(sides * K("linePay"));
 }
-function findLines(slots){
+function flagDieFrom(dice){
+  dice = dice || [];
+  for (var i = 0; i < dice.length; i++) if (dice[i] && dice[i].flag) return dice[i];
+  return null;
+}
+function boardCell(slots, flagDie, cell){
+  if (cell === 4) return flagDie;
+  var ix = cell < 4 ? cell : cell - 1;
+  return slots[ix];
+}
+function findLines(slots, flagDie){
   slots = slots || [];
   var hits = [], L, j, d, sides, value, ok, pay;
   for (var i = 0; i < FLEET_LINES.length; i++){
@@ -1114,8 +1124,8 @@ function findLines(slots){
     sides = 0;
     value = 0;
     for (j = 0; j < 3; j++){
-      d = slots[L.idx[j]];
-      if (!d || d.dead || d.flag || !d.value){ ok = false; break; }
+      d = boardCell(slots, flagDie, L.idx[j]);
+      if (!d || d.dead || !d.value){ ok = false; break; }
       if (!sides){ sides = d.sides; value = d.value; }
       else if (d.sides !== sides || d.value !== value){ ok = false; break; }
     }
@@ -1171,6 +1181,8 @@ var ROLL_BUMP_MS = 980;
 var hullGradSeq = 0;
 var pending = null;          // the round, resolved but waiting on your brace choice
 var flagInLine = false;      // is the flagship's number part of your straight?
+var flagInline = false;      // flagship is in an across (Energy) formation
+var flagIncol = false;       // flagship is in a down (Attack) formation
 var lastTally = null;        // what the current roll is worth, for the bottom bar
 var pageCheckpoint = null;   // lets a player reset only the choices on this page
 // The flagship is a d6 with a number on it, and it does BOTH: its boost fires AND
@@ -1194,6 +1206,8 @@ function newGame(){
   pageCheckpoint = null;
   animate = {};
   flagInLine = false;
+  flagInline = false;
+  flagIncol = false;
   lastTally = null;
   G = {
     round: 1,
@@ -2045,6 +2059,8 @@ function flagHtml(){
   return '<div class="die fleet-die flag' + (sel.flag ? ' sel selected' : '') +
     (flagInLine ? ' inrun' : '') + spin + '" data-flag="1">' +
     (sel.flag ? '<span class="reroll-mark">REROLL</span>' : '') +
+    (flagInline ? '<i class="nrg-line" aria-hidden="true"></i>' : '') +
+    (flagIncol ? '<i class="atk-line" aria-hidden="true"></i>' : '') +
     die3d(flagHullSvg(n, id), animate.flag ? 30 : 0) +
     '<div class="fcap die-caption flag-caption" style="color:' + flagTint(id).fill + '">' +
       (p.shortF ? p.shortF(flagMul(G.you)) : (p.short || p.name)) + '</div>' +
@@ -2199,6 +2215,8 @@ function flagTokenHtml(t){
 function rollView(){
   if (G.you.rolls === 0){
     flagInLine = false;
+    flagInline = false;
+    flagIncol = false;
     lastTally = null;
     return '<p class="say">Every available ship and your flagship will roll. Use the button under the fleet.</p>' +
       gridHtml() +
@@ -2209,6 +2227,8 @@ function rollView(){
   lastTally = t;
   var fn = flagNumber(G.you);
   flagInLine = !!(t.run && fn >= t.run.start && fn <= t.run.top);
+  flagInline = false;
+  flagIncol = false;
   for (var si = 0; si < G.you.values.length; si++){
     G.you.values[si].inrun = false;
     G.you.values[si].inline = false;
@@ -2225,7 +2245,13 @@ function rollView(){
     }
   }
   (t.lines || []).forEach(function(L){
-    L.idx.forEach(function(ix){
+    L.idx.forEach(function(cell){
+      if (cell === 4){
+        if (L.kind === "row") flagInline = true;
+        else flagIncol = true;
+        return;
+      }
+      var ix = cell < 4 ? cell : cell - 1;
       if (G.you.values[ix]){
         if (L.kind === "row") G.you.values[ix].inline = true;
         else G.you.values[ix].incol = true;
@@ -2829,8 +2855,8 @@ function helpView(){
 
     '<div class="card">' +
     shopHead("gold", "Your flagship", "Six faces, one per number") +
-    '<p>It rolls like any other die, but it never fights. Its number joins your ' +
-    'straight, and whichever face it lands on <b>adds a bonus to the matching ships</b> — ' +
+    '<p>It rolls like any other die, but it never fights. It is a <b>d6</b>: its number joins your ' +
+    'straight and can complete a formation line through the middle of the board, and whichever face it lands on <b>adds a bonus to the matching ships</b> — ' +
     '2, 3 and 4 match that exact number; 5 boosts every odd shield and 6 boosts every even ' +
     'attack. ' +
     'Those dice get a thin ring in the flagship\'s colour so you can see it happening. ' +
@@ -2851,14 +2877,8 @@ function helpView(){
 
     '<div class="card">' +
     shopHead("nrg", "Formation lines", "Same size, same number, three in a row") +
-    '<p>The flagship sits in the middle, so only the <b>top row, bottom row, left ' +
-    'column, and right column</b> can line up. Three ships of the <b>same size</b> ' +
-    'showing the <b>same number</b> pay a bonus equal to that die size.</p>' +
-    '<p><b class="nrg">Across</b> (top or bottom) pays Energy — a yellow bar on top of ' +
-    'the cards. <b class="red">Down</b> (left or right) pays Attack — a red bar on the ' +
-    'right. The orange bar on the bottom is still a straight. You can have more than ' +
-    'one at once. You start with three d4s across the top, so a d4 row can happen from ' +
-    'round one; a column needs more ships.</p></div>' +
+    '<p>The flagship is a <b>d6</b> in the middle of the board, so it counts. Three dice of the <b>same size</b> showing the <b>same number</b> — including the flagship in the centre row or centre column — pay a bonus equal to that die size. Centre lines only work with <b>d6s</b>, because that is what the flagship is.</p>' +
+    '<p><b class="nrg">Across</b> pays Energy — a yellow bar on top of the cards. <b class="red">Down</b> pays Attack — a red bar on the right. The orange bar on the bottom is still a straight. You can have more than one at once. You start with three d4s across the top, so a d4 row can happen from round one.</p></div>' +
 
     '<div class="card">' +
     shopHead("red", "Taking damage", "The defender always chooses") +

@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.07 — flagship counts in formation lines (prototype)
+
+The flagship is a **d6**, so it counts. The centre row and centre column can now
+pay when the ships beside it are also d6s showing the same number. Edge lines
+are unchanged.
+
 ### Fleet Dice 2 · 2.06 — formation lines (prototype)
 
 Three ships of the **same size** showing the **same number**:
