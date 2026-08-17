@@ -2300,6 +2300,45 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   font-size: 13px;
 }
 
+.fleet-formation.brace-grid,
+.brace-grid {
+  gap: 6px;
+  grid-auto-rows: 1fr;
+}
+
+.brace-grid .fleet-cell .fleet-die,
+.brace-grid .fleet-cell .empty-slot {
+  min-height: 0;
+  height: 100%;
+  padding: 4px 4px 5px;
+}
+
+.brace-grid .empty-slot {
+  min-height: 0;
+  gap: 2px;
+}
+
+.brace-grid .empty-slot span {
+  font-size: 14px;
+}
+
+.brace-grid .hull {
+  max-height: 48px;
+}
+
+.brace-grid .die-caption {
+  margin-top: 1px;
+  font-size: 8px;
+}
+
+.brace-grid .fleet-die.brace-flagship {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
 .ship-act {
   display: flex;
   align-items: center;
@@ -2373,8 +2412,8 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
 .fleet-die.static.brace-flag,
 .fleet-die.brace-flagship {
-  min-height: 148px;
-  padding: 8px 6px 7px;
+  min-height: 0;
+  padding: 6px 4px;
   box-shadow: none;
   border-color: color-mix(in srgb, var(--repair) 40%, var(--line));
   background: color-mix(in srgb, var(--repair) 8%, #121c30);
@@ -2421,16 +2460,16 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
 .brace-flag-hp {
   color: var(--repair);
-  font-size: 34px;
+  font-size: 22px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .brace-flag-risk {
   color: var(--repair);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 850;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 

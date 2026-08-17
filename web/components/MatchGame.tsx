@@ -805,6 +805,7 @@ function FleetFormation({
   ships,
   slots,
   compact,
+  className,
   renderShip,
   renderFlag,
   renderLocked,
@@ -812,6 +813,7 @@ function FleetFormation({
   ships: { id: string }[];
   slots?: number;
   compact?: boolean;
+  className?: string;
   renderShip: (index: number) => ReactNode;
   renderFlag: () => ReactNode;
   renderLocked?: (index: number) => ReactNode;
@@ -848,7 +850,7 @@ function FleetFormation({
       </div>,
     );
   }
-  return <div className={compact ? "fleet-formation shop-grid" : "fleet-formation"}>{cells}</div>;
+  return <div className={["fleet-formation", compact ? "shop-grid" : "", className || ""].filter(Boolean).join(" ")}>{cells}</div>;
 }
 
 function BraceFleet({
@@ -964,6 +966,7 @@ function BraceFleet({
         </div>
 
         <FleetFormation
+          className="brace-grid"
           ships={you.ships}
           slots={you.slots}
           renderFlag={() => (
@@ -972,7 +975,7 @@ function BraceFleet({
                 lethalChoice || overHealth ? "brace-flag-lethal" : ""
               }`}
             >
-              <div className="brace-flag-label">Flagship Health</div>
+              <div className="brace-flag-label">Flagship</div>
               <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
               <span className="brace-flag-risk">
                 {flagshipDamage <= 0

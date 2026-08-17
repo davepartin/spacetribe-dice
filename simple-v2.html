@@ -675,10 +675,15 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
   letter-spacing:-.04em;line-height:1.05;text-transform:none}
 .brace-lead{margin:0;max-width:34em;color:var(--dim);font-size:15px;line-height:1.45}
 .brace-flag-label{color:var(--faint);font-size:9px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
-.brace-flag-hp{color:var(--hp);font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
-.brace-flag-risk{color:var(--hp);font-size:10px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
-.die.brace-flagship{min-height:148px;border-color:color-mix(in srgb,var(--hp) 40%,var(--line));
+.brace-flag-hp{color:var(--hp);font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.brace-flag-risk{color:var(--hp);font-size:9px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
+.die.brace-flagship{min-height:0;border-color:color-mix(in srgb,var(--hp) 40%,var(--line));
   background:color-mix(in srgb,var(--hp) 8%,#121c30)}
+.brace-grid{gap:6px;grid-auto-rows:1fr}
+.brace-grid .die,.brace-grid .empty-slot{height:100%;min-height:0;padding:4px 4px 5px}
+.brace-grid .hull{max-height:48px}
+.brace-grid .die-caption{margin-top:1px;font-size:8px}
+.brace-grid .die.brace-flagship{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .jump-nav{display:flex;gap:8px;margin:18px 0 14px;overflow-x:auto}
 .jump-nav a,.jump-nav button{flex:0 0 auto;padding:9px 13px;color:var(--dim);border:1px solid var(--line);
   border-radius:999px;font-size:11px;font-weight:800;background:transparent;cursor:pointer}
@@ -746,7 +751,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 <script>
 "use strict";
 
-var VERSION = "2.12";   // compact shipyard rows
+var VERSION = "2.13";   // compact taking-damage flagship grid
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2319,7 +2324,7 @@ function braceView(){
   var cells = [], fleet = G.you.dice, i, ix, d, hurt, pick;
   for (i = 0; i < 9; i++){
     if (i === 4){
-      cells.push('<div class="die fleet-die flag brace-flagship static"><div class="brace-flag-label">Flagship Health</div>' +
+      cells.push('<div class="die fleet-die flag brace-flagship static"><div class="brace-flag-label">Flagship</div>' +
         '<strong class="brace-flag-hp">' + Math.max(0, G.you.hp) + '</strong>' +
         '<span class="brace-flag-risk">' + (total > 0 ? 'Takes ' + total : 'Safe') + '</span></div>');
       continue;
@@ -2337,7 +2342,7 @@ function braceView(){
       '<div class="kind die-caption">' + (hurt ? "Damaged" : picked ? "Blocking " + soakOf(d.s) : pick ? "Tap — Block " + soakOf(d.s)
         : "d" + d.s) + '</div></div>');
   }
-  h += '<div class="grid fleet-formation">' + cells.join("") + '</div>';
+  h += '<div class="grid fleet-formation brace-grid">' + cells.join("") + '</div>';
   return h;
 }
 

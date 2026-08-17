@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.13 — compact taking-damage flagship (prototype)
+
+The taking-damage screen used a giant health number and a 148px minimum on the
+flagship card, so the middle row stretched and empty slots followed. The
+flagship now sits at the same height as the ships: health, then what it takes.
+
 ### Fleet Dice 2 · 2.12 — compact shipyard rows (prototype)
 
 The locked and unlock slots had a tall minimum height, so rows 2 and 3 stretched
