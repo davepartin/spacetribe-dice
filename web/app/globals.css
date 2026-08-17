@@ -2144,6 +2144,7 @@ input:focus {
 .fleet-cell .fleet-die,
 .fleet-cell .empty-slot {
   width: 100%;
+  height: 100%;
 }
 
 .empty-slot {
@@ -2182,9 +2183,10 @@ input:focus {
 }
 
 button.empty-slot.unlock-slot {
-  gap: 8px;
-  min-height: 148px;
-  padding: 18px 10px 14px;
+  gap: 6px;
+  min-height: 0;
+  height: 100%;
+  padding: 12px 8px;
   color: var(--ink);
   background: color-mix(in srgb, var(--energy) 12%, #0c1324);
   border: 1px dashed color-mix(in srgb, var(--energy) 55%, var(--line));
@@ -2217,7 +2219,7 @@ button.empty-slot.unlock-slot .unlock-slot-label {
 
 button.empty-slot.unlock-slot .unlock-slot-cost {
   color: var(--energy);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 900;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -2226,7 +2228,8 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 
 .fleet-die.shop-ship,
 .fleet-die.shop-flag {
-  min-height: 148px;
+  min-height: 0;
+  height: 100%;
   cursor: default;
   gap: 4px;
   padding-left: 4px;
@@ -2234,10 +2237,16 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 }
 
 .fleet-die.shop-flagship {
-  min-height: 168px;
-  border-color: color-mix(in srgb, var(--energy) 45%, var(--line));
+  min-height: 0;
+  border-color: color-mix(in srgb, var(--gold) 70%, var(--line));
   box-shadow: none;
-  background: color-mix(in srgb, var(--energy) 8%, #121c30);
+  background: linear-gradient(180deg, var(--panel), #0d1425);
+}
+
+.fleet-die.shop-ship .ship-act,
+.fleet-die.shop-flagship .ship-act {
+  margin-top: auto;
+  width: 100%;
 }
 
 .ship-act {
@@ -2286,8 +2295,27 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
   cursor: default;
 }
 
-.shop-flag-level {
-  color: var(--energy);
+.shop-flag-label {
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shop-flag-lvl {
+  color: var(--gold);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.shop-flag-lvl span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--faint);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -2329,7 +2357,13 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 }
 
 .brace-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
   margin: 0 2px 14px;
+  padding: 0;
 }
 
 .brace-title {

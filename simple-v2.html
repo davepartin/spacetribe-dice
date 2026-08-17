@@ -644,11 +644,11 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 .empty-slot small{color:var(--faint);font-size:8px;font-weight:800;letter-spacing:.08em;
   text-transform:uppercase;opacity:.7}
 .empty-slot.locked-slot{opacity:.4}
-button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;color:var(--ink);
+button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;color:var(--ink);
   background:color-mix(in srgb,var(--nrg) 12%,#0c1324);
   border:1px dashed color-mix(in srgb,var(--nrg) 55%,var(--line));opacity:1;cursor:pointer}
 .unlock-slot-label{max-width:9em;font-size:12px;font-weight:850;text-align:center;text-transform:none;opacity:1}
-.unlock-slot-cost{color:var(--nrg);font-size:18px;font-weight:900}
+.unlock-slot-cost{color:var(--nrg);font-size:16px;font-weight:900}
 .straight-panel{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:8px 10px;border:1px solid var(--gold);border-radius:12px;background:#211d08;margin-bottom:8px}
 .straight-panel h2{margin:2px 0 0;font-size:14px;text-transform:none;letter-spacing:-.02em;color:var(--ink)}
@@ -669,7 +669,8 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 .flag-token button{min-width:40px;min-height:32px;padding:0;color:var(--gold);background:transparent;
   border:1px solid #6c5c1c;border-radius:8px;cursor:pointer;font-weight:900}
 .flag-token.spent{opacity:.55}
-.brace-header{margin:0 2px 14px}
+.brace-header{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  gap:0;margin:0 2px 14px;padding:0}
 .brace-title{margin:4px 0 8px;color:var(--ink);font-size:clamp(28px,6.5vw,40px);font-weight:900;
   letter-spacing:-.04em;line-height:1.05;text-transform:none}
 .brace-lead{margin:0;max-width:34em;color:var(--dim);font-size:15px;line-height:1.45}
@@ -699,7 +700,13 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
   border-color:color-mix(in srgb,var(--blue) 55%,var(--line))}
 .flagship-upgrade-act{color:#fff8e8;background:color-mix(in srgb,var(--nrg) 22%,#1a1520);
   border-color:color-mix(in srgb,var(--nrg) 65%,var(--line))}
-.shop-flag-level{color:var(--nrg);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.die.shop-ship,.die.shop-flagship{height:100%;cursor:default;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.die.shop-ship .ship-act,.die.shop-flagship .ship-act{margin-top:auto;width:100%}
+.shop-flag-label{color:var(--gold);font-size:9px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.shop-flag-lvl{color:var(--gold);font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.05;text-align:center}
+.shop-flag-lvl span{display:block;margin-bottom:2px;color:var(--faint);font-size:9px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase}
 .report-title{margin:0 0 16px}
 .report-title h1{margin:4px 0 0;font-size:clamp(28px,5vw,40px);letter-spacing:-.04em}
 .go-btn{width:100%;min-height:48px;padding:10px 14px;color:#fff;
@@ -734,7 +741,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.09";   // bigger ships pay more for a formation line
+var VERSION = "2.10";   // compact shipyard flagship card
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2643,9 +2650,9 @@ function fleetGridHtml(){
   var lvl = G.you.flag.lvl || 1, flagCost = lvl >= 3 ? null : flagLvlCost(lvl + 1);
   for (i = 0; i < 9; i++){
     if (i === 4){
-      cells.push('<div class="die fleet-die flag shop-flagship static"><div class="brace-flag-label">Flagship</div>' +
-        '<strong class="brace-flag-hp">' + Math.max(0, G.you.hp) + '</strong>' +
-        '<span class="shop-flag-level">level ' + lvl + '</span>' +
+      cells.push('<div class="die fleet-die flag shop-flagship static">' +
+        '<div class="shop-flag-label">Flagship</div>' +
+        '<strong class="shop-flag-lvl"><span>Level</span>' + lvl + '</strong>' +
         (flagCost
           ? '<button class="ship-act flagship-upgrade-act" data-flagup="1"' +
             (G.you.energy < flagCost ? ' disabled' : '') + '>Upgrade to level ' + (lvl + 1) + ' ' + flagCost + '⚡</button>'

@@ -476,9 +476,8 @@ function Shipyard({
             slots={you.slots}
             renderFlag={() => (
               <div className="fleet-die shop-flag shop-flagship static">
-                <div className="brace-flag-label">Flagship</div>
-                <strong className="brace-flag-hp">{Math.max(0, you.hp)}</strong>
-                <span className="shop-flag-level">level {you.flag.level}</span>
+                <div className="shop-flag-label">Flagship</div>
+                <strong className="shop-flag-lvl"><span>Level</span>{you.flag.level}</strong>
                 {flagCost ? (
                   <button
                     className="ship-act flagship-upgrade-act"

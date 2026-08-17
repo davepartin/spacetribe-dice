@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.10 — compact shipyard flagship (prototype)
+
+The middle shipyard cell was showing flagship **health** as a giant green number,
+so it read like level 63 and stretched the whole row. It now shows **Level** at
+the same height as the ships around it. Health stays on the board at the top.
+
 ### Fleet Dice 2 · 2.09 — bigger ships pay more for a formation line (prototype)
 
 Three d10s matching is about six times rarer than three d4s, but paying the die
