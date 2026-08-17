@@ -651,12 +651,13 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 .straight-options button.on,.straight-options button.active{color:#201900;background:var(--gold)}
 .straight-options b,.straight-options span{display:block;font-size:10px}
 .straight-options span{margin-top:3px;font-size:8px}
-.straight-reminder{margin:4px 0 8px;color:var(--faint);font-size:11px;text-align:center}
-.flag-token{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:6px 10px;
-  border:1px solid #5b4d15;border-radius:10px;background:#1b190b;min-height:40px}
+.flag-token{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:6px 10px;
+  border:1px solid #5b4d15;border-radius:10px;background:#1b190b}
+.flag-token-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .flag-token span{color:var(--gold);font-size:8px;font-weight:850;letter-spacing:.08em;
   text-transform:uppercase;white-space:nowrap}
-.flag-token strong{margin:0;flex:1;font-size:11px;font-weight:700;color:var(--ink);line-height:1.2}
+.flag-token strong{margin:0;font-size:12px;font-weight:700;color:var(--ink);line-height:1.15}
+.flag-token-hint{margin:0;font-style:normal;color:var(--faint);font-size:10px;font-weight:600}
 .flag-token-btns{display:flex;flex-direction:row;gap:6px;flex:none}
 .flag-token button{min-width:40px;min-height:32px;padding:0;color:var(--gold);background:transparent;
   border:1px solid #6c5c1c;border-radius:8px;cursor:pointer;font-weight:900}
@@ -726,7 +727,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.04";   // one REROLL mark on selected dice
+var VERSION = "2.05";   // token above totals; tiny straight hint in the token
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2097,11 +2098,7 @@ function straightTiers(length){
 }
 
 function straightBannerHtml(t){
-  if (!t.run){
-    return G.you.rolls > 0
-      ? '<p class="straight-reminder">No straight yet · five numbers in a row earns a reward.</p>'
-      : "";
-  }
+  if (!t.run) return "";
   var r = t.run, tiers = straightTiers(r.length), taken = r.taken || r.length;
   var h = '<section class="straight-panel"><div>' +
     '<p class="eyebrow">STRAIGHT FOUND · ' + r.start + '\u2013' + r.top + '</p>' +
@@ -2125,12 +2122,18 @@ function guideHtml(){
   return "";
 }
 
-function flagTokenHtml(){
+function flagTokenHtml(t){
   if (G.you.rolls < 1) return "";
+  var hint = (t && t.run)
+    ? ""
+    : '<em class="flag-token-hint">Straights earn a bonus</em>';
+  var copy = '<div class="flag-token-copy"><span>Token</span>' +
+    '<strong>' + (G.you.flag.token ? 'Turn flagship' : 'Spent') + '</strong>' +
+    hint + '</div>';
   if (!G.you.flag.token){
-    return '<section class="flag-token spent"><span>Token</span><strong>Spent</strong></section>';
+    return '<section class="flag-token spent">' + copy + '</section>';
   }
-  return '<section class="flag-token"><span>Token</span><strong>Turn flagship</strong>' +
+  return '<section class="flag-token">' + copy +
     '<div class="flag-token-btns"><button data-flagturn="-1">−1</button>' +
     '<button data-flagturn="1">+1</button></div></section>';
 }
@@ -2155,16 +2158,10 @@ function rollView(){
       if (ix >= 0) live[ix].inrun = true;
     }
   }
-  var rollsLeft = Math.max(0, K("rollsPerRound") - G.you.rolls);
-
-  return '<p class="say">' + (rollsLeft
-      ? 'Tap dice to reroll. Fire at the top locks this round.'
-      : 'Free rolls are done. Fire at the top, or spend Energy below.') +
-    '</p>' +
-    totalsHtml(t) +
+  return flagTokenHtml(t) +
     straightBannerHtml(t) +
+    totalsHtml(t) +
     gridHtml() +
-    flagTokenHtml() +
     '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
 }
 
