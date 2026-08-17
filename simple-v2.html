@@ -93,13 +93,13 @@ h1{margin:0;font-size:21px;letter-spacing:.18em;text-transform:uppercase;font-we
 .roll-under:active{transform:scale(.98)}
 
 h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 2px 9px;font-weight:700}
-.say{font-size:15px;color:var(--dim);margin:0 2px 12px}
+.say{font-size:14px;color:var(--dim);margin:0 2px 8px}
 .say b{color:var(--ink)}
 .say .red{color:var(--red);font-weight:700}
 .say .blue{color:var(--blue);font-weight:700}
 .say .nrg{color:var(--nrg);font-weight:700}
 
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:19px 0 14px;
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 8px;
   perspective:820px}
 .grid .die{width:auto}
 .slot,.empty-slot{position:relative;display:flex;flex-direction:column;align-items:center;
@@ -301,6 +301,8 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .lr.end b{font-size:18px}
 .rep .hp{color:var(--hp)} .rep .dir{color:var(--direct)}
 .tot{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:9px}
+.tot.live-tot{position:sticky;top:0;z-index:8;margin:0 0 8px;padding:8px 6px;
+  background:#10182bf5;border:1px solid var(--line);border-radius:12px}
 .tot.three{grid-template-columns:repeat(3,1fr)}
 .tot > div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center}
 .tot .n{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
@@ -619,7 +621,7 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 
 /* Versus layout chrome — Fleet Dice 2 solo should read like a match. */
 .eyebrow{margin:0;color:var(--gold);font-size:10px;font-weight:850;letter-spacing:.12em}
-.stage{padding:clamp(20px,4vw,32px);border:1px solid var(--line);border-radius:23px;background:#10182be8}
+.stage{padding:12px 12px 16px;border:1px solid var(--line);border-radius:23px;background:#10182be8}
 .stage-docked{margin-bottom:0}
 .header-pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .header-ref-btn{min-height:32px;padding:0 11px;color:var(--dim);background:#10182a99;
@@ -640,21 +642,23 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
   border:1px dashed color-mix(in srgb,var(--nrg) 55%,var(--line));opacity:1;cursor:pointer}
 .unlock-slot-label{max-width:9em;font-size:12px;font-weight:850;text-align:center;text-transform:none;opacity:1}
 .unlock-slot-cost{color:var(--nrg);font-size:18px;font-weight:900}
-.straight-panel{display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:15px;border:1px solid var(--gold);border-radius:14px;background:#211d08;margin-bottom:10px}
-.straight-panel h2{margin:4px 0 0;font-size:17px;text-transform:none;letter-spacing:-.02em;color:var(--ink)}
+.straight-panel{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 10px;border:1px solid var(--gold);border-radius:12px;background:#211d08;margin-bottom:8px}
+.straight-panel h2{margin:2px 0 0;font-size:14px;text-transform:none;letter-spacing:-.02em;color:var(--ink)}
 .straight-options{display:flex;gap:7px;overflow-x:auto}
-.straight-options button{flex:0 0 auto;min-width:108px;min-height:54px;padding:7px 10px;
+.straight-options button{flex:0 0 auto;min-width:96px;min-height:44px;padding:6px 8px;
   color:var(--dim);background:#111725;border:1px solid #5b4d15;border-radius:9px}
 .straight-options button.on,.straight-options button.active{color:#201900;background:var(--gold)}
 .straight-options b,.straight-options span{display:block;font-size:10px}
 .straight-options span{margin-top:3px;font-size:8px}
-.straight-reminder{margin:10px 0;color:var(--faint);font-size:12px;text-align:center}
-.flag-token{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:13px;
-  padding:13px 15px;border:1px solid #5b4d15;border-radius:13px;background:#1b190b}
-.flag-token span{display:block;color:var(--gold);font-size:8px;font-weight:850;letter-spacing:.12em}
-.flag-token strong{display:block;margin-top:3px;font-size:12px;color:var(--ink)}
-.flag-token button{min-width:50px;min-height:39px;color:var(--gold);background:transparent;
+.straight-reminder{margin:4px 0 8px;color:var(--faint);font-size:11px;text-align:center}
+.flag-token{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:6px 10px;
+  border:1px solid #5b4d15;border-radius:10px;background:#1b190b;min-height:40px}
+.flag-token span{color:var(--gold);font-size:8px;font-weight:850;letter-spacing:.08em;
+  text-transform:uppercase;white-space:nowrap}
+.flag-token strong{margin:0;flex:1;font-size:11px;font-weight:700;color:var(--ink);line-height:1.2}
+.flag-token-btns{display:flex;flex-direction:row;gap:6px;flex:none}
+.flag-token button{min-width:40px;min-height:32px;padding:0;color:var(--gold);background:transparent;
   border:1px solid #6c5c1c;border-radius:8px;cursor:pointer;font-weight:900}
 .flag-token.spent{opacity:.55}
 .brace-header{margin:0 2px 14px}
@@ -722,7 +726,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.02";   // Fleet Dice 2 prototype — versus layout, tumbling dice
+var VERSION = "2.03";   // compact token; keep roll totals on screen
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -2026,7 +2030,7 @@ function straightTableHtml(){
 // because it is the answer to "how am I doing" - and you want that before you
 // start deciding which dice to send back.
 function totalsHtml(t){
-  return '<div class="tot">' +
+  return '<div class="tot live-tot">' +
     '<div class="a"><div class="n">' + t.attack + '</div><div class="l">Attack</div></div>' +
     '<div class="d"><div class="n">' + t.defense + '</div><div class="l">Shields</div></div>' +
     '<div class="e"><div class="n">' + t.energy + '</div><div class="l">Energy</div></div>' +
@@ -2124,12 +2128,11 @@ function guideHtml(){
 function flagTokenHtml(){
   if (G.you.rolls < 1) return "";
   if (!G.you.flag.token){
-    return '<section class="flag-token spent"><div><span>FLAGSHIP TOKEN · ONCE PER MATCH</span>' +
-      '<strong>Token spent.</strong></div></section>';
+    return '<section class="flag-token spent"><span>Token</span><strong>Spent</strong></section>';
   }
-  return '<section class="flag-token"><div><span>FLAGSHIP TOKEN · ONCE PER MATCH</span>' +
-    '<strong>Rotate the flagship one number.</strong></div>' +
-    '<div><button data-flagturn="-1">−1</button> <button data-flagturn="1">+1</button></div></section>';
+  return '<section class="flag-token"><span>Token</span><strong>Turn flagship</strong>' +
+    '<div class="flag-token-btns"><button data-flagturn="-1">−1</button>' +
+    '<button data-flagturn="1">+1</button></div></section>';
 }
 
 function rollView(){
@@ -2155,13 +2158,13 @@ function rollView(){
   var rollsLeft = Math.max(0, K("rollsPerRound") - G.you.rolls);
 
   return '<p class="say">' + (rollsLeft
-      ? 'Tap only the dice you want to roll again. Press red Fire at the top when this roll is the one.'
-      : 'Free rolls are done. Fire at the top, spend Energy to reroll below, or use your Flagship Token.') +
+      ? 'Tap dice to reroll. Fire at the top locks this round.'
+      : 'Free rolls are done. Fire at the top, or spend Energy below.') +
     '</p>' +
     totalsHtml(t) +
     straightBannerHtml(t) +
-    flagTokenHtml() +
     gridHtml() +
+    flagTokenHtml() +
     '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
 }
 

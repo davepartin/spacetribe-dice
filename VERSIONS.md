@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.03 — compact token, totals stay with the dice (prototype)
+
+The Flagship Token is a thin row **under** the fleet. Attack / Shields / Energy /
+Repair / Direct stick to the top of the roll screen so they stay in view while
+you pick dice. Also cache-busts the phone iframe so it loads this file.
+
 ### Fleet Dice 2 · 2.02 — versus layout (prototype)
 
 Solo v2 now uses the **versus match layout**: 5-cell health board (You / Energy /
