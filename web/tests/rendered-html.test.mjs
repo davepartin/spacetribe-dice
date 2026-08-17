@@ -40,6 +40,10 @@ for (const [segments, expected] of [
   });
 }
 
+test("solo-v2 iframe cache-busts the prototype file", () => {
+  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.02/);
+});
+
 test("solo page has quit and home controls", () => {
   const html = readPage("solo", "index.html");
   assert.match(html, /Quit game/i);
