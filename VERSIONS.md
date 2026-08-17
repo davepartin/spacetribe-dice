@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.05 — token above the totals (prototype)
+
+The Flagship Token sits **above** the totals (Attack / Shields / Energy / Repair /
+Direct). A tiny line in the token says **Straights earn a bonus**. Nothing sits
+between the totals and the dice. Order: token, totals, dice, Roll.
+
 ### Fleet Dice 2 · 2.04 — one REROLL mark (prototype)
 
 Tapping a die for reroll showed the word **REROLL** twice — once from the old

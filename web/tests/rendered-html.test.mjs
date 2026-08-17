@@ -41,7 +41,7 @@ for (const [segments, expected] of [
 }
 
 test("solo-v2 iframe cache-busts the prototype file", () => {
-  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.04/);
+  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.05/);
 });
 
 test("solo page has quit and home controls", () => {
@@ -67,9 +67,11 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   const html = readFileSync(file, "utf8");
   assert.match(html, /Fleet Dice 2/);
   assert.match(html, /dieTumble0/);
-  assert.match(html, /VERSION = "2\.04"/);
+  assert.match(html, /VERSION = "2\.05"/);
   assert.match(html, /live-tot/);
   assert.match(html, /Turn flagship/);
+  assert.match(html, /Straights earn a bonus/);
+  assert.doesNotMatch(html, /No straight yet/);
   assert.match(html, /reroll-mark/);
   assert.doesNotMatch(html, /\.die\.sel::after\{content:"REROLL"/);
   assert.match(html, /stage-docked/);
