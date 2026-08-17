@@ -734,7 +734,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.08";   // formation line chart in How to play
+var VERSION = "2.09";   // bigger ships pay more for a formation line
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -801,7 +801,7 @@ var C = {
   runMult:      { v:1,  min:0,  max:3,  label:"Straight bonus multiplier", step:0.25,
                   note:"Scales the whole straight table." },
   linePay:      { v:1,  min:0,  max:3,  label:"Formation line multiplier", step:0.25,
-                  note:"Three same-size dice showing the same number. The flagship counts as a d6. Across pays Energy, down pays Attack. Prize is the die size times this." },
+                  note:"Three same-size dice showing the same number. Prize is half the die, squared, times this — d4 pays 4, d6 pays 9, d8 pays 16, d10 pays 25. Matching is rarer on bigger dice." },
   priceD4:      { v:4,  min:1,  max:20, label:"Price of a d4" },
   priceD6:      { v:6,  min:1,  max:20, label:"Price of a d6" },
   priceD8:      { v:9,  min:1,  max:30, label:"Price of a d8" },
@@ -1094,8 +1094,9 @@ function tally(dice, flagFace, mul, pick, slots){
 // Six possible 3-dice lines on the 3×3. The flagship sits in the middle and
 // counts as a d6, so the centre row and centre column only pay when the ships
 // beside it are also d6s showing the same number. Across pays Energy, down pays
-// Attack. Prize is the die size (Tune: linePay). Indices are board cells 0–8
-// with 4 = flagship, not fleet-slot numbers.
+// Attack. Three dice match on 1/S² of rolls, so the prize is (S/2)² — d4 stays
+// 4, d10 pays 25. Paying the die size itself made hunting d10s worse than
+// hunting d4s. Tune: linePay. Indices are board cells 0–8 with 4 = flagship.
 var FLEET_LINES = [
   { kind:"row", idx:[0,1,2] },
   { kind:"row", idx:[3,4,5] },
@@ -1105,7 +1106,7 @@ var FLEET_LINES = [
   { kind:"col", idx:[2,5,8] }
 ];
 function linePrize(sides){
-  return Math.round(sides * K("linePay"));
+  return Math.round((sides * sides / 4) * K("linePay"));
 }
 function flagDieFrom(dice){
   dice = dice || [];
@@ -2891,7 +2892,7 @@ function helpView(){
 
     '<div class="card">' +
     shopHead("nrg", "Formation lines", "Same size, same number, three in a row") +
-    '<p>The flagship is a <b>d6</b> in the middle of the board, so it counts. Three dice of the <b>same size</b> showing the <b>same number</b> — including the flagship in the centre row or centre column — pay a bonus equal to that die size. The face number does not change the prize: three 2s on d4s pay the same as three 4s. Centre lines only work with <b>d6s</b>, because that is what the flagship is.</p>' +
+    '<p>The flagship is a <b>d6</b> in the middle of the board, so it counts. Three dice of the <b>same size</b> showing the <b>same number</b> — including the flagship in the centre row or centre column — pay a bonus. Bigger ships pay more, because matching is rarer: three d4s hit about one roll in sixteen, three d10s about one in a hundred. The face number does not change the prize: three 2s on d4s pay the same as three 4s. Centre lines only work with <b>d6s</b>, because that is what the flagship is.</p>' +
     '<p><b class="nrg">Across</b> pays Energy — a yellow bar on top of the cards. <b class="red">Down</b> pays Attack — a red bar on the right. The orange bar on the bottom is still a straight. You can have more than one at once. You start with three d4s across the top, so a d4 row can happen from round one.</p>' +
     lineTableHtml() + '</div>' +
 

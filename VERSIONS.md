@@ -43,6 +43,13 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.09 — bigger ships pay more for a formation line (prototype)
+
+Three d10s matching is about six times rarer than three d4s, but paying the die
+size only gave 10 vs 4. Prize is now **half the die, squared**: d4 stays **4**,
+d6 pays **9**, d8 pays **16**, d10 pays **25**. That keeps the expected bonus
+similar if the three ships are already in a line. The opening d4 row is unchanged.
+
 ### Fleet Dice 2 · 2.08 — formation line chart in How to play (prototype)
 
 How to play now has a chart for three-of-a-kind lines, the same shape as the
