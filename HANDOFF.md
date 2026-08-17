@@ -8,7 +8,7 @@ Everything you need to be useful is either here or pointed at from here.
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same rules, versus layout + new dice — prototype | `simple-v2.html` (2.06) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.07) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -153,8 +153,10 @@ faces add a rising repair/Direct ladder rather than being plain numbers.
 ### The flagship — a normal d6
 
 It rolls with the fleet and **never fights**. Its number joins your straight, and
-whichever face it lands on **adds a bonus to every ship showing that same
-number**. Those ships get a thin ring in the flagship's colour so you can see it.
+in Fleet Dice 2 it also counts as a **d6** in a formation through the middle of
+the board. Whichever face it lands on **adds a bonus to every ship showing that
+same number**. Those ships get a thin ring in the flagship's colour so you can
+see it.
 
 **Each face does one thing, automatically. No menus on a die** — the choosing in
 this game lives in which dice you reroll.
@@ -172,9 +174,10 @@ this game lives in which dice you reroll.
 level 3 adds 4. One purchase raises all six faces. The **#1** face is the
 exception — it has no matching die, so it rings nothing.
 
-**It never scores itself.** Its number bridges a straight and nothing else. A
-flagship on 6 is not a red die for "+2 per attack". This has been got wrong three
-separate times; if a total looks high, check this first.
+**It never scores itself.** Its number bridges a straight (and in Fleet Dice 2,
+a centre formation of d6s). It does not hit or block. A flagship on 6 is not a
+red die for "+2 per attack". This has been got wrong three separate times; if a
+total looks high, check this first.
 
 **Each fleet has one Flagship Token per match.** Anytime after the first roll,
 its owner may rotate the flagship one number up or down; 1 and 6 wrap. The token
@@ -198,7 +201,10 @@ own token by the same rule.
    the **biggest ship in the line** decides how big. A long straight may be cashed
    as a shorter one — there is a banner on the roll screen with a button per tier
    and the totals move live as you pick. Dice in the straight get an **orange bar
-   across the bottom of the slot** (solo and versus).
+   across the bottom of the slot** (solo and versus). **Fleet Dice 2 also pays
+   formation lines:** three same-size dice showing the same number. Across pays
+   Energy, down pays Attack. The flagship is a d6, so the centre row and column
+   count when the ships beside it are d6s too.
 4. **Submit / lock.** Both fleets fire once both sides have locked. Your **volley**
    is `your attack − their shields`. **Direct** is tracked separately and
    **nothing stops it** — not shields, not a ship thrown in front of it.
@@ -389,7 +395,7 @@ join a room without getting stuck.
 | `web/components/HomeScreen.tsx` | Landing + code join |
 | `web/public/fleet-dice-key-art.png` | Brand key art |
 | `web/public/fleet-dice-v88.html` | Fleet Dice 1 solo file shipped inside the online app |
-| `web/public/fleet-dice-2.html` | Fleet Dice 2 prototype (same rules, new dice) |
+| `web/public/fleet-dice-2.html` | Fleet Dice 2 prototype (copy of `simple-v2.html`) |
 | `.github/workflows/deploy-web.yml` | Push `main` → GitHub Pages |
 
 ---
@@ -444,7 +450,7 @@ pnpm dev
 | File | What it is |
 | --- | --- |
 | **`simple.html`** | Fleet Dice 1. One file, no dependencies. Always newest (v88). Do not use this file for Version 2 experiments. |
-| **`simple-v2.html`** | Fleet Dice 2 prototype. Same rules; versus layout + tumbling dice. Bump 2.xx here. |
+| **`simple-v2.html`** | Fleet Dice 2 prototype. Versus layout + tumbling dice, plus formation lines (flagship counts as a d6). Bump 2.xx here. |
 | **`simple01.html` … `simple87.html`** | Frozen Fleet Dice 1 snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
