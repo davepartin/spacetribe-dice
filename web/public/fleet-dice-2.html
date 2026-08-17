@@ -182,8 +182,8 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .die.fe{border-color:var(--nrg);box-shadow:0 0 0 1px var(--nrg),0 0 22px -8px var(--nrg)}
 .die.fd{border-color:var(--direct);box-shadow:0 0 0 1px var(--direct),0 0 22px -8px var(--direct)}
 .die.sel{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 24px -8px #fff}
-.die.sel::after{content:"REROLL";position:absolute;top:5px;right:6px;font-size:8px;
-  letter-spacing:.08em;font-weight:800;color:#fff}
+.reroll-mark{position:absolute;top:5px;right:6px;font-size:8px;
+  letter-spacing:.08em;font-weight:800;color:#fff;pointer-events:none}
 .die{position:relative}
 .die .kind{font-size:9px;letter-spacing:.1em;text-transform:uppercase;text-align:center;font-weight:800;margin-top:-2px}
 .die.r .kind{color:var(--red)}
@@ -726,7 +726,7 @@ button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;co
 <script>
 "use strict";
 
-var VERSION = "2.03";   // compact token; keep roll totals on screen
+var VERSION = "2.04";   // one REROLL mark on selected dice
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
