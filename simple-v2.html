@@ -11,11 +11,12 @@
   --bg:#080c18; --panel:#111a2e; --panel2:#16223c; --line:#26334f;
   --ink:#eaf0ff; --dim:#93a3c4; --faint:#61729a;
   --red:#ff5566; --blue:#45b6ff; --gold:#ffd75e; --nrg:#ffe81f; --hp:#7cf0a8;
+  --energy:#ffe81f; --repair:#7cf0a8; --teal:#4ecdc4;
   --orange:#ff9438; --direct:#b98bff; --slot:#4ecdc4;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
-  margin:0;min-height:100%;min-height:100svh;padding-bottom:calc(108px + env(safe-area-inset-bottom, 0px));color:var(--ink);
+  margin:0;min-height:100%;min-height:100svh;padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px));color:var(--ink);
   background:radial-gradient(900px 600px at 25% -8%,#1a2a5533,transparent 65%),
              radial-gradient(700px 500px at 85% 8%,#3a1f5a33,transparent 60%),var(--bg);
   font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -29,7 +30,7 @@ html{
   touch-action:pan-y;
   -webkit-text-size-adjust:100%;
 }
-.wrap{max-width:540px;margin:0 auto;padding:10px 14px 0}
+.wrap{max-width:640px;margin:0 auto;padding:10px 16px 0}
 header{display:flex;align-items:baseline;justify-content:space-between;padding:2px 2px 9px}
 h1{margin:0;font-size:21px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;
    background:linear-gradient(90deg,var(--blue),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -40,15 +41,26 @@ h1{margin:0;font-size:21px;letter-spacing:.18em;text-transform:uppercase;font-we
 
 /* The health board is context, not the game. It shrank so the 3x3 grid could
    have the screen - that grid is the thing you are actually looking at. */
-.board{display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center;
+.board{display:grid;
+  grid-template-columns:minmax(48px,.85fr) minmax(52px,.9fr) minmax(44px,.75fr) minmax(100px,1.35fr) minmax(48px,.85fr);
+  align-items:center;
   background:linear-gradient(180deg,var(--panel),#0d1425);
   border:1px solid var(--line);border-radius:13px;padding:0;gap:0;overflow:hidden;
-  margin-bottom:8px}
+  margin-bottom:10px}
 .board .score{align-self:stretch;padding:7px 13px;display:flex;flex-direction:column;
   justify-content:center}
-.board .you-score{background:#dbe1ea}
-.board .you-score .who{color:#40506b}
-.board .you-score .val{color:#08744e}
+.board .you-score{margin:4px 2px 4px 4px;padding:5px 8px;background:transparent;
+  border:1.5px solid #fff;border-radius:10px}
+.board .you-score .who{color:var(--ink)}
+.board .you-score .val{color:var(--hp)}
+.board .energy-score{border-left:1px solid var(--line)}
+.board .energy-score .who{color:color-mix(in srgb,var(--nrg) 70%,var(--faint))}
+.board .energy-score .val{color:var(--nrg);font-size:19px}
+.board .energy-score .soon{margin-left:3px;color:var(--faint);font-size:11px;font-weight:700}
+.board .base-score{border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.board .base-score .who{color:color-mix(in srgb,var(--nrg) 55%,var(--faint))}
+.board .base-score .val{color:var(--nrg);font-size:19px}
+.board .enemy-score{background:#05070d;border-left:1px solid #2c1620}
 .board .enemy-score{background:#05070d;border-left:1px solid #2c1620}
 .board .enemy-score .who{color:#ff6076}
 .board .enemy-score .val{color:var(--hp)}
@@ -87,15 +99,12 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fain
 .say .blue{color:var(--blue);font-weight:700}
 .say .nrg{color:var(--nrg);font-weight:700}
 
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;
-  padding:10px 8px 12px;border-radius:18px;perspective:820px;
-  background:
-    radial-gradient(120% 90% at 50% -10%,#2a5a3a33,transparent 55%),
-    linear-gradient(180deg,#102218,#0b1610);
-  border:1px solid #1c3a28;box-shadow:inset 0 0 42px #00000088}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:19px 0 14px;
+  perspective:820px}
 .grid .die{width:auto}
-.slot{position:relative;border:1px dashed #2a4a38;border-radius:15px;min-height:128px;opacity:.55;
-  background:radial-gradient(ellipse at 50% 80%,#00000055,transparent 70%)}
+.slot,.empty-slot{position:relative;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:4px;border:1px dashed color-mix(in srgb,var(--line) 80%,transparent);
+  border-radius:15px;min-height:118px;background:rgba(8,14,26,.35)}
 /* The slot number. Quiet enough to ignore, there when you need to name a ship. */
 .slotno{position:absolute;top:6px;left:8px;font-size:10px;font-weight:800;
   letter-spacing:.06em;color:var(--slot);opacity:.55;font-variant-numeric:tabular-nums;
@@ -607,6 +616,105 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 .faceentry .marks{display:flex;gap:1px;align-items:center}
 .faceentry .marks .gly{width:11px;height:11px}
 .center{text-align:center}
+
+/* Versus layout chrome — Fleet Dice 2 solo should read like a match. */
+.eyebrow{margin:0;color:var(--gold);font-size:10px;font-weight:850;letter-spacing:.12em}
+.stage{padding:clamp(20px,4vw,32px);border:1px solid var(--line);border-radius:23px;background:#10182be8}
+.stage-docked{margin-bottom:0}
+.header-pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.header-ref-btn{min-height:32px;padding:0 11px;color:var(--dim);background:#10182a99;
+  border:1px solid var(--line);border-radius:999px;font-size:10px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.quiet-pill{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.die-caption{margin-top:3px;color:var(--dim);font-size:9px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;text-align:center}
+.die.r .die-caption{color:var(--red)}
+.die.b .die-caption{color:var(--blue)}
+.empty-slot span,.empty-slot .slotno{position:static;color:var(--faint);font-size:18px;font-weight:800;opacity:.55}
+.empty-slot small{color:var(--faint);font-size:8px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;opacity:.7}
+.empty-slot.locked-slot{opacity:.4}
+button.empty-slot.unlock-slot{gap:8px;min-height:148px;padding:18px 10px 14px;color:var(--ink);
+  background:color-mix(in srgb,var(--nrg) 12%,#0c1324);
+  border:1px dashed color-mix(in srgb,var(--nrg) 55%,var(--line));opacity:1;cursor:pointer}
+.unlock-slot-label{max-width:9em;font-size:12px;font-weight:850;text-align:center;text-transform:none;opacity:1}
+.unlock-slot-cost{color:var(--nrg);font-size:18px;font-weight:900}
+.straight-panel{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:15px;border:1px solid var(--gold);border-radius:14px;background:#211d08;margin-bottom:10px}
+.straight-panel h2{margin:4px 0 0;font-size:17px;text-transform:none;letter-spacing:-.02em;color:var(--ink)}
+.straight-options{display:flex;gap:7px;overflow-x:auto}
+.straight-options button{flex:0 0 auto;min-width:108px;min-height:54px;padding:7px 10px;
+  color:var(--dim);background:#111725;border:1px solid #5b4d15;border-radius:9px}
+.straight-options button.on,.straight-options button.active{color:#201900;background:var(--gold)}
+.straight-options b,.straight-options span{display:block;font-size:10px}
+.straight-options span{margin-top:3px;font-size:8px}
+.straight-reminder{margin:10px 0;color:var(--faint);font-size:12px;text-align:center}
+.flag-token{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:13px;
+  padding:13px 15px;border:1px solid #5b4d15;border-radius:13px;background:#1b190b}
+.flag-token span{display:block;color:var(--gold);font-size:8px;font-weight:850;letter-spacing:.12em}
+.flag-token strong{display:block;margin-top:3px;font-size:12px;color:var(--ink)}
+.flag-token button{min-width:50px;min-height:39px;color:var(--gold);background:transparent;
+  border:1px solid #6c5c1c;border-radius:8px;cursor:pointer;font-weight:900}
+.flag-token.spent{opacity:.55}
+.brace-header{margin:0 2px 14px}
+.brace-title{margin:4px 0 8px;color:var(--ink);font-size:clamp(28px,6.5vw,40px);font-weight:900;
+  letter-spacing:-.04em;line-height:1.05;text-transform:none}
+.brace-lead{margin:0;max-width:34em;color:var(--dim);font-size:15px;line-height:1.45}
+.brace-flag-label{color:var(--faint);font-size:9px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.brace-flag-hp{color:var(--hp);font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.brace-flag-risk{color:var(--hp);font-size:10px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.die.brace-flagship{min-height:148px;border-color:color-mix(in srgb,var(--hp) 40%,var(--line));
+  background:color-mix(in srgb,var(--hp) 8%,#121c30)}
+.jump-nav{display:flex;gap:8px;margin:18px 0 14px;overflow-x:auto}
+.jump-nav a,.jump-nav button{flex:0 0 auto;padding:9px 13px;color:var(--dim);border:1px solid var(--line);
+  border-radius:999px;font-size:11px;font-weight:800;background:transparent;cursor:pointer}
+.upgrade-section{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:17px;background:#0c1324}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:12px}
+.section-heading h2{margin:0;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)}
+.section-heading span{color:var(--faint);font-size:9px;font-weight:800;letter-spacing:.12em}
+.buy-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.buy-die{min-height:96px;padding:8px 4px;border:1px solid var(--line);border-radius:13px;background:#121c30;
+  display:flex;flex-direction:column;align-items:center;gap:2px}
+.buy-die strong{font-size:18px}
+.buy-die span{color:var(--nrg);font-size:11px}
+.buy-die .hull{max-height:44px}
+.ship-act{display:flex;align-items:center;justify-content:center;width:100%;min-height:34px;margin-top:2px;
+  padding:6px 4px;color:var(--ink);background:#18243d;border:1px solid var(--line);border-radius:8px;
+  font-size:10px;font-weight:800;line-height:1.2;text-align:center;cursor:pointer;white-space:normal}
+.ship-act:disabled{opacity:.4;cursor:not-allowed}
+.ship-upgrade-act{color:#d8f0ff;background:color-mix(in srgb,var(--blue) 28%,#121c30);
+  border-color:color-mix(in srgb,var(--blue) 55%,var(--line))}
+.flagship-upgrade-act{color:#fff8e8;background:color-mix(in srgb,var(--nrg) 22%,#1a1520);
+  border-color:color-mix(in srgb,var(--nrg) 65%,var(--line))}
+.shop-flag-level{color:var(--nrg);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.report-title{margin:0 0 16px}
+.report-title h1{margin:4px 0 0;font-size:clamp(28px,5vw,40px);letter-spacing:-.04em}
+.go-btn{width:100%;min-height:48px;padding:10px 14px;color:#fff;
+  background:linear-gradient(180deg,#3573ff,#1c46c6);border:1px solid #5182ff;border-radius:11px;
+  font-size:15px;font-weight:800;cursor:pointer}
+.go-btn:disabled{opacity:.4}
+.outline-dock-btn{padding:0 12px;color:var(--ink);background:#111a2e;border:1px solid var(--line);
+  border-radius:11px;font-size:12px;font-weight:800;cursor:pointer}
+.dock-primary-stack{display:flex;gap:6px;align-items:stretch}
+.dock-primary-stack .go-btn{flex:1}
+.dock{position:static;z-index:auto;margin-top:18px;padding:14px 0 calc(8px + env(safe-area-inset-bottom,0px));
+  background:transparent;border-top:1px solid var(--line);backdrop-filter:none}
+.dockin{max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:stretch;gap:12px}
+.match-dock-links{display:flex;align-items:stretch;justify-content:space-between;gap:12px;
+  max-width:560px;margin:0}
+.howto-btn{flex:3 1 0;min-height:44px;padding:10px 14px;color:#d8f0ff;
+  background:color-mix(in srgb,var(--blue) 18%,#121c30);
+  border:1px solid color-mix(in srgb,var(--blue) 45%,var(--line));border-radius:12px;
+  font-size:12px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.dock-cancel{flex:1 1 0;min-height:44px;padding:10px 14px;color:#ffd0d7;
+  background:color-mix(in srgb,var(--red) 14%,#121c30);
+  border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));border-radius:12px;
+  font-size:12px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+@media (max-width:430px){
+  .board{grid-template-columns:minmax(40px,.8fr) minmax(44px,.8fr) minmax(36px,.7fr) minmax(84px,1.3fr) minmax(40px,.8fr)}
+  .board .score{padding:7px 6px}
+}
 </style>
 </head>
 <body>
@@ -614,7 +722,7 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 <script>
 "use strict";
 
-var VERSION = "2.01";   // Fleet Dice 2 prototype — do not edit simple.html for this track
+var VERSION = "2.02";   // Fleet Dice 2 prototype — versus layout, tumbling dice
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -1829,22 +1937,23 @@ function dieHtml(d, i, clickable){
   var delay = (i % 4) * 45;
   var spin = animate[i] ? " rolled spin-" + (rollSpin[i] || 0) : "";
   if (d.dead){
-    return '<div class="die hurt"><span class="slotno">' + (i + 1) + '</span>' +
-      die3d(hullSvg(d.sides, 0, "dry")) + '<div class="kind">Damaged</div></div>';
+    return '<div class="die fleet-die hurt ready-die"><span class="slotno">' + (i + 1) + '</span>' +
+      die3d(hullSvg(d.sides, 0, "dry")) + '<div class="kind die-caption">Damaged</div></div>';
   }
   if (G.you.rolls === 0){
-    return '<div class="die ready noPick"><span class="slotno">' + (i + 1) + '</span>' +
-      die3d(hullSvg(d.sides, "", "dry")) + '<div class="kind">Ready</div></div>';
+    return '<div class="die fleet-die ready noPick ready-die"><span class="slotno">' + (i + 1) + '</span>' +
+      die3d(hullSvg(d.sides, "", "dry")) + '<div class="kind die-caption">Ready</div></div>';
   }
   var k = kindOf(d.value);
-  var cls = k === "attack" ? "r" : "b";
+  var cls = k === "attack" ? "r attack-die" : "b shield-die";
   var label = k === "attack" ? "Attack" : "Shield";
   var extra = (d.inrun ? " inrun" : "") + spin + feedsFlag(d.value);
-  return '<div class="die ' + cls + (sel[i] ? " sel" : "") + extra + '"' +
+  return '<div class="die fleet-die ' + cls + (sel[i] ? " sel selected" : "") + extra + '"' +
     (clickable ? ' data-die="' + i + '"' : '') + '>' +
+    (sel[i] ? '<span class="reroll-mark">REROLL</span>' : '') +
     '<span class="slotno">' + (i + 1) + '</span>' +
     die3d(hullSvg(d.sides, d.value, k), animate[i] ? delay : 0) +
-    '<div class="kind">' + label + '</div></div>';
+    '<div class="kind die-caption">' + label + '</div></div>';
 }
 
 // Nine cells. The flagship holds the middle; the fleet forms up around it.
@@ -1858,22 +1967,23 @@ function gridHtml(){
     ix = i < 4 ? i : i - 1;
     cells.push(ix < fleet.length
       ? dieHtml(fleet[ix], ix, G.you.rolls > 0)
-      : '<div class="slot"><span class="slotno">' + (ix + 1) + '</span></div>');
+      : '<div class="empty-slot"><span>' + (ix + 1) + '</span><small>slot free</small></div>');
   }
-  return '<div class="grid">' + cells.join("") + '</div>';
+  return '<div class="grid fleet-formation">' + cells.join("") + '</div>';
 }
 
 function flagHtml(){
   var id = flagFace(G.you), p = FACES[id], n = flagNumber(G.you);
   var spin = animate.flag ? " rolled spin-" + (rollSpin.flag || 0) : "";
   if (G.you.rolls === 0){
-    return '<div class="die flag ready noPick">' +
-      die3d(flagHullSvg("", id)) + '<div class="fcap">Ready</div></div>';
+    return '<div class="die fleet-die flag ready noPick ready-die">' +
+      die3d(flagHullSvg("", id)) + '<div class="fcap die-caption">Ready</div></div>';
   }
-  return '<div class="die flag' + (sel.flag ? ' sel' : '') +
+  return '<div class="die fleet-die flag' + (sel.flag ? ' sel selected' : '') +
     (flagInLine ? ' inrun' : '') + spin + '" data-flag="1">' +
+    (sel.flag ? '<span class="reroll-mark">REROLL</span>' : '') +
     die3d(flagHullSvg(n, id), animate.flag ? 30 : 0) +
-    '<div class="fcap" style="color:' + flagTint(id).fill + '">' +
+    '<div class="fcap die-caption flag-caption" style="color:' + flagTint(id).fill + '">' +
       (p.shortF ? p.shortF(flagMul(G.you)) : (p.short || p.name)) + '</div>' +
     '</div>';
 }
@@ -1983,27 +2093,27 @@ function straightTiers(length){
 }
 
 function straightBannerHtml(t){
-  if (!t.run) return "";
+  if (!t.run){
+    return G.you.rolls > 0
+      ? '<p class="straight-reminder">No straight yet · five numbers in a row earns a reward.</p>'
+      : "";
+  }
   var r = t.run, tiers = straightTiers(r.length), taken = r.taken || r.length;
-  var h = '<div class="strk"><div class="strkh">' +
-    '<span class="stag">' + r.length + ' in a row</span>' +
-    '<span class="st">' + r.start + ' through ' + r.top +
-      ' \u00b7 biggest ship <b>d' + r.biggest + '</b>' +
-      (flagInLine ? ' \u00b7 flagship in the line' : '') + '</span></div>';
+  var h = '<section class="straight-panel"><div>' +
+    '<p class="eyebrow">STRAIGHT FOUND · ' + r.start + '\u2013' + r.top + '</p>' +
+    '<h2>Choose how to cash it.</h2></div>';
   if (tiers.length > 1){
-    h += '<div class="choose">Choose your prize</div><div class="picks">' +
+    h += '<div class="straight-options">' +
       tiers.slice().reverse().map(function(L){
         var rw = straightReward(L, r.biggest);
-        var label = rw.label + (rw.ship && G.you.dice.length >= openSlots(G.you)
-          ? ' \u00b7 requires an open slot' : '');
-        return '<button class="pick' + (L === taken ? ' on' : '') + '" data-take="' + L + '">' +
-          '<b>' + L + ' in a row</b><span>' + label + '</span>' +
-          '<i>' + (L === taken ? 'taking' : 'take') + '</i></button>';
+        return '<button class="' + (L === taken ? 'on' : '') + '" data-take="' + L + '">' +
+          '<b>' + L + ' straight</b><span>' + rw.label + '</span></button>';
       }).join("") + '</div>';
   } else {
-    h += '<div class="strkp">Pays <b>' + r.reward.label + '</b></div>';
+    h += '<div class="straight-options"><button class="on"><b>' + r.length +
+      ' straight</b><span>' + r.reward.label + '</span></button></div>';
   }
-  return h + '</div>';
+  return h + '</section>';
 }
 
 function guideHtml(){
@@ -2012,23 +2122,21 @@ function guideHtml(){
 }
 
 function flagTokenHtml(){
-  // Available as soon as the fleet has rolled — not only after the third free roll.
   if (G.you.rolls < 1) return "";
   if (!G.you.flag.token){
-    return '<div class="flagtoken spent"><div class="tokencopy"><b>Flagship Token</b>' +
-      '<small>Token spent.</small></div></div>';
+    return '<section class="flag-token spent"><div><span>FLAGSHIP TOKEN · ONCE PER MATCH</span>' +
+      '<strong>Token spent.</strong></div></section>';
   }
-  return '<div class="flagtoken"><div class="tokencopy"><b>Flagship Token · once per match</b>' +
-    '<small>Rotate the flagship one number.</small></div>' +
-    '<div class="turns"><button data-flagturn="-1">−1</button>' +
-      '<button data-flagturn="1">+1</button></div></div>';
+  return '<section class="flag-token"><div><span>FLAGSHIP TOKEN · ONCE PER MATCH</span>' +
+    '<strong>Rotate the flagship one number.</strong></div>' +
+    '<div><button data-flagturn="-1">−1</button> <button data-flagturn="1">+1</button></div></section>';
 }
 
 function rollView(){
   if (G.you.rolls === 0){
     flagInLine = false;
     lastTally = null;
-    return '<p class="say">Every available ship and your flagship will roll.</p>' +
+    return '<p class="say">Every available ship and your flagship will roll. Use the button under the fleet.</p>' +
       gridHtml() +
       '<div class="roll-slot">' + rerollBtnHtml() + '</div>';
   }
@@ -2047,8 +2155,8 @@ function rollView(){
   var rollsLeft = Math.max(0, K("rollsPerRound") - G.you.rolls);
 
   return '<p class="say">' + (rollsLeft
-      ? 'Tap only the dice you want to roll again.'
-      : 'Free rolls are done. Fire, spend Energy to reroll, or use your Flagship Token.') +
+      ? 'Tap only the dice you want to roll again. Press red Fire at the top when this roll is the one.'
+      : 'Free rolls are done. Fire at the top, spend Energy to reroll below, or use your Flagship Token.') +
     '</p>' +
     totalsHtml(t) +
     straightBannerHtml(t) +
@@ -2063,16 +2171,18 @@ function braceView(){
   var p = pending, left = Math.max(0, p.incoming - p.soaked);
   var used = p.fed ? p.fed.length : 0, room = K("soakMax") - used;
   var total = left + p.direct;
+  var doomed = total >= G.you.hp + (p.you.heal || 0);
 
-  var h = '<h2>Enemy shot has landed</h2>' +
+  var h = '<header class="brace-header">' +
+    '<p class="eyebrow">ENEMY VOLLEY</p>' +
+    '<h1 class="brace-title">' + (doomed ? 'Flagship will fall' : 'Taking damage') + '</h1>' +
+    '<p class="brace-lead">Choose ships to protect your flagship. Each ship you tap blocks its size, then is <b>damaged for one round</b>. <b class="dir">Direct</b> cannot be blocked.</p>' +
+    '</header>' +
     '<div class="tot three">' +
-      '<div class="a"><div class="n">' + left + '</div><div class="l">Volley</div></div>' +
+      '<div class="a"><div class="n">' + left + '</div><div class="l">Volley left</div></div>' +
       '<div class="dir"><div class="n">' + p.direct + '</div><div class="l">Direct</div></div>' +
-      '<div class="h"><div class="n">' + Math.max(0, G.you.hp + p.you.heal) + '</div>' +
-        '<div class="l">Your flagship</div></div>' +
-    '</div>' +
-    '<p class="say">Tap ships to block the <span class="red">volley</span>. ' +
-    '<b class="dir">Direct</b> always reaches your flagship.</p>';
+      '<div class="h"><div class="n">' + total + '</div><div class="l">To flagship</div></div>' +
+    '</div>';
 
   if (p.fed && p.fed.length){
     h += '<p class="say">' + p.fed.map(function(f){
@@ -2080,41 +2190,28 @@ function braceView(){
     }).join(' \u00b7 ') + '.</p>';
   }
 
-  if (left > 0 && room <= 0){
-    h += '<p class="hint">No more ships can step in — the rest lands on the flagship.</p>';
-  } else if (left > 0 && !canSoak(G.you)){
-    h += '<p class="hint">Every ship is damaged — this lands on the flagship.</p>';
-  }
-
-  // The same 3x3 the roll screen uses, so the board never changes shape. Empty
-  // empty slots still show, because "slot 5 is empty" is information too.
   var cells = [], fleet = G.you.dice, i, ix, d, hurt, pick;
   for (i = 0; i < 9; i++){
     if (i === 4){
-      cells.push('<div class="die flag brace-flag"><div class="flbl">Flagship</div>' +
-        '<div class="fcap hp">' + Math.max(0, G.you.hp + p.you.heal) + '</div></div>');
+      cells.push('<div class="die fleet-die flag brace-flagship static"><div class="brace-flag-label">Flagship Health</div>' +
+        '<strong class="brace-flag-hp">' + Math.max(0, G.you.hp) + '</strong>' +
+        '<span class="brace-flag-risk">' + (total > 0 ? 'Takes ' + total : 'Safe') + '</span></div>');
       continue;
     }
     ix = i < 4 ? i : i - 1;
     d = fleet[ix];
-    if (!d){ cells.push('<div class="slot"><span class="slotno">' + (ix+1) + '</span></div>'); continue; }
+    if (!d){ cells.push('<div class="empty-slot"><span>' + (ix+1) + '</span></div>'); continue; }
     hurt = isDamaged(d);
     pick = !hurt && left > 0 && room > 0;
-    cells.push('<div class="die' + (hurt ? " hurt" : "") + (pick ? "" : " noPick") + '"' +
+    var picked = p.fed && p.fed.some(function(f){ return f.slot === ix + 1; });
+    cells.push('<div class="die fleet-die brace-ship-die' + (hurt ? " hurt" : "") + (picked ? " selected" : "") + (pick ? "" : " noPick") + '"' +
       (pick ? ' data-brace="' + ix + '"' : '') + '>' +
       '<span class="slotno">' + (ix+1) + '</span>' +
       die3d(hullSvg(d.s, "", hurt ? "dry" : "defense")) +
-      '<div class="kind">' + (hurt ? "Damaged" : pick ? "d" + d.s + " \u00b7 blocks " + soakOf(d.s)
+      '<div class="kind die-caption">' + (hurt ? "Damaged" : picked ? "Blocking " + soakOf(d.s) : pick ? "Tap — Block " + soakOf(d.s)
         : "d" + d.s) + '</div></div>');
   }
-  h += '<div class="grid">' + cells.join("") + '</div>';
-
-  h += '<div class="row"><button id="brace-reset">Reset choices on this page</button>' +
-    '<button class="go" id="brace-done">' +
-    (total > 0
-      ? 'Continue \u2014 flagship takes ' + total
-      : 'Continue \u2014 nothing gets through') +
-    '</button></div>';
+  h += '<div class="grid fleet-formation">' + cells.join("") + '</div>';
   return h;
 }
 
@@ -2275,7 +2372,8 @@ function reportView(){
         '</b><small>Total change</small></span></div></div>';
   }
 
-  return '<h2>Round ' + G.round + ' result</h2>' +
+  return '<div class="report-title"><p class="eyebrow">BOTH FLEETS REVEALED</p>' +
+    '<h1>Round ' + G.round + ' result</h1></div>' +
     '<div class="report-sides">' +
       '<section class="reportside you">' +
         healthCard("you", "Your", r.youHpBefore, r.youHpAfter, r.themDealt, r.you.heal) +
@@ -2412,43 +2510,54 @@ function buyCardHtml(sides){
 // numbers - so "scrap the d4 in slot 2" is a thing you can see rather than
 // something you have to translate.
 function fleetGridHtml(){
-  var cells = [], i, ix, d, hurt, next, cost;
+  var cells = [], i, ix, d, hurt, next, cost, open = openSlots(G.you);
+  var nextSlot = open + 1, nextCost = open < K("maxDice") ? slotCost(nextSlot) : null;
+  var lvl = G.you.flag.lvl || 1, flagCost = lvl >= 3 ? null : flagLvlCost(lvl + 1);
   for (i = 0; i < 9; i++){
     if (i === 4){
-      cells.push('<div class="die flag shopflag"><div class="flbl">Flagship</div>' +
-        '<div class="fcap hp">' + Math.max(0, G.you.hp) + '</div>' +
-        '<div class="chg">level ' + (G.you.flag.lvl || 1) + '</div></div>');
+      cells.push('<div class="die fleet-die flag shop-flagship static"><div class="brace-flag-label">Flagship</div>' +
+        '<strong class="brace-flag-hp">' + Math.max(0, G.you.hp) + '</strong>' +
+        '<span class="shop-flag-level">level ' + lvl + '</span>' +
+        (flagCost
+          ? '<button class="ship-act flagship-upgrade-act" data-flagup="1"' +
+            (G.you.energy < flagCost ? ' disabled' : '') + '>Upgrade to level ' + (lvl + 1) + ' ' + flagCost + '⚡</button>'
+          : '<span class="ship-act">Level 3 maximum</span>') +
+        '</div>');
       continue;
     }
     ix = i < 4 ? i : i - 1;
-    if (ix >= openSlots(G.you)){
-      cells.push('<div class="slot locked"><span class="slotno">' + (ix + 1) + '</span>' +
-        '<span class="free">locked</span></div>');
+    if (ix >= open){
+      if (ix === open && nextCost != null){
+        cells.push('<button class="empty-slot unlock-slot" data-unlock="1"' +
+          (G.you.energy < nextCost ? ' disabled' : '') + '>' +
+          '<span class="slotno">' + (ix + 1) + '</span>' +
+          '<span class="unlock-slot-label">Unlock fleet slot</span>' +
+          '<strong class="unlock-slot-cost">' + nextCost + '⚡</strong></button>');
+      } else {
+        cells.push('<div class="empty-slot locked-slot"><span>' + (ix + 1) + '</span><small>locked</small></div>');
+      }
       continue;
     }
     d = G.you.dice[ix];
     if (!d){
-      cells.push('<div class="slot"><span class="slotno">' + (ix + 1) + '</span>' +
-        '<span class="free">slot free</span></div>');
+      cells.push('<div class="empty-slot"><span>' + (ix + 1) + '</span><small>slot free</small></div>');
       continue;
     }
     hurt = isDamaged(d);
     next = nextSize(d.s);
     cost = growCost(d.s);
-    cells.push('<div class="die noPick' + (hurt ? " hurt" : "") + '">' +
+    cells.push('<div class="die fleet-die shop-ship noPick' + (hurt ? " hurt" : "") + '">' +
       '<span class="slotno">' + (ix + 1) + '</span>' +
-      (next ? '<div class="shipacts top"><button class="growb" data-grow="' + ix + '"' +
-        (hurt || G.you.energy < cost ? ' disabled' : '') + '>' +
-        (hurt ? 'Damaged' : 'Upgrade to d' + next + ' · ' + cost + '⚡') + '</button></div>' : '') +
       die3d(hullSvg(d.s, "", hurt ? "dry" : "defense")) +
-      '<div class="kind">d' + d.s + '</div>' +
-      '<div class="shipacts">' +
-        '<button class="scrapb" data-sell="' + ix + '"' +
-          (hurt || G.you.dice.length <= 1 ? ' disabled' : '') + '>' +
-          (hurt ? 'Damaged' : 'Scrap · ' + sellValue(d.s) + '⚡') + '</button>' +
-      '</div></div>');
+      '<div class="kind die-caption">d' + d.s + '</div>' +
+      (next
+        ? '<button class="ship-act ship-upgrade-act" data-grow="' + ix + '"' +
+          (hurt || G.you.energy < cost ? ' disabled' : '') + '>' +
+          (hurt ? 'Damaged' : 'Upgrade to d' + next + ' ' + cost + '⚡') + '</button>'
+        : '<span class="ship-act">' + (hurt ? 'Damaged' : 'Max d10') + '</span>') +
+      '</div>');
   }
-  return '<div class="grid">' + cells.join("") + '</div>';
+  return '<div class="grid fleet-formation">' + cells.join("") + '</div>';
 }
 
 function slotSectionHtml(){
@@ -2470,37 +2579,28 @@ function slotSectionHtml(){
 function shopView(){
   var full = G.you.dice.length >= openSlots(G.you);
   var filled = G.you.dice.length, cap = openSlots(G.you);
-  var theirBig = Math.max.apply(null, G.them.dice.map(function(d){ return d.s; }));
   var plan = enemyPlanInfo(G.them.plan);
 
-  return '<h2>Upgrade fleet</h2>' +
-    '<div class="tot three purse">' +
-      '<div class="e"><div class="n">' + G.you.energy + '</div><div class="l">Energy to spend</div></div>' +
-      '<div><div class="n">' + filled + '/' + cap + '</div><div class="l">Ships / open slots</div></div>' +
-      '<div><div class="n">' + G.them.dice.length + ' ships</div>' +
-        '<div class="l">Enemy · ' + plan.short + ' · largest d' + theirBig + '</div></div>' +
-    '</div>' +
-    '<p class="say">' + plan.line + '</p>' +
-
-    '<div class="card">' +
-    shopHead("gold", "Your ships",
-      'Upgrade one step: d4 → d6 → d8 → d10') +
-    fleetGridHtml() + '</div>' +
-
-    slotSectionHtml() +
-
-    '<div class="card">' +
-    shopHead("blue", "Buy a new ship",
-      full ? (cap < K("maxDice") ? 'Every open slot is full — open another or upgrade'
-                                  : 'Every slot is full — upgrade or scrap instead')
-           : (cap - filled) + ' of ' + cap + ' slots still free') +
-    '<div class="ships">' + [4,6,8,10].map(buyCardHtml).join("") + '</div></div>' +
-
-    flagshipSectionHtml() +
-
-    '<div class="footreset">' +
-      '<button class="tiny resetpage" id="page-reset">Reset choices on this page</button>' +
-    '</div>';
+  return '<header class="brace-header">' +
+    '<p class="eyebrow">SHIPYARD</p>' +
+    '<h1 class="brace-title">Upgrade fleet</h1>' +
+    '<p class="brace-lead">Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll. ' +
+      plan.line + '</p></header>' +
+    '<nav class="jump-nav" aria-label="Upgrade sections">' +
+      '<button type="button" data-jump="fleet-upgrades">Fleet</button>' +
+      '<button type="button" data-jump="buy-ships">Buy ships</button></nav>' +
+    '<section class="upgrade-section" id="fleet-upgrades">' +
+      '<div class="section-heading"><h2>Your ships</h2><span>' + filled + ' / ' + cap + ' slots</span></div>' +
+      fleetGridHtml() + '</section>' +
+    '<section class="upgrade-section" id="buy-ships">' +
+      '<div class="section-heading"><h2>Buy a ship</h2><span>' +
+        (full ? 'OPEN A SLOT FIRST' : 'OPEN SLOT READY') + '</span></div>' +
+      '<div class="buy-row">' + [4,6,8,10].map(function(sides){
+        var cost = priceOf(sides), can = !full && G.you.energy >= cost;
+        return '<button class="buy-die die-size-' + sides + '" data-buysize="' + sides + '"' +
+          (can ? '' : ' disabled') + '>' + die3d(hullSvg(sides, "", can ? "attack" : "dry")) +
+          '<strong>d' + sides + '</strong><span>' + cost + '⚡</span></button>';
+      }).join("") + '</div></section>';
 }
 // ── the two reference screens ────────────────────────────────────────────────
 // Energy was the one number on the board with no explanation anywhere. You could
@@ -2805,36 +2905,60 @@ function render(){
            : G.phase === "roll" ? rollView()
            : G.phase === "report" ? reportView()
            : G.phase === "shop" ? shopView() : overView();
-  var label = G.phase === "brace" ? ""
-            : G.phase === "report" ? (matchOver() ? "See result" : "Continue")
-            : G.phase === "shop" ? "Go to round " + G.round : "";
+  var earning = (G.phase === "roll" && lastTally) ? lastTally.energy + G.you.base : 0;
   var boardMid = G.phase === "roll" && G.you.rolls > 0
     ? fireBtnHtml()
-    : '<div class="mid">FLAGSHIP<br>HEALTH</div>';
-  var dockPrimary = G.phase === "roll" || !label ? ""
-    : '<button class="go" id="next">' + label + '</button>';
+    : '<div class="mid fleet-mid">FLAGSHIP<br>HEALTH</div>';
+  var p = pending;
+  var braceLeft = p ? Math.max(0, p.incoming - p.soaked) : 0;
+  var braceTotal = p ? braceLeft + p.direct : 0;
+  var dockPrimary = "";
+  if (G.phase === "brace"){
+    dockPrimary = '<div class="dock-primary-stack">' +
+      (p && p.fed && p.fed.length
+        ? '<button class="outline-dock-btn" id="brace-reset" type="button">Reset</button>' : '') +
+      '<button class="go-btn" id="brace-done" type="button">' +
+        (braceTotal > 0 ? 'Continue — Flagship takes ' + braceTotal + ' Dmg'
+          : 'Continue — Flagship is safe') +
+      '</button></div>';
+  } else if (G.phase === "report"){
+    dockPrimary = '<button class="go-btn" id="next" type="button">' +
+      (matchOver() ? "See result" : "Continue to upgrades") + '</button>';
+  } else if (G.phase === "shop"){
+    dockPrimary = '<button class="go-btn" id="next" type="button">Go to round ' + G.round + '</button>';
+  }
+  var staged = G.phase !== "tune" && G.phase !== "costs" && G.phase !== "help";
+  var showDock = G.phase !== "tune" && G.phase !== "costs" && G.phase !== "help" && G.phase !== "over";
 
   hullGradSeq = 0;
   document.getElementById("app").innerHTML =
-    '<div class="wrap"><header><h1>Fleet Dice 2 <button class="ver" id="tune">v' + VERSION + '</button></h1>' +
-    '<span><button class="tiny quit" id="quit">Quit</button> ' +
-    '<button class="tiny nrg" id="costs">Upgrade costs</button> ' +
-    '<span class="pill">' + (G.phase === "over" ? "Finished" : "Round " + G.round) + '</span></span></header>' +
-    '<div class="board"><div class="score you-score"><div class="who">You</div>' +
-    '<div class="val hp">' + Math.max(0, G.you.hp) + '</div></div>' +
-    boardMid +
-    '<div class="score enemy-score r"><div class="who">Enemy</div><div class="val hp">' +
-      Math.max(0, G.them.hp) + '</div></div></div>' +
-    body + '</div>' +
-    (G.phase === "over" || G.phase === "tune" || G.phase === "costs" ||
-      G.phase === "help" || G.phase === "brace" ? "" :
-      '<div class="dock"><div class="dockin"><div class="met">' + dockMetrics() +
-      '</div><button class="tiny quit" id="quit-dock">Quit<br>game</button>' +
-      '<button class="tiny howto" id="help">How<br>to play</button>' +
-      dockPrimary + '</div></div>');
+    '<div class="wrap"><header class="site-header">' +
+      '<h1>Fleet Dice 2 <button class="ver" id="tune">v' + VERSION + '</button></h1>' +
+      '<div class="header-pills">' +
+        '<button class="header-ref-btn" id="costs" type="button">Upgrade costs</button>' +
+        '<span class="quiet-pill">' + (G.phase === "over" ? "Finished" : "Round " + G.round) + '</span>' +
+      '</div></header>' +
+    '<div class="board">' +
+      '<div class="score you-score"><div class="who">You</div><div class="val hp">' + Math.max(0, G.you.hp) + '</div></div>' +
+      '<div class="score energy-score"><div class="who">Energy</div><div class="val">' + G.you.energy +
+        (earning ? '<span class="soon">→' + (G.you.energy + earning) + '</span>' : '') + '</div></div>' +
+      '<div class="score base-score"><div class="who">Base</div><div class="val">' +
+        (G.you.base ? '+' + G.you.base : '0') + '</div></div>' +
+      boardMid +
+      '<div class="score enemy-score r"><div class="who">Enemy</div><div class="val hp">' +
+        Math.max(0, G.them.hp) + '</div></div></div>' +
+    (staged ? '<section class="stage stage-docked">' + body + '</section>' : body) +
+    '</div>' +
+    (showDock
+      ? '<div class="dock"><div class="dockin">' + dockPrimary +
+        '<div class="match-dock-links">' +
+        '<button class="dock-cancel" id="quit-dock" type="button">Quit game</button>' +
+        '<button class="howto-btn" id="help" type="button">How to play</button>' +
+        '</div></div></div>'
+      : '');
 
   wire();
-  animate = {};        // consumed - a tap re-renders without replaying it
+  animate = {};
 }
 
 function wire(){

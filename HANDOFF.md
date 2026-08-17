@@ -8,7 +8,7 @@ Everything you need to be useful is either here or pointed at from here.
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same rules, new dice look — prototype | `simple-v2.html` (2.01) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same rules, versus layout + new dice — prototype | `simple-v2.html` (2.02) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -443,7 +443,7 @@ pnpm dev
 | File | What it is |
 | --- | --- |
 | **`simple.html`** | Fleet Dice 1. One file, no dependencies. Always newest (v88). Do not use this file for Version 2 experiments. |
-| **`simple-v2.html`** | Fleet Dice 2 prototype. Same rules; new dice look. Bump 2.xx here. |
+| **`simple-v2.html`** | Fleet Dice 2 prototype. Same rules; versus layout + tumbling dice. Bump 2.xx here. |
 | **`simple01.html` … `simple87.html`** | Frozen Fleet Dice 1 snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |

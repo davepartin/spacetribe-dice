@@ -63,7 +63,9 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   const html = readFileSync(file, "utf8");
   assert.match(html, /Fleet Dice 2/);
   assert.match(html, /dieTumble0/);
-  assert.match(html, /VERSION = "2\.01"/);
+  assert.match(html, /VERSION = "2\.02"/);
+  assert.match(html, /stage-docked/);
+  assert.match(html, /energy-score/);
   assert.doesNotMatch(html, /\bd12\b|\bd14\b/);
 });
 
