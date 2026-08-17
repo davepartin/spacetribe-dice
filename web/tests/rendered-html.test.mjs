@@ -20,6 +20,7 @@ test("static export includes the Fleet Dice home screen", () => {
   assert.match(html, /Build the fleet\. Break the flagship/i);
   assert.match(html, /Play solo/);
   assert.match(html, /Battle a friend/);
+  assert.match(html, /Fleet Dice 2/);
   assert.match(html, /Join the fight/);
   assert.match(html, /Winners from the last 30 days/);
   assert.match(html, /\/spacetribe-dice\/how-to-play\//);
@@ -28,6 +29,7 @@ test("static export includes the Fleet Dice home screen", () => {
 
 for (const [segments, expected] of [
   [["solo", "index.html"], "Fleet Dice solo game"],
+  [["solo-v2", "index.html"], "Fleet Dice 2 prototype"],
   [["versus", "index.html"], "Create private match"],
   [["join", "index.html"], "Join a Match"],
   [["match", "index.html"], "Opening battlefield"],
@@ -53,6 +55,16 @@ test("static export includes the solo game asset", () => {
   assert.match(html, /quitToHome/);
   assert.match(html, /Back home/);
   assert.match(html, /dieBump|playRollBump/);
+});
+
+test("static export includes the Fleet Dice 2 prototype", () => {
+  const file = join(outDir, "fleet-dice-2.html");
+  assert.ok(existsSync(file), "missing fleet-dice-2.html in out/");
+  const html = readFileSync(file, "utf8");
+  assert.match(html, /Fleet Dice 2/);
+  assert.match(html, /dieTumble0/);
+  assert.match(html, /VERSION = "2\.01"/);
+  assert.doesNotMatch(html, /\bd12\b|\bd14\b/);
 });
 
 test("asset paths use the GitHub Pages basePath", () => {

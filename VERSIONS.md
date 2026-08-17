@@ -43,7 +43,19 @@ The three most useful settings for the current game:
 
 ## Versions
 
-### 88 — dice roll bump (current)
+### Fleet Dice 2 · 2.01 — physical dice (prototype)
+
+A **new file**, not a replacement for Fleet Dice 1. Same rules, same straight
+chart, no new superpowers. The dice are solid plastic shapes (triangle / square /
+diamond / pentagon) that tumble when you roll. Play it at `/solo-v2/` or open
+`simple-v2.html`. Versus is unchanged until this solo look is approved.
+
+### 88 — dice roll bump (current Fleet Dice 1)
+
+Tapping **Roll** gives the dice a short shake and a face pop, so a reroll still
+feels like a roll even when the same number comes back. Each ship keeps its own
+randomizer: d4 → 1–4, d6 → 1–6, d8 → 1–8, d10 → 1–10. Versus will get the same
+motion once this feels right in solo.
 
 Tapping **Roll** gives the dice a short shake and a face pop, so a reroll still
 feels like a roll even when the same number comes back. Each ship keeps its own
