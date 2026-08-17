@@ -43,6 +43,13 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.02 — versus layout (prototype)
+
+Solo v2 now uses the **versus match layout**: 5-cell health board (You / Energy /
+Base / Fire / Enemy), stage panel, gold straight bar, flagship token row, shop
+grid with unlock-in-slot, and an action dock (Quit + How to play). Dice still
+tumble. Fleet Dice 1 is unchanged. Versus waits until this feel is approved.
+
 ### Fleet Dice 2 · 2.01 — physical dice (prototype)
 
 A **new file**, not a replacement for Fleet Dice 1. Same rules, same straight
