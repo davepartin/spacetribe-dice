@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function SoloV2Page() {
   return (
     <SoloGame
-      gameSrc="/fleet-dice-2.html"
+      gameSrc="/fleet-dice-2.html?v=2.02"
       title="Fleet Dice 2 prototype"
     />
   );
