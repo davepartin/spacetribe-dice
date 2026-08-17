@@ -16,8 +16,9 @@ React app under `web/` that reimplements the same rules in TypeScript
 (`web/lib/game.ts`) and aims to **feel** like solo — same 3×3 fleet, same hull
 shapes, same colours, same how-to depth.
 
-**Dave is not a developer.** Prefer plain words. Do not commit or push unless he
-asks. Prefer showing something he can open on a phone over inventing architecture.
+**Dave is not a developer.** Prefer plain words. When a change is ready to play,
+push it to `main` so the phone site updates — he gave standing permission.
+Prefer showing something he can open on a phone over inventing architecture.
 
 ---
 
@@ -67,9 +68,9 @@ Copy everything between the lines.
 > 8. **Plain words.** If you use a term, make sure it names something in the game
 >    today. We once carried a word for nine versions after deleting the rule it
 >    described.
-> 9. **Don't commit unless I ask.** When I say commit and push, push to `main`
->    so GitHub Pages updates. Never force-push. Never commit `firebase-debug.log`
->    or secrets.
+> 9. **When a build is done, push it.** Commit and push to `main` so GitHub
+>    Pages updates. Do not wait for a separate "Push." Never force-push. Never
+>    commit `firebase-debug.log` or secrets.
 >
 > Write like you're explaining it to me over coffee — warm, direct, and no
 > jargon I haven't used first.
@@ -469,7 +470,8 @@ pnpm dev
 3. If it's a **solo rule**, snapshot `simple.html`, bump `VERSION`, edit, write
    `VERSIONS.md`.
 4. If it's **versus UX / online**, edit `web/`, keep copy plain, match solo
-   visuals when that's the ask, then **commit and push only when he says so**.
+   visuals when that's the ask, then **commit and push to `main`** so he can
+   play it on the phone.
 5. If join/create breaks with permissions, check **rules deploy** before rewriting
    the client.
 
