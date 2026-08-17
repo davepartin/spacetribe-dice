@@ -582,7 +582,10 @@ because of a bug in the harness, not the game.
 11. **Versus should look like solo.** If solo teaches a symbol or a shape, versus
     How to play and the board must show the same pictures.
 12. **Host stays; guest joins.** Creating a room is not the same as opening the
-    invite. Explain that on the waiting screen every time.
+    invite. Explain that on the waiting screen every time. If nobody joins,
+    **Cancel game** (waiting page or Your matches) closes the room. Creating a
+    new match also closes an empty waiting room this phone still remembers.
+    Empty rooms drop off **Now on the field** after 45 minutes with no heartbeat.
 
 ---
 

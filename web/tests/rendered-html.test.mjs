@@ -40,6 +40,10 @@ for (const [segments, expected] of [
   });
 }
 
+test("versus launcher explains empty rooms get closed", () => {
+  assert.match(readPage("versus", "index.html"), /empty room waiting/i);
+});
+
 test("solo-v2 iframe cache-busts the prototype file", () => {
   assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.05/);
 });

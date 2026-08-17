@@ -74,17 +74,18 @@ export function InvitePanel({
         </a>
         {onCancel ? (
           <button
-            className="action-button outline-action"
+            className="action-button red-action invite-cancel"
             disabled={busy}
             onClick={onCancel}
             type="button"
           >
-            Cancel game
+            {busy ? "Cancelling…" : "Cancel game"}
           </button>
         ) : null}
       </div>
       <p className="waiting-note">
         Keep this page open. When your friend joins with the code, the battle starts here automatically.
+        Nobody coming? Cancel the game, then create a new match.
       </p>
     </section>
   );

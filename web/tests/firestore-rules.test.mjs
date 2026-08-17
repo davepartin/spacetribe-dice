@@ -201,3 +201,86 @@ test("a non-participant cannot finish an active room code", async () => {
     }),
   );
 });
+
+test("the host can cancel a waiting room and free its code", async () => {
+  const waitingId = "match-waiting";
+  const waitingCode = "1001";
+  await testEnvironment.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    await Promise.all([
+      setDoc(doc(db, "codes", waitingCode), {
+        matchId: waitingId,
+        hostUid,
+        guestUid: null,
+        status: "waiting",
+        updatedAt: new Date(0),
+      }),
+      setDoc(doc(db, "matches", waitingId), {
+        hostUid,
+        guestUid: null,
+        status: "waiting",
+        state: {
+          status: "waiting",
+          winner: null,
+          cancelledBy: null,
+          players: {
+            host: { name: "Dave", email: hostUid, phase: "waiting" },
+          },
+        },
+        version: 1,
+        updatedAt: new Date(0),
+      }),
+      setDoc(doc(db, "liveBattles", waitingId), {
+        hostUid,
+        guestUid: null,
+        hostName: "Dave",
+        guestName: null,
+        status: "waiting",
+        round: 1,
+        updatedAt: new Date(0),
+      }),
+    ]);
+  });
+
+  const db = testEnvironment.authenticatedContext(hostUid).firestore();
+  const matchRef = doc(db, "matches", waitingId);
+  const boardRef = doc(db, "liveBattles", waitingId);
+  const codeRef = doc(db, "codes", waitingCode);
+
+  await assertSucceeds(
+    runTransaction(db, async (transaction) => {
+      await Promise.all([
+        transaction.get(matchRef),
+        transaction.get(boardRef),
+        transaction.get(codeRef),
+      ]);
+      transaction.update(matchRef, {
+        status: "finished",
+        state: {
+          status: "finished",
+          winner: null,
+          cancelledBy: "Dave",
+          players: {
+            host: { name: "Dave", email: hostUid, phase: "over" },
+          },
+        },
+        version: 2,
+        updatedAt: serverTimestamp(),
+      });
+      transaction.delete(boardRef);
+      transaction.delete(codeRef);
+    }),
+  );
+
+  await testEnvironment.withSecurityRulesDisabled(async (context) => {
+    const verificationDb = context.firestore();
+    const [matchSnapshot, boardSnapshot, codeSnapshot] = await Promise.all([
+      getDoc(doc(verificationDb, "matches", waitingId)),
+      getDoc(doc(verificationDb, "liveBattles", waitingId)),
+      getDoc(doc(verificationDb, "codes", waitingCode)),
+    ]);
+    assert.equal(matchSnapshot.data().status, "finished");
+    assert.equal(boardSnapshot.exists(), false);
+    assert.equal(codeSnapshot.exists(), false);
+  });
+});
