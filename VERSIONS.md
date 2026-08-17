@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.14 — toggle damage off, sell ships (prototype)
+
+On taking damage, tap a ship to block and tap it again to take it off. In the
+shipyard each ship has Upgrade and Sell. Sell asks **Are you sure you want to
+sell?** before it goes.
+
 ### Fleet Dice 2 · 2.13 — compact taking-damage flagship (prototype)
 
 The taking-damage screen used a giant health number and a 148px minimum on the
