@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.11 — shipyard flagship matches the ship cards (prototype)
+
+The centre row was taller because the flagship card had no hull, a two-line
+Level, and a wrapping upgrade button, so the grid stretched the whole row. It
+now uses the same recipe as a ship: hull, one-line caption, short button.
+
 ### Fleet Dice 2 · 2.10 — compact shipyard flagship (prototype)
 
 The middle shipyard cell was showing flagship **health** as a giant green number,
