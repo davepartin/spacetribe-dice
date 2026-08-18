@@ -43,6 +43,11 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.15 — shipyard upgrade only (prototype)
+
+Sell came off the ship cards. Two buttons in one cell made Upgrade too small to
+tap. Each ship is back to one full-width upgrade button.
+
 ### Fleet Dice 2 · 2.14 — toggle damage off, sell ships (prototype)
 
 On taking damage, tap a ship to block and tap it again to take it off. In the

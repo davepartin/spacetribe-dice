@@ -447,12 +447,9 @@ function Shipyard({
   onHelp: () => void;
   onCancel: () => void;
 }) {
-  const [sellId, setSellId] = useState<string | null>(null);
   const nextSlot = you.slots + 1;
   const nextSlotCost = you.slots >= 8 ? null : slotPrice(nextSlot);
   const flagCost = flagshipUpgradeCost(you.flag.level);
-  const sellShip = you.ships.find((ship) => ship.id === sellId) ?? null;
-  const sellPay = sellShip ? Math.floor(priceOf(sellShip.sides) / 2) : 0;
   return (
     <>
       <HealthBoard enemy={enemy} you={you} />
@@ -461,7 +458,7 @@ function Shipyard({
           <p className="eyebrow">SHIPYARD</p>
           <h1 className="brace-title">Upgrade fleet</h1>
           <p className="brace-lead">
-            Upgrade or sell ships, unlock the next fleet slot, or raise the flagship — then roll.
+            Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll.
           </p>
         </header>
         <nav className="jump-nav" aria-label="Upgrade sections">
@@ -529,28 +526,18 @@ function Shipyard({
                   <span className="slot-badge">{index + 1}</span>
                   <ShipHull ready sides={ship.sides} value={0} />
                   <span className="die-caption">d{ship.sides}</span>
-                  <div className="shop-acts">
-                    {next ? (
-                      <button
-                        className="ship-act ship-upgrade-act"
-                        disabled={busy || damaged || (cost ?? 0) > you.energy}
-                        onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
-                        type="button"
-                      >
-                        {damaged ? "Damaged" : `To d${next} ${cost}⚡`}
-                      </button>
-                    ) : (
-                      <span className="ship-act ship-act-maxed">{damaged ? "Damaged" : "Max d10"}</span>
-                    )}
+                  {next ? (
                     <button
-                      className="ship-act ship-sell-act"
-                      disabled={busy || damaged || you.ships.length <= 1}
-                      onClick={() => setSellId(ship.id)}
+                      className="ship-act ship-upgrade-act"
+                      disabled={busy || damaged || (cost ?? 0) > you.energy}
+                      onClick={() => play({ type: "shop", operation: "upgrade", shipId: ship.id })}
                       type="button"
                     >
-                      {damaged ? "Damaged" : `Sell ${Math.floor(priceOf(ship.sides) / 2)}⚡`}
+                      {damaged ? "Damaged" : `To d${next} ${cost}⚡`}
                     </button>
-                  </div>
+                  ) : (
+                    <span className="ship-act ship-act-maxed">{damaged ? "Damaged" : "Max d10"}</span>
+                  )}
                 </div>
               );
             }}
@@ -593,30 +580,6 @@ function Shipyard({
           </button>
         }
       />
-      {sellShip ? (
-        <div className="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="sell-title">
-          <div className="confirm-card">
-            <h2 id="sell-title">Are you sure you want to sell?</h2>
-            <p>This d{sellShip.sides} goes for {sellPay}⚡.</p>
-            <div className="confirm-actions">
-              <button className="action-button outline-action" onClick={() => setSellId(null)} type="button">
-                Cancel
-              </button>
-              <button
-                className="action-button gold-action"
-                disabled={busy}
-                onClick={() => {
-                  void play({ type: "shop", operation: "scrap", shipId: sellShip.id });
-                  setSellId(null);
-                }}
-                type="button"
-              >
-                Sell
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </>
   );
 }
