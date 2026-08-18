@@ -2277,29 +2277,11 @@ button.empty-slot.unlock-slot .unlock-slot-cost {
 }
 
 .shop-grid .ship-act {
-  min-height: 26px;
+  min-height: 32px;
   margin-top: 2px;
-  padding: 3px 2px;
-  font-size: 9px;
+  padding: 5px 4px;
+  font-size: 10px;
   line-height: 1.15;
-}
-
-.shop-grid .shop-acts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  width: 100%;
-  margin-top: 2px;
-}
-
-.shop-grid .shop-acts .ship-act {
-  margin-top: 0;
-}
-
-.ship-sell-act {
-  color: #f3e0b0;
-  background: #1a1520;
-  border-color: #6c5c1c;
 }
 
 .shop-grid button.empty-slot.unlock-slot {

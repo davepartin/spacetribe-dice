@@ -711,18 +711,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px}
 .shop-grid .hull{max-height:40px}
 .shop-grid .die-caption{margin-top:0;font-size:8px}
-.shop-grid .ship-act{min-height:26px;margin-top:2px;padding:3px 2px;font-size:9px;line-height:1.15}
-.shop-grid .shop-acts{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:100%;margin-top:2px}
-.shop-grid .shop-acts .ship-act{margin-top:0}
-.ship-sell-act{color:#f3e0b0;background:#1a1520;border-color:#6c5c1c}
-.ask-cover{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:24px;background:#050914d8}
-.ask-card{width:min(420px,100%);padding:22px 20px;border:1px solid var(--line);border-radius:18px;background:#10182a}
-.ask-card p{margin:0 0 8px;color:var(--ink);font-size:16px;font-weight:700}
-.ask-card .ask-sub{color:var(--dim);font-size:14px;font-weight:500}
-.ask-btns{display:flex;gap:8px;margin-top:16px}
-.ask-btns button{flex:1;min-height:44px;border-radius:11px;font-weight:800;cursor:pointer}
-#sell-no{color:var(--ink);background:#111a2e;border:1px solid var(--line)}
-#sell-yes{color:#201900;background:var(--gold);border:1px solid #6c5c1c}
+.shop-grid .ship-act{min-height:32px;margin-top:2px;padding:5px 4px;font-size:10px;line-height:1.15}
 .shop-grid .empty-slot{gap:2px}
 .shop-grid .empty-slot span,.shop-grid .empty-slot .slotno{font-size:14px}
 .shop-grid button.empty-slot.unlock-slot{height:100%;padding:6px 6px;gap:3px}
@@ -762,7 +751,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 <script>
 "use strict";
 
-var VERSION = "2.14";   // brace toggle off, sell ships with confirm
+var VERSION = "2.15";   // shipyard upgrade only — sell removed
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -1211,7 +1200,6 @@ var rollBusy = false;
 var ROLL_BUMP_MS = 980;
 var hullGradSeq = 0;
 var pending = null;          // the round, resolved but waiting on your brace choice
-var sellAsk = null;          // shipyard: which fleet index is waiting on a sell confirm
 var flagInLine = false;      // is the flagship's number part of your straight?
 var flagInline = false;      // flagship is in an across (Energy) formation
 var flagIncol = false;       // flagship is in a down (Attack) formation
@@ -1235,7 +1223,6 @@ var pageCheckpoint = null;   // lets a player reset only the choices on this pag
 function newGame(){
   var startingSlots = Math.min(K("maxDice"), Math.max(K("startSlots"), K("startDice")));
   pending = null;
-  sellAsk = null;
   pageCheckpoint = null;
   animate = {};
   flagInLine = false;
@@ -1656,22 +1643,6 @@ function unlockSlot(){
   toast("Slot " + next + " is open");
   render();
 }
-function askSell(i){
-  if (!G.you.dice[i]) return;
-  if (G.you.dice.length <= 1) return toast("You need at least one ship");
-  if (isDamaged(G.you.dice[i])) return toast("That ship is damaged \u2014 it is back next round");
-  sellAsk = i;
-  render();
-}
-function sellAskHtml(){
-  var d = G.you.dice[sellAsk];
-  if (!d) return "";
-  return '<div class="ask-cover" role="dialog" aria-modal="true">' +
-    '<div class="ask-card"><p>Are you sure you want to sell?</p>' +
-    '<p class="ask-sub">This d' + d.s + ' goes for ' + sellValue(d.s) + '⚡.</p>' +
-    '<div class="ask-btns"><button type="button" id="sell-no">Cancel</button>' +
-    '<button type="button" id="sell-yes">Sell</button></div></div></div>';
-}
 function sellDie(i){
   if (G.you.dice.length <= 1) return toast("You need at least one ship");
   if (!G.you.dice[i]) return;
@@ -1679,7 +1650,6 @@ function sellDie(i){
   var sides = G.you.dice[i].s;
   G.you.energy += sellValue(sides);
   G.you.dice.splice(i, 1);
-  sellAsk = null;
   toast("Sold a d" + sides + " for " + sellValue(sides) + " Energy");
   render();
 }
@@ -2727,16 +2697,12 @@ function fleetGridHtml(){
       '<span class="slotno">' + (ix + 1) + '</span>' +
       die3d(hullSvg(d.s, "", hurt ? "dry" : "defense")) +
       '<div class="kind die-caption">d' + d.s + '</div>' +
-      '<div class="shop-acts">' +
-        (next
-          ? '<button class="ship-act ship-upgrade-act" data-grow="' + ix + '"' +
-            (hurt || G.you.energy < cost ? ' disabled' : '') + '>' +
-            (hurt ? 'Damaged' : 'To d' + next + ' ' + cost + '⚡') + '</button>'
-          : '<span class="ship-act">' + (hurt ? 'Damaged' : 'Max d10') + '</span>') +
-        '<button class="ship-act ship-sell-act" data-sell="' + ix + '"' +
-          (hurt || G.you.dice.length <= 1 ? ' disabled' : '') + '>' +
-          (hurt ? 'Damaged' : 'Sell ' + sellValue(d.s) + '⚡') + '</button>' +
-      '</div></div>');
+      (next
+        ? '<button class="ship-act ship-upgrade-act" data-grow="' + ix + '"' +
+          (hurt || G.you.energy < cost ? ' disabled' : '') + '>' +
+          (hurt ? 'Damaged' : 'To d' + next + ' ' + cost + '⚡') + '</button>'
+        : '<span class="ship-act">' + (hurt ? 'Damaged' : 'Max d10') + '</span>') +
+      '</div>');
   }
   return '<div class="grid fleet-formation shop-grid">' + cells.join("") + '</div>';
 }
@@ -2765,7 +2731,7 @@ function shopView(){
   return '<header class="brace-header">' +
     '<p class="eyebrow">SHIPYARD</p>' +
     '<h1 class="brace-title">Upgrade fleet</h1>' +
-    '<p class="brace-lead">Upgrade or sell ships, unlock the next fleet slot, or raise the flagship — then roll. ' +
+    '<p class="brace-lead">Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll. ' +
       plan.line + '</p></header>' +
     '<nav class="jump-nav" aria-label="Upgrade sections">' +
       '<button type="button" data-jump="fleet-upgrades">Fleet</button>' +
@@ -2781,8 +2747,7 @@ function shopView(){
         return '<button class="buy-die die-size-' + sides + '" data-buysize="' + sides + '"' +
           (can ? '' : ' disabled') + '>' + die3d(hullSvg(sides, "", can ? "attack" : "dry")) +
           '<strong>d' + sides + '</strong><span>' + cost + '⚡</span></button>';
-      }).join("") + '</div></section>' +
-    (sellAsk != null ? sellAskHtml() : '');
+      }).join("") + '</div></section>';
 }
 // ── the two reference screens ────────────────────────────────────────────────
 // Energy was the one number on the board with no explanation anywhere. You could
@@ -3311,20 +3276,6 @@ function wire(){
   });
   var us = document.querySelector("[data-unlock]");
   if (us) us.onclick = unlockSlot;
-  Array.prototype.forEach.call(document.querySelectorAll("[data-sell]"), function(el){
-    el.onclick = function(ev){
-      if (ev && ev.stopPropagation) ev.stopPropagation();
-      askSell(+el.getAttribute("data-sell"));
-    };
-  });
-  var sellNo = document.getElementById("sell-no");
-  if (sellNo) sellNo.onclick = function(){ sellAsk = null; render(); };
-  var sellYes = document.getElementById("sell-yes");
-  if (sellYes) sellYes.onclick = function(){
-    var i = sellAsk;
-    sellAsk = null;
-    if (i != null) sellDie(i);
-  };
 }
 
 function toast(msg){
