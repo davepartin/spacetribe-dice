@@ -53,6 +53,7 @@ test("solo page has quit and home controls", () => {
   assert.match(html, /Quit game/i);
   assert.match(html, />Home</);
   assert.match(html, /fleet-dice-v88\.html/);
+  assert.match(html, /solo-game-frame/);
 });
 
 test("static export includes the solo game asset", () => {
