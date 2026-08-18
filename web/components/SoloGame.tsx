@@ -34,12 +34,14 @@ export function SoloGame({
         </div>
       </header>
 
-      <iframe
-        className="solo-game"
-        src={withBasePath(gameSrc)}
-        title={title}
-        allow="fullscreen"
-      />
+      <div className="solo-game-frame">
+        <iframe
+          className="solo-game"
+          src={withBasePath(gameSrc)}
+          title={title}
+          allow="fullscreen"
+        />
+      </div>
 
       {confirmQuit ? (
         <div
