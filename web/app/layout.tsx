@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,14 @@ const spaceGrotesk = Space_Grotesk({
 const siteOrigin = "https://davepartin.github.io/spacetribe-dice";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "/spacetribe-dice";
 
+export const viewport: Viewport = {
+  themeColor: "#080c18",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title: {
@@ -30,7 +38,6 @@ export const metadata: Metadata = {
   description:
     "Build a fleet of dice, chase straights, and break the enemy flagship.",
   applicationName: "Fleet Dice",
-  themeColor: "#080c18",
   appleWebApp: {
     capable: true,
     title: "Fleet Dice",

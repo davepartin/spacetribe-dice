@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.16 — fill the phone screen (prototype)
+
+The play page left a black strip under the Roll button. Safari was painting
+empty space below the game, and pull-to-bounce showed more black. The game now
+fills the phone down to the browser bar.
+
 ### Fleet Dice 2 · 2.15 — shipyard upgrade only (prototype)
 
 Sell came off the ship cards. Two buttons in one cell made Upgrade too small to

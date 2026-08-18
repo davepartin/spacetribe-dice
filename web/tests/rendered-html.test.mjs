@@ -45,7 +45,7 @@ test("versus launcher explains empty rooms get closed", () => {
 });
 
 test("solo-v2 iframe cache-busts the prototype file", () => {
-  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.15/);
+  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.16/);
 });
 
 test("solo page has quit and home controls", () => {
@@ -53,6 +53,7 @@ test("solo page has quit and home controls", () => {
   assert.match(html, /Quit game/i);
   assert.match(html, />Home</);
   assert.match(html, /fleet-dice-v88\.html/);
+  assert.match(html, /solo-game-frame/);
 });
 
 test("static export includes the solo game asset", () => {
@@ -71,7 +72,9 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   const html = readFileSync(file, "utf8");
   assert.match(html, /Fleet Dice 2/);
   assert.match(html, /dieTumble0/);
-  assert.match(html, /VERSION = "2\.15"/);
+  assert.match(html, /VERSION = "2\.16"/);
+  assert.match(html, /html\.in-frame/);
+  assert.match(html, /classList\.add\("in-frame"\)/);
   assert.match(html, /live-tot/);
   assert.match(html, /Turn flagship/);
   assert.match(html, /Straights earn a bonus/);
