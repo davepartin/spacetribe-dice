@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.17 — pick which slot to open (prototype)
+
+Locked cells 6, 7, 8 and 9 are all tappable. The first extra slot still costs 7
+Energy; each one after that costs 1 more, whichever cell you pick. That lets you
+open a column for Attack instead of always filling the next square in order.
+
 ### Fleet Dice 2 · 2.16 — fill the phone screen (prototype)
 
 The play page left a black strip under the Roll button. Safari was painting

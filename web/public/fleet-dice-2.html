@@ -664,6 +664,11 @@ button.homeback{display:block;width:100%;margin-top:10px;padding:11px 12px;
 button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;color:var(--ink);
   background:color-mix(in srgb,var(--nrg) 12%,#0c1324);
   border:1px dashed color-mix(in srgb,var(--nrg) 55%,var(--line));opacity:1;cursor:pointer}
+button.empty-slot.place-slot{gap:4px;min-height:0;height:100%;padding:10px 6px;color:var(--ink);
+  background:color-mix(in srgb,var(--nrg) 8%,#0c1324);
+  border:1px dashed color-mix(in srgb,var(--nrg) 40%,var(--line));opacity:1;cursor:pointer}
+button.empty-slot.place-slot.selected{border-color:var(--nrg);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--nrg) 70%,transparent)}
 .unlock-slot-label{max-width:9em;font-size:12px;font-weight:850;text-align:center;text-transform:none;opacity:1}
 .unlock-slot-cost{color:var(--nrg);font-size:16px;font-weight:900}
 .straight-panel{display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -731,7 +736,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 .shop-grid .ship-act{min-height:32px;margin-top:2px;padding:5px 4px;font-size:10px;line-height:1.15}
 .shop-grid .empty-slot{gap:2px}
 .shop-grid .empty-slot span,.shop-grid .empty-slot .slotno{font-size:14px}
-.shop-grid button.empty-slot.unlock-slot{height:100%;padding:6px 6px;gap:3px}
+.shop-grid button.empty-slot.unlock-slot,.shop-grid button.empty-slot.place-slot{height:100%;padding:6px 6px;gap:3px}
 .shop-grid .unlock-slot-label{max-width:8em;font-size:11px}
 .shop-grid .unlock-slot-cost{font-size:13px}
 .report-title{margin:0 0 16px}
@@ -768,7 +773,7 @@ button.empty-slot.unlock-slot{gap:6px;min-height:0;height:100%;padding:12px 8px;
 <script>
 "use strict";
 
-var VERSION = "2.16";   // fill the phone screen — no black bar under the game
+var VERSION = "2.17";   // tap slot 6–9 to unlock — pick a vertical line
 
 // ── ONE OPEN QUESTION ────────────────────────────────────────────────────
 // AN ENERGY CARRY CAP - not solved. A ceiling on Energy carried between rounds,
@@ -818,11 +823,11 @@ var C = {
                   note:"The rest may be opened between rounds. Width now competes with upgrading the ships you already own." },
   maxDice:      { v:8,  min:3,  max:8,  label:"Fleet slots",
                   note:"Eight around the flagship, which holds the ninth." },
-  slot5Cost:    { v:7,  min:0,  max:30, label:"Open slot 5 costs" },
-  slot6Cost:    { v:8,  min:0,  max:40, label:"Open slot 6 costs" },
-  slot7Cost:    { v:9,  min:0,  max:50, label:"Open slot 7 costs" },
-  slot8Cost:    { v:10, min:0,  max:60, label:"Open slot 8 costs",
-                  note:"Opening a slot is permanent. A ship still has to be bought for it." },
+  slot5Cost:    { v:7,  min:0,  max:30, label:"First extra slot costs" },
+  slot6Cost:    { v:8,  min:0,  max:40, label:"Second extra slot costs" },
+  slot7Cost:    { v:9,  min:0,  max:50, label:"Third extra slot costs" },
+  slot8Cost:    { v:10, min:0,  max:60, label:"Fourth extra slot costs",
+                  note:"Tap any locked cell — 6, 7, 8 or 9. Price is how many extras you have already bought, not which cell. Opening is permanent; a ship still has to be bought for it." },
   rollsPerRound:{ v:3,  min:1,  max:5,  label:"Rolls each round",
                   note:"Hold the dice you want, reroll the rest." },
   rerollCost:   { v:1,  min:1,  max:4,  label:"Energy per extra reroll",
@@ -865,12 +870,57 @@ function growCost(sides){
   var next = nextSize(sides);
   return next ? Math.max(0, priceOf(next) - priceOf(sides)) : 0;
 }
-function slotCost(slot){
+function slotCost(n){
   return { 5:K("slot5Cost"), 6:K("slot6Cost"),
-           7:K("slot7Cost"), 8:K("slot8Cost") }[slot] || 0;
+           7:K("slot7Cost"), 8:K("slot8Cost") }[n] || 0;
+}
+function nextUnlockCost(side){
+  var n = openSlots(side);
+  if (n >= K("maxDice")) return 0;
+  return slotCost(n + 1);
+}
+function startingOpen(){
+  var n = Math.min(K("maxDice"), Math.max(K("startSlots"), K("startDice")));
+  var open = [], i;
+  for (i = 0; i < K("maxDice"); i++) open[i] = i < n;
+  return open;
 }
 function openSlots(side){
-  return Math.min(K("maxDice"), side.slots === undefined ? K("maxDice") : side.slots);
+  var n = 0, i;
+  if (!side || !side.open) return K("maxDice");
+  for (i = 0; i < side.open.length; i++) if (side.open[i]) n++;
+  return n;
+}
+function shipCount(side){
+  var n = 0, i;
+  if (!side || !side.dice) return 0;
+  for (i = 0; i < side.dice.length; i++) if (side.dice[i]) n++;
+  return n;
+}
+function emptyOpenSlots(side){
+  var a = [], i;
+  for (i = 0; i < K("maxDice"); i++)
+    if (side.open && side.open[i] && !side.dice[i]) a.push(i);
+  return a;
+}
+function lockedSlots(side){
+  var a = [], i;
+  for (i = 0; i < K("maxDice"); i++) if (!side.open || !side.open[i]) a.push(i);
+  return a;
+}
+function firstEmptyOpen(side){
+  var a = emptyOpenSlots(side);
+  return a.length ? a[0] : -1;
+}
+// 3×3 cell number: ships are 1–4 and 6–9. 5 is the flagship in the middle.
+function boardLabel(ix){
+  return ix < 4 ? ix + 1 : ix + 2;
+}
+function placeShip(side, ship){
+  var ix = firstEmptyOpen(side);
+  if (ix < 0) return false;
+  side.dice[ix] = ship;
+  return true;
 }
 
 // A 1 blocks for 1 and pays the most Energy. A 2 hits for only 2 but carries the
@@ -949,14 +999,16 @@ function faceMatches(f, value){
 }
 
 function applyFace(id, t, dice, mul){
-  var f = FACES[id], n = 0, i;
+  var f = FACES[id], n = 0, i, die;
   if (!f || !f.gives) { t.rerolls = 0; return t; }   // the Reactor pays no die
   for (i = 0; i < dice.length; i++){
+    die = dice[i];
+    if (!die) continue;
     // The flagship lends its number to a straight and NOTHING else. Skipping it
     // here matters: without this, a flagship showing a 6 counted itself as a
     // fourth red die and its own "+2 per attack" paid it for existing.
-    if (dice[i].flag) continue;
-    if (faceMatches(f, dice[i].value)) n++;
+    if (die.flag) continue;
+    if (faceMatches(f, die.value)) n++;
   }
   // One multiplier for the whole flagship: level 1 adds 2 a match, level 2 adds 3,
   // level 3 adds 4. Direct is tracked on its own because nothing can block it.
@@ -1021,11 +1073,13 @@ function roll(sides){
 // flagship quietly counted as a d6 and paid 9 Energy instead of 6 - the flagship
 // was doing a third job nobody asked it to do.
 function bestRun(dice){
-  var bySize = {}, i, v;
+  var bySize = {}, i, v, die;
   for (i = 0; i < dice.length; i++){
-    v = dice[i].value;
+    die = dice[i];
+    if (!die) continue;
+    v = die.value;
     if (!(v in bySize)) bySize[v] = 0;                    // present, size unknown
-    if (!dice[i].flag && dice[i].sides > bySize[v]) bySize[v] = dice[i].sides;
+    if (!die.flag && die.sides > bySize[v]) bySize[v] = die.sides;
   }
   var best = null;
   for (var start = 1; start <= 10; start++){
@@ -1094,6 +1148,7 @@ function straightBonus(length, biggest){
 function tally(dice, flagFace, mul, pick, slots){
   var t = { attack: 0, defense: 0, energy: 0, heal: 0, direct: 0, rerolls: 0, face: flagFace || null };
   for (var i = 0; i < dice.length; i++){
+    if (!dice[i]) continue;
     // The flagship lends its NUMBER to the straight and nothing else. Letting it
     // also score as a die would be gaining two things for one choice.
     if (dice[i].flag) continue;
@@ -1196,8 +1251,8 @@ function newShip(sides){ return { s: sides, out: 0 }; }
 function soakOf(sides){ return sides; }
 function isDamaged(ship){ return ship.out >= G.round; }
 function startingDice(){
-  var a = [], i;
-  for (i = 0; i < K("startDice"); i++) a.push(newShip(4));
+  var a = [], n = Math.min(K("maxDice"), K("startDice")), i;
+  for (i = 0; i < K("maxDice"); i++) a[i] = i < n ? newShip(4) : null;
   return a;
 }
 // A damaged ship does not roll at all. It sits in its slot, greyed out, and is
@@ -1222,6 +1277,7 @@ var flagInline = false;      // flagship is in an across (Energy) formation
 var flagIncol = false;       // flagship is in a down (Attack) formation
 var lastTally = null;        // what the current roll is worth, for the bottom bar
 var pageCheckpoint = null;   // lets a player reset only the choices on this page
+var placeIx = -1;            // empty slot chosen for the next bought ship
 // The flagship is a d6 with a number on it, and it does BOTH: its boost fires AND
 // its number joins your straight. It used to be a choice between the two, and
 // making you pick was the wrong call - the moment worth building toward is your
@@ -1238,9 +1294,9 @@ var pageCheckpoint = null;   // lets a player reset only the choices on this pag
 // and the solo board stays as quiet as versus.
 
 function newGame(){
-  var startingSlots = Math.min(K("maxDice"), Math.max(K("startSlots"), K("startDice")));
   pending = null;
   pageCheckpoint = null;
+  placeIx = -1;
   animate = {};
   flagInLine = false;
   flagInline = false;
@@ -1250,10 +1306,10 @@ function newGame(){
     round: 1,
     phase: "roll",
     guide: false,
-    you:  { dice: startingDice(), values: [], slots: startingSlots, energy: 0, damage: 0, rolls: 0,
+    you:  { dice: startingDice(), values: [], open: startingOpen(), energy: 0, damage: 0, rolls: 0,
             hp: K("startHP"), base: 0,
             flag: { faces: starterFaces(), face: 0, lvl: 1, token: true, tokenMove: null } },
-    them: { dice: startingDice(), values: [], slots: startingSlots, energy: 0, damage: 0,
+    them: { dice: startingDice(), values: [], open: startingOpen(), energy: 0, damage: 0,
             hp: K("startHP"), base: 0,
             flag: { faces: starterFaces(), face: 0, lvl: 1, token: true, tokenMove: null },
             plan: pickEnemyPlan() },
@@ -1282,17 +1338,17 @@ function resetPageChoices(){
 
 function readyRoll(side){
   side.values = side.dice.map(function(d){
-    return { sides:d.s, value:0, ship:d, dead:isDamaged(d) };
+    return d ? { sides:d.s, value:0, ship:d, dead:isDamaged(d) } : null;
   });
 }
 
 function rollAll(side){
   side.values = side.dice.map(function(d){
-    return { sides: d.s, value: rollFace(d), ship: d, dead: isDamaged(d) };
+    return d ? { sides: d.s, value: rollFace(d), ship: d, dead: isDamaged(d) } : null;
   });
   if (side === G.you){
     animate = { flag: true };
-    for (var i = 0; i < side.values.length; i++) animate[i] = true;
+    for (var i = 0; i < side.values.length; i++) if (side.values[i]) animate[i] = true;
   }
   side.flag.face = Math.floor(Math.random() * 6);
 }
@@ -1346,7 +1402,7 @@ function useTheirFlagToken(){
 }
 
 function liveDice(side){
-  return side.values.filter(function(v){ return !v.dead; });
+  return side.values.filter(function(v){ return v && !v.dead; });
 }
 
 // You tap the dice you want to CHANGE, always - whether the roll is free or paid.
@@ -1359,9 +1415,11 @@ function liveDice(side){
 // which is what stops it being rerolled. Belt and braces: the card
 // carries no data-die either, so there is nothing to tap.
 function pickedDice(){
-  var out = [], i;
-  for (i = 0; i < G.you.values.length; i++)
-    if (sel[i] && !G.you.values[i].dead) out.push(i);
+  var out = [], i, v;
+  for (i = 0; i < G.you.values.length; i++){
+    v = G.you.values[i];
+    if (sel[i] && v && !v.dead) out.push(i);
+  }
   return out;
 }
 /** Play the bump on the dice that just changed, then unlock the board. */
@@ -1393,7 +1451,7 @@ function doReroll(){
     straightPick = null;
     var first = [];
     for (var i = 0; i < G.you.values.length; i++){
-      if (!G.you.values[i].dead) first.push(i);
+      if (G.you.values[i] && !G.you.values[i].dead) first.push(i);
     }
     first.flag = true;
     return playRollBump(first);
@@ -1428,6 +1486,7 @@ function playThem(){
   for (var r = 1; r < K("rollsPerRound"); r++){
     var keep = botHolds(G.them.values);
     for (var i = 0; i < G.them.values.length; i++){
+      if (!G.them.values[i]) continue;
       if (!keep[i]) G.them.values[i].value = roll(G.them.values[i].sides);
     }
   }
@@ -1441,13 +1500,13 @@ function botHolds(vals){
     need = [];
     for (v = st; v < st + K("runMin") + 2 && v <= 10; v++){
       for (i = 0; i < vals.length; i++)
-        if (vals[i].value === v && need.indexOf(i) < 0){ need.push(i); break; }
+        if (vals[i] && vals[i].value === v && need.indexOf(i) < 0){ need.push(i); break; }
     }
     if (!bestWin || need.length > bestWin.length) bestWin = need;
   }
   for (i = 0; i < bestWin.length; i++) keep[bestWin[i]] = true;
   for (i = 0; i < vals.length; i++)
-    if (!keep[i] && vals[i].value > vals[i].sides * 0.7) keep[i] = true;
+    if (vals[i] && !keep[i] && vals[i].value > vals[i].sides * 0.7) keep[i] = true;
   return keep;
 }
 
@@ -1488,8 +1547,7 @@ function submit(){
     else them.energy += K("reactorNow");
   }
 
-  if (you.shipPrize && G.you.dice.length < openSlots(G.you)){
-    G.you.dice.push(newShip(you.shipPrize));
+  if (you.shipPrize && placeShip(G.you, newShip(you.shipPrize))){
     you.shipBuilt = you.shipPrize;
   }
 
@@ -1556,7 +1614,7 @@ function settleRound(){
 // ship is mathematically closest"; it is how much of next round's fleet you are
 // willing to give up to protect the flagship now.
 function wholeShips(side){
-  return side.dice.filter(function(d){ return !isDamaged(d); });
+  return side.dice.filter(function(d){ return d && !isDamaged(d); });
 }
 function canSoak(side){ return wholeShips(side).length > 0; }
 // Damaged for exactly one round. You keep the ship - you just fight the next
@@ -1577,7 +1635,7 @@ function themBrace(dmg){
   if (dmg <= 0) return dmg;
   while (dmg > 0 && used < K("soakMax")){
     whole = [];
-    for (i = 0; i < t.dice.length; i++) if (!isDamaged(t.dice[i])) whole.push(i);
+    for (i = 0; i < t.dice.length; i++) if (t.dice[i] && !isDamaged(t.dice[i])) whole.push(i);
     if (!whole.length) break;
     if (t.hp - dmg > 25) break;                       // not worth a ship yet
     whole.sort(function(a, b){ return t.dice[a].s - t.dice[b].s; });
@@ -1628,13 +1686,17 @@ function startRound(){
 
 // ── shop ─────────────────────────────────────────────────────────────────
 function buyDie(sides){
-  var cost = priceOf(sides);
-  if (G.you.dice.length >= openSlots(G.you))
-    return toast(openSlots(G.you) < K("maxDice") ? "Open another slot first" : "No room \u2014 upgrade or scrap a ship");
+  var cost = priceOf(sides), empties = emptyOpenSlots(G.you), ix;
+  if (!empties.length)
+    return toast(openSlots(G.you) < K("maxDice") ? "Open a slot first — tap 6, 7, 8 or 9" : "No room \u2014 upgrade a ship");
   if (G.you.energy < cost) return;
+  ix = (placeIx >= 0 && empties.indexOf(placeIx) >= 0) ? placeIx
+     : (empties.length === 1 ? empties[0] : -1);
+  if (ix < 0) return toast("Tap the free slot where this ship should sit");
   G.you.energy -= cost;
-  G.you.dice.push(newShip(sides));
-  toast("d" + sides + " joined your fleet");
+  G.you.dice[ix] = newShip(sides);
+  placeIx = -1;
+  toast("d" + sides + " in slot " + boardLabel(ix));
   render();
 }
 function growDie(i){
@@ -1647,26 +1709,30 @@ function growDie(i){
   if (G.you.energy < cost) return toast("Upgrading that ship costs " + cost + " Energy");
   G.you.energy -= cost;
   ship.s = next;
-  toast("Slot " + (i + 1) + " upgraded into a d" + next);
+  toast("Slot " + boardLabel(i) + " upgraded into a d" + next);
   render();
 }
-function unlockSlot(){
-  var next = openSlots(G.you) + 1, cost;
-  if (next > K("maxDice")) return;
-  cost = slotCost(next);
-  if (G.you.energy < cost) return toast("Opening slot " + next + " costs " + cost + " Energy");
+function unlockSlot(ix){
+  var cost;
+  ix = +ix;
+  if (isNaN(ix) || ix < 0 || ix >= K("maxDice")) return;
+  if (G.you.open[ix]) return;
+  cost = nextUnlockCost(G.you);
+  if (!cost) return;
+  if (G.you.energy < cost) return toast("Opening a slot costs " + cost + " Energy");
   G.you.energy -= cost;
-  G.you.slots = next;
-  toast("Slot " + next + " is open");
+  G.you.open[ix] = true;
+  placeIx = ix;
+  toast("Slot " + boardLabel(ix) + " is open");
   render();
 }
 function sellDie(i){
-  if (G.you.dice.length <= 1) return toast("You need at least one ship");
+  if (shipCount(G.you) <= 1) return toast("You need at least one ship");
   if (!G.you.dice[i]) return;
   if (isDamaged(G.you.dice[i])) return toast("That ship is damaged \u2014 it is back next round");
   var sides = G.you.dice[i].s;
   G.you.energy += sellValue(sides);
-  G.you.dice.splice(i, 1);
+  G.you.dice[i] = null;
   toast("Sold a d" + sides + " for " + sellValue(sides) + " Energy");
   render();
 }
@@ -1746,17 +1812,22 @@ function themGrow(){
   growRate = plan === "width" ? 0.24 : plan === "capital" ? 0.40 : 0.30;
 
   for (n = timesPerRound(buyRate * pace); n > 0; n--){
-    if (t.dice.length >= K("maxDice")) break;
-    if (t.dice.length >= openSlots(t)) t.slots = Math.min(K("maxDice"), openSlots(t) + 1);
+    if (shipCount(t) >= K("maxDice")) break;
+    if (!emptyOpenSlots(t).length){
+      var locked = lockedSlots(t);
+      if (!locked.length) break;
+      t.open[locked[0]] = true;
+    }
     sides = 4;
-    if (plan === "capital" && t.dice.length >= 5) sides = 6;
-    t.dice.push(newShip(sides));
+    if (plan === "capital" && shipCount(t) >= 5) sides = 6;
+    placeShip(t, newShip(sides));
   }
 
   for (n = timesPerRound(growRate * pace); n > 0; n--){
     best = -1;
     bestScore = null;
     for (i = 0; i < t.dice.length; i++){
+      if (!t.dice[i]) continue;
       nx = nextSize(t.dice[i].s);
       if (!nx) continue;
       // Width upgrades the smallest; capital the largest; command prefers mid
@@ -2050,11 +2121,11 @@ function dieHtml(d, i, clickable){
   var delay = (i % 4) * 45;
   var spin = animate[i] ? " rolled spin-" + (rollSpin[i] || 0) : "";
   if (d.dead){
-    return '<div class="die fleet-die hurt ready-die"><span class="slotno">' + (i + 1) + '</span>' +
+    return '<div class="die fleet-die hurt ready-die"><span class="slotno">' + boardLabel(i) + '</span>' +
       die3d(hullSvg(d.sides, 0, "dry")) + '<div class="kind die-caption">Damaged</div></div>';
   }
   if (G.you.rolls === 0){
-    return '<div class="die fleet-die ready noPick ready-die"><span class="slotno">' + (i + 1) + '</span>' +
+    return '<div class="die fleet-die ready noPick ready-die"><span class="slotno">' + boardLabel(i) + '</span>' +
       die3d(hullSvg(d.sides, "", "dry")) + '<div class="kind die-caption">Ready</div></div>';
   }
   var k = kindOf(d.value);
@@ -2066,23 +2137,28 @@ function dieHtml(d, i, clickable){
     (sel[i] ? '<span class="reroll-mark">REROLL</span>' : '') +
     (d.inline ? '<i class="nrg-line" aria-hidden="true"></i>' : '') +
     (d.incol ? '<i class="atk-line" aria-hidden="true"></i>' : '') +
-    '<span class="slotno">' + (i + 1) + '</span>' +
+    '<span class="slotno">' + boardLabel(i) + '</span>' +
     die3d(hullSvg(d.sides, d.value, k), animate[i] ? delay : 0) +
     '<div class="kind die-caption">' + label + '</div></div>';
 }
 
-// Nine cells. The flagship holds the middle; the fleet forms up around it.
-// Every slot around the flagship is numbered 1 to 8, filled or empty, so a ship
-// has an address. "The d8 in slot 3" beats "the third one along" the moment two
-// ships are the same size - which is most of the time.
+// Nine cells. The flagship holds the middle (slot 5). Ships are 1–4 and 6–9.
+// Tap 6, 7, 8 or 9 in the shipyard to open that cell, so a line down the board
+// is a real choice and not "whatever is next."
 function gridHtml(){
-  var cells = [], fleet = G.you.values.slice(0, 8), i, ix;
+  var cells = [], i, ix, d, open;
   for (i = 0; i < 9; i++){
     if (i === 4){ cells.push(flagHtml()); continue; }
     ix = i < 4 ? i : i - 1;
-    cells.push(ix < fleet.length
-      ? dieHtml(fleet[ix], ix, G.you.rolls > 0)
-      : '<div class="empty-slot"><span>' + (ix + 1) + '</span><small>slot free</small></div>');
+    d = G.you.values[ix];
+    open = G.you.open[ix];
+    if (d){
+      cells.push(dieHtml(d, ix, G.you.rolls > 0));
+    } else if (open){
+      cells.push('<div class="empty-slot"><span>' + boardLabel(ix) + '</span><small>slot free</small></div>');
+    } else {
+      cells.push('<div class="empty-slot locked-slot"><span>' + boardLabel(ix) + '</span><small>locked</small></div>');
+    }
   }
   return '<div class="grid fleet-formation">' + cells.join("") + '</div>';
 }
@@ -2205,7 +2281,7 @@ function dockMetrics(){
     '<div><div class="n' + (G.you.base ? ' p' : '') + '">' +
       (G.you.base ? '+' + G.you.base : '0') + '</div>' +
       '<div class="l">Base energy<br>per round</div></div>' +
-    '<div><div class="n">' + G.you.dice.length + '/' + openSlots(G.you) +
+    '<div><div class="n">' + shipCount(G.you) + '/' + openSlots(G.you) +
       '</div><div class="l">Ships /<br>open slots</div></div>';
 }
 
@@ -2279,6 +2355,7 @@ function rollView(){
   flagInline = false;
   flagIncol = false;
   for (var si = 0; si < G.you.values.length; si++){
+    if (!G.you.values[si]) continue;
     G.you.values[si].inrun = false;
     G.you.values[si].inline = false;
     G.you.values[si].incol = false;
@@ -2286,7 +2363,7 @@ function rollView(){
   if (t.run){
     for (var v = t.run.start; v <= t.run.top; v++){
       for (si = 0; si < G.you.values.length; si++){
-        if (!G.you.values[si].dead && G.you.values[si].value === v){
+        if (G.you.values[si] && !G.you.values[si].dead && G.you.values[si].value === v){
           G.you.values[si].inrun = true;
           break;
         }
@@ -2335,7 +2412,7 @@ function braceView(){
 
   if (p.fed && p.fed.length){
     h += '<p class="say">' + p.fed.map(function(f){
-      return 'Your <b>d' + f.s + '</b> in slot ' + f.slot + ' took <b>' + f.soak + '</b>';
+      return 'Your <b>d' + f.s + '</b> in slot ' + boardLabel(f.slot - 1) + ' took <b>' + f.soak + '</b>';
     }).join(' \u00b7 ') + '.</p>';
   }
 
@@ -2349,13 +2426,17 @@ function braceView(){
     }
     ix = i < 4 ? i : i - 1;
     d = fleet[ix];
-    if (!d){ cells.push('<div class="empty-slot"><span>' + (ix+1) + '</span></div>'); continue; }
+    if (!d){
+      cells.push('<div class="empty-slot' + (G.you.open[ix] ? '' : ' locked-slot') + '"><span>' +
+        boardLabel(ix) + '</span>' + (G.you.open[ix] ? '' : '<small>locked</small>') + '</div>');
+      continue;
+    }
     hurt = isDamaged(d);
     var picked = p.fed && p.fed.some(function(f){ return f.slot === ix + 1; });
     pick = !hurt && (picked || (left > 0 && room > 0));
     cells.push('<div class="die fleet-die brace-ship-die' + (hurt ? " hurt" : "") + (picked ? " selected" : "") + (pick ? "" : " noPick") + '"' +
       (pick ? ' data-brace="' + ix + '"' : '') + '>' +
-      '<span class="slotno">' + (ix+1) + '</span>' +
+      '<span class="slotno">' + boardLabel(ix) + '</span>' +
       die3d(hullSvg(d.s, "", hurt ? "dry" : "defense")) +
       '<div class="kind die-caption">' + (hurt ? "Damaged" : picked ? "Blocking " + soakOf(d.s) + " — tap off"
         : pick ? "Tap — Block " + soakOf(d.s)
@@ -2463,7 +2544,7 @@ function reportView(){
   theirs += lr("Your shields", tStopped ? "−" + tStopped : "0", "blue");
   if (r.fed && r.fed.length){
     theirs += lr("You put " + r.fed.map(function(f){
-      return "your d" + f.s + " in slot " + f.slot; }).join(" and ") + " in the way",
+      return "your d" + f.s + " in slot " + boardLabel(f.slot - 1); }).join(" and ") + " in the way",
       "−" + Math.min(r.soaked, r.volley), "blue");
   }
   theirs += lr("Through to your flagship", tThrough, "", "sub");
@@ -2489,7 +2570,7 @@ function reportView(){
   if (tWasted) yourNotes += '<div class="line"><b class="blue">' + tWasted +
     ' Shields</b> went to waste — you out-shielded the Enemy shot.</div>';
   if (r.fed && r.fed.length) yourNotes += '<div class="line">' + r.fed.map(function(f){
-    return 'Your <b>d' + f.s + '</b> in slot ' + f.slot; }).join(" and ") +
+    return 'Your <b>d' + f.s + '</b> in slot ' + boardLabel(f.slot - 1); }).join(" and ") +
     ' took the hit, so ' + (r.fed.length === 1 ? 'it is' : 'they are') +
     ' <b>damaged</b> next round — no roll, no scrapping.</div>';
   yourNotes += '<div class="line">Your flagship fired ' + faceEffect(r.youFace) + '.</div>';
@@ -2653,7 +2734,7 @@ function growthMarksHtml(sides){
 // a shape on the grid was two different languages for one object.
 function buyCardHtml(sides){
   var cost = priceOf(sides), f = hullFacts(sides);
-  var full = G.you.dice.length >= openSlots(G.you);
+  var full = !emptyOpenSlots(G.you).length;
   var can = !full && G.you.energy >= cost;
   return '<div class="ship' + (can ? " can" : " cant") + '">' +
     die3d(hullSvg(sides, "", can ? "attack" : "dry")) +
@@ -2670,12 +2751,14 @@ function buyCardHtml(sides){
     '</button></div>';
 }
 
-// The scrapyard is your own board, not a list. Same 3x3, same hulls, same slot
-// numbers - so "scrap the d4 in slot 2" is a thing you can see rather than
-// something you have to translate.
+// Same 3×3 as the roll board. Tap a locked cell — 6, 7, 8 or 9 — to open it.
+// The first extra slot costs 7, each later one costs 1 more, whichever cell you pick.
 function fleetGridHtml(){
-  var cells = [], i, ix, d, hurt, next, cost, open = openSlots(G.you);
-  var nextSlot = open + 1, nextCost = open < K("maxDice") ? slotCost(nextSlot) : null;
+  var cells = [], i, ix, d, hurt, next, cost;
+  var unlockCost = nextUnlockCost(G.you);
+  var empties = emptyOpenSlots(G.you);
+  var chosen = (placeIx >= 0 && empties.indexOf(placeIx) >= 0) ? placeIx
+    : (empties.length === 1 ? empties[0] : -1);
   var lvl = G.you.flag.lvl || 1, flagCost = lvl >= 3 ? null : flagLvlCost(lvl + 1);
   for (i = 0; i < 9; i++){
     if (i === 4){
@@ -2690,28 +2773,27 @@ function fleetGridHtml(){
       continue;
     }
     ix = i < 4 ? i : i - 1;
-    if (ix >= open){
-      if (ix === open && nextCost != null){
-        cells.push('<button class="empty-slot unlock-slot" data-unlock="1"' +
-          (G.you.energy < nextCost ? ' disabled' : '') + '>' +
-          '<span class="slotno">' + (ix + 1) + '</span>' +
-          '<span class="unlock-slot-label">Unlock fleet slot</span>' +
-          '<strong class="unlock-slot-cost">' + nextCost + '⚡</strong></button>');
-      } else {
-        cells.push('<div class="empty-slot locked-slot"><span>' + (ix + 1) + '</span><small>locked</small></div>');
-      }
+    if (!G.you.open[ix]){
+      cells.push('<button class="empty-slot unlock-slot" data-unlock="' + ix + '"' +
+        (unlockCost && G.you.energy >= unlockCost ? '' : ' disabled') + '>' +
+        '<span class="slotno">' + boardLabel(ix) + '</span>' +
+        '<span class="unlock-slot-label">Unlock</span>' +
+        '<strong class="unlock-slot-cost">' + unlockCost + '⚡</strong></button>');
       continue;
     }
     d = G.you.dice[ix];
     if (!d){
-      cells.push('<div class="empty-slot"><span>' + (ix + 1) + '</span><small>slot free</small></div>');
+      cells.push('<button class="empty-slot place-slot' + (chosen === ix ? ' selected' : '') +
+        '" data-place="' + ix + '" type="button">' +
+        '<span class="slotno">' + boardLabel(ix) + '</span>' +
+        '<small>' + (chosen === ix ? 'ship goes here' : 'slot free') + '</small></button>');
       continue;
     }
     hurt = isDamaged(d);
     next = nextSize(d.s);
     cost = growCost(d.s);
     cells.push('<div class="die fleet-die shop-ship noPick' + (hurt ? " hurt" : "") + '">' +
-      '<span class="slotno">' + (ix + 1) + '</span>' +
+      '<span class="slotno">' + boardLabel(ix) + '</span>' +
       die3d(hullSvg(d.s, "", hurt ? "dry" : "defense")) +
       '<div class="kind die-caption">d' + d.s + '</div>' +
       (next
@@ -2725,30 +2807,28 @@ function fleetGridHtml(){
 }
 
 function slotSectionHtml(){
-  var open = openSlots(G.you), next = open + 1;
+  var open = openSlots(G.you), cost = nextUnlockCost(G.you);
   if (open >= K("maxDice")){
     return '<div class="card">' +
       shopHead("blue", "Open another fleet slot", "All " + K("maxDice") + " slots are open") +
       '</div>';
   }
-  var cost = slotCost(next), can = G.you.energy >= cost;
   return '<div class="card">' +
     shopHead("blue", "Open another fleet slot", open + " of " + K("maxDice") + " slots open") +
-    '<div class="slotoffer"><div class="i"><b>Open slot ' + next + '</b>' +
-      '<small>Does not include a ship.</small></div>' +
-      '<button data-unlock="1"' + (can ? '' : ' disabled') + '>' + cost + '⚡' +
-      '</button></div></div>';
+    '<p class="hint">Tap locked slot 6, 7, 8 or 9 on the grid. Next costs <b class="nrg">' +
+      cost + '⚡</b>.</p></div>';
 }
 
 function shopView(){
-  var full = G.you.dice.length >= openSlots(G.you);
-  var filled = G.you.dice.length, cap = openSlots(G.you);
+  var empties = emptyOpenSlots(G.you);
+  var full = !empties.length;
+  var filled = shipCount(G.you), cap = openSlots(G.you);
   var plan = enemyPlanInfo(G.them.plan);
 
   return '<header class="brace-header">' +
     '<p class="eyebrow">SHIPYARD</p>' +
     '<h1 class="brace-title">Upgrade fleet</h1>' +
-    '<p class="brace-lead">Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll. ' +
+    '<p class="brace-lead">Tap a locked slot to open it — pick 6, 7, 8 or 9 if you want a line down the board. Then upgrade, buy, or raise the flagship. ' +
       plan.line + '</p></header>' +
     '<nav class="jump-nav" aria-label="Upgrade sections">' +
       '<button type="button" data-jump="fleet-upgrades">Fleet</button>' +
@@ -2758,7 +2838,7 @@ function shopView(){
       fleetGridHtml() + '</section>' +
     '<section class="upgrade-section" id="buy-ships">' +
       '<div class="section-heading"><h2>Buy a ship</h2><span>' +
-        (full ? 'OPEN A SLOT FIRST' : 'OPEN SLOT READY') + '</span></div>' +
+        (full ? 'TAP A LOCKED SLOT' : 'OPEN SLOT READY') + '</span></div>' +
       '<div class="buy-row">' + [4,6,8,10].map(function(sides){
         var cost = priceOf(sides), can = !full && G.you.energy >= cost;
         return '<button class="buy-die die-size-' + sides + '" data-buysize="' + sides + '"' +
@@ -2801,8 +2881,8 @@ function costsView(){
           ' faces and blocks on ' + (sd / 2) + ', and lifts a straight to the d' + sd + ' tier.');
       }).join("") +
     '</div>' +
-    '<p class="hint">You have ' + (openSlots(G.you) - G.you.dice.length) + ' of ' + openSlots(G.you) +
-    ' open slots free.</p></div>' +
+    '<p class="hint">You have ' + emptyOpenSlots(G.you).length + ' of ' + openSlots(G.you) +
+    ' open slots free. Tap a locked cell on the shipyard to open it.</p></div>' +
 
     '<div class="card jumpmark" id="cost-upgrade">' +
     shopHead("gold", "Upgrade ships in place", "Between rounds, without losing the ship") +
@@ -2813,13 +2893,15 @@ function costsView(){
     '</div></div>' +
 
     '<div class="card jumpmark" id="cost-slots">' +
-    shopHead("blue", "Fleet slots", "Permanent width; the ship is bought separately") +
+    shopHead("blue", "Fleet slots", "Tap the cell you want; the ship is bought separately") +
     '<div class="ctab">' +
-      [5,6,7,8].map(function(n){
-        var open = n <= openSlots(G.you);
-        return row('<b>Slot ' + n + '</b>' + (open ? ' <span class="ok">open</span>' : ''),
-          slotCost(n) + '⚡', open ? 'Already part of your formation.'
-          : 'Open the slot, then buy any ship to fill it.');
+      [1,2,3,4].map(function(n){
+        var cost = slotCost(n + 4);
+        var bought = openSlots(G.you) >= n + 4;
+        var labels = ["First extra slot", "Second extra slot", "Third extra slot", "Fourth extra slot"];
+        return row('<b>' + labels[n - 1] + '</b>' + (bought ? ' <span class="ok">bought</span>' : ''),
+          cost + '⚡', bought ? 'Already open somewhere on the board.'
+          : 'Tap locked slot 6, 7, 8 or 9. Same price whichever cell you pick. Then buy a ship into it.');
       }).join("") +
     '</div></div>' +
 
@@ -2886,7 +2968,7 @@ function helpView(){
       '<div class="line"><b>3 · Take the hit.</b> You choose where Enemy damage goes — ' +
       'all on your flagship, or put as many ships as you want in front of it. Every ship ' +
       'you choose will miss the next round.</div>' +
-      '<div class="line"><b>4 · Spend.</b> Between rounds you upgrade ships, open slots, buy ' +
+      '<div class="line"><b>4 · Spend.</b> Between rounds you upgrade ships, tap a locked slot to open it, buy ' +
       'new ships or upgrade the flagship. Enemy has a plan for the whole match — ' +
       '<b>Width</b>, <b>Capital</b>, or <b>Command</b> — shown on the shipyard screen. ' +
       'Then it starts again.</div>' +
@@ -2930,6 +3012,7 @@ function helpView(){
     shopHead("nrg", "Formation lines", "Same size, same number, three in a row") +
     '<p>The flagship is a <b>d6</b> in the middle of the board, so it counts. Three dice of the <b>same size</b> showing the <b>same number</b> — including the flagship in the centre row or centre column — pay a bonus. Bigger ships pay more, because matching is rarer: three d4s hit about one roll in sixteen, three d10s about one in a hundred. The face number does not change the prize: three 2s on d4s pay the same as three 4s. Centre lines only work with <b>d6s</b>, because that is what the flagship is.</p>' +
     '<p><b class="nrg">Across</b> pays Energy — a yellow bar on top of the cards. <b class="red">Down</b> pays Attack — a red bar on the right. The orange bar on the bottom is still a straight. You can have more than one at once. You start with three d4s across the top, so a d4 row can happen from round one.</p>' +
+    '<p>Locked cells are yours to pick. In the shipyard tap slot <b>6, 7, 8 or 9</b>. The first extra slot costs 7 Energy; each one after that costs 1 more, whichever cell you open. Open the cell under a column if you want Attack down the board.</p>' +
     lineTableHtml() + '</div>' +
 
     '<div class="card">' +
@@ -3291,8 +3374,12 @@ function wire(){
   Array.prototype.forEach.call(document.querySelectorAll("[data-grow]"), function(el){
     el.onclick = function(){ growDie(+el.getAttribute("data-grow")); };
   });
-  var us = document.querySelector("[data-unlock]");
-  if (us) us.onclick = unlockSlot;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-unlock]"), function(el){
+    el.onclick = function(){ unlockSlot(+el.getAttribute("data-unlock")); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-place]"), function(el){
+    el.onclick = function(){ placeIx = +el.getAttribute("data-place"); render(); };
+  });
 }
 
 function toast(msg){
