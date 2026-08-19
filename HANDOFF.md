@@ -8,7 +8,7 @@ Everything you need to be useful is either here or pointed at from here.
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.16) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.17) — online at `/solo-v2/` |
 | **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
@@ -187,8 +187,8 @@ own token by the same rule.
 
 ### A round
 
-1. **Between rounds.** Upgrade a ship one size, buy a new ship, unlock a fleet
-   slot, or upgrade the flagship's level. *(Solo still allows **scrap** for half
+1. **Between rounds.** Upgrade a ship one size, buy a new ship, tap a locked
+   slot (6, 7, 8 or 9) to open it, or upgrade the flagship's level. *(Solo still allows **scrap** for half
    price. Versus shipyard UI no longer offers scrap — upgrade / buy / slots /
    flagship only.)*
 2. **Roll.** The page begins with every available die Ready. Roll 1 rolls
@@ -248,7 +248,7 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 | Ship prices — d4/d6/d8/d10 | 4 / 6 / 9 / 13 | priced by measured value, not by size |
 | Scrap value | 50% | solo only in the UI now |
 | Fleet slots | 4 open of 8 | plus the flagship. You start with 4 d4s and 0 Energy |
-| Unlock slots 5 / 6 / 7 / 8 | 7 / 8 / 9 / 10⚡ | always 2 more than the slot number |
+| Unlock extra slots | 7 / 8 / 9 / 10⚡ | first extra is 7, each later one +1. You pick cell 6–9 so a line down the board is possible |
 | Upgrade d4→d6 / d6→d8 / d8→d10 | 2 / 3 / 4⚡ | the difference between ship prices |
 | Rolls a round | 3 | then 1 Energy a die |
 | A ship blocks | **its own size** | d4 blocks 4, d10 blocks 10 |
