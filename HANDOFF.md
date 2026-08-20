@@ -9,7 +9,7 @@ Everything you need to be useful is either here or pointed at from here.
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
 | **Versus (Fleet Dice 1)** | Two humans, private room, Jackbox-style code, live sync | `/versus/` then `/match/?id=` |
-| **Solo (Fleet Dice 2)** | Same core rules, tumbling dice, pick-a-slot, formation lines | `simple-v2.html` (2.17) — online at `/solo-v2/` |
+| **Solo (Fleet Dice 2)** | Same core rules, tumbling dice, pick-a-slot, three of a kind | `simple-v2.html` (2.18) — online at `/solo-v2/` |
 | **Versus (Fleet Dice 2)** | Same Firebase rooms as Fleet Dice 1, with v2 rules on the room | `/versus-v2/` then `/match/?id=` |
 
 All four sit on the home page. Join-by-code is shared: the room stores
@@ -207,10 +207,8 @@ own token by the same rule.
    as a shorter one — there is a banner on the roll screen with a button per tier
    and the totals move live as you pick. Dice in the straight get an **orange bar
    across the bottom of the slot** (solo and versus). **Fleet Dice 2 also pays
-   formation lines:** three same-size dice showing the same number. Across pays
-   Energy, down pays Attack. The flagship is a d6, so the centre row and column
-   count when the ships beside it are d6s too. Prize is half the die, squared
-   (d4 = 4, d6 = 9, d8 = 16, d10 = 25) so rare big-dice lines pay more.
+   three of a kind:** three dice showing the same number, any size. Across is
+   **5 Energy**. Down is **10 Attack**. The flagship in the middle counts.
 4. **Submit / lock.** Both fleets fire once both sides have locked. Your **volley**
    is `your attack − their shields`. **Direct** is tracked separately and
    **nothing stops it** — not shields, not a ship thrown in front of it.
@@ -275,13 +273,12 @@ Versus hard-codes matching values in `web/lib/game.ts`.
 | **7 in a row** | 12 attack | 18 | 24 | 30 |
 | **8 in a row** | free d4 + 8 | free d6 + 12 | free d8 + 16 | free d10 + 20 |
 
-**Fleet Dice 2 formation lines** (three same-size, same number). Prize is half
-the die, squared — matching is rarer on bigger dice:
+**Fleet Dice 2 three of a kind** (same number, any die size). Flat bonus:
 
-| | d4 | d6 | d8 | d10 |
-| --- | --- | --- | --- | --- |
-| **Across · Energy** | 4⚡ | 9⚡ | 16⚡ | 25⚡ |
-| **Down · Attack** | 4 | 9 | 16 | 25 |
+| | Bonus |
+| --- | --- |
+| **Across · Energy** | 5⚡ |
+| **Down · Attack** | 10 |
 
 ---
 
@@ -465,7 +462,7 @@ pnpm dev
 | File | What it is |
 | --- | --- |
 | **`simple.html`** | Fleet Dice 1. One file, no dependencies. Always newest (v88). Do not use this file for Version 2 experiments. |
-| **`simple-v2.html`** | Fleet Dice 2 prototype. Versus layout + tumbling dice, plus formation lines (flagship counts as a d6). Bump 2.xx here. |
+| **`simple-v2.html`** | Fleet Dice 2 prototype. Versus layout + tumbling dice, pick-a-slot, three of a kind. Bump 2.xx here. |
 | **`simple01.html` … `simple87.html`** | Frozen Fleet Dice 1 snapshots. Never edited again. |
 | **`web/`** | Online home + solo iframe/page + versus app (Next.js). |
 | **`web/README.md`** | Online setup, routes, Firebase deploy one-liners. |
@@ -494,7 +491,7 @@ pnpm dev
    visuals when that's the ask, then **commit and push to `main`** so he can
    play it on the phone. Fleet Dice 2 versus lives in `web/lib/game.ts` +
    `MatchGame.tsx` (not the solo iframe). A `ruleset` of `"v2"` on the room is
-   what turns on formation lines and pick-a-slot; missing ruleset stays classic.
+   what turns on three of a kind and pick-a-slot; missing ruleset stays classic.
 5. If join/create breaks with permissions, check **rules deploy** before rewriting
    the client.
 

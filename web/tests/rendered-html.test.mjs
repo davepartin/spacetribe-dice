@@ -56,7 +56,7 @@ test("Fleet Dice 2 versus launcher uses the same rooms with v2 rules", () => {
 });
 
 test("solo-v2 iframe cache-busts the prototype file", () => {
-  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.17/);
+  assert.match(readPage("solo-v2", "index.html"), /fleet-dice-2\.html\?v=2\.18/);
 });
 
 test("solo page has quit and home controls", () => {
@@ -83,7 +83,7 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   const html = readFileSync(file, "utf8");
   assert.match(html, /Fleet Dice 2/);
   assert.match(html, /dieTumble0/);
-  assert.match(html, /VERSION = "2\.17"/);
+  assert.match(html, /VERSION = "2\.18"/);
   assert.match(html, /function boardLabel/);
   assert.match(html, /data-unlock="' \+ ix/);
   assert.match(html, /Tap a locked slot/);
@@ -95,14 +95,16 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   assert.match(html, /nrg-line/);
   assert.match(html, /atk-line/);
   assert.match(html, /linePay/);
-  assert.match(html, /sides \* sides \/ 4/);
-  assert.match(html, /Formation lines/);
+  assert.match(html, /function lineAcross/);
+  assert.match(html, /Three of a kind/);
   assert.match(html, /Across · Energy/);
   assert.match(html, /Down · Attack/);
   assert.match(html, /flagship is a <b>d6<\/b>/);
-  assert.match(html, /Centre lines only work with/);
+  assert.match(html, /Same number, any size/);
   assert.match(html, /idx:\[3,4,5\]/);
   assert.match(html, /idx:\[1,4,7\]/);
+  assert.doesNotMatch(html, /sides \* sides \/ 4/);
+  assert.doesNotMatch(html, /Centre lines only work with/);
   assert.doesNotMatch(html, /never in a line/);
   assert.doesNotMatch(html, /No straight yet/);
   assert.match(html, /reroll-mark/);
@@ -119,9 +121,9 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   assert.doesNotMatch(html, /\bd12\b|\bd14\b/);
 });
 
-test("how-to-play covers Fleet Dice 2 formation lines", () => {
+test("how-to-play covers Fleet Dice 2 three of a kind", () => {
   const html = readPage("how-to-play", "index.html");
-  assert.match(html, /Formation lines/);
+  assert.match(html, /Three of a kind/);
   assert.match(html, /Across · Energy/);
   assert.match(html, /Down · Attack/);
   assert.match(html, /tap slot/);

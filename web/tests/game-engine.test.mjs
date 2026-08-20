@@ -338,26 +338,49 @@ test("repair can keep a brace volley from counting as an inescapable kill", () =
   assert.ok(guest.directIncoming >= 16);
 });
 
-test("Fleet Dice 2 three d4s across the top pay 4 Energy", () => {
+test("Fleet Dice 2 three of a kind across pays 5 Energy, any die size", () => {
   const state = newMatch("match-v2", "4821", "secret", "host-uid", "Ada", "v2");
   joinMatch(state, "guest-uid", "Grace");
   const host = state.players.host;
   host.dice = [
     { id: host.ships[0].id, sides: 4, value: 4, slot: 0 },
-    { id: host.ships[1].id, sides: 4, value: 4, slot: 1 },
-    { id: host.ships[2].id, sides: 4, value: 4, slot: 2 },
+    { id: host.ships[1].id, sides: 8, value: 4, slot: 1 },
+    { id: host.ships[2].id, sides: 10, value: 4, slot: 2 },
     { id: host.ships[3].id, sides: 4, value: 1, slot: 3 },
     { id: "flag", sides: 6, value: 1, flag: true },
   ];
   const classic = previewTally(host);
   const v2 = previewTally(host, undefined, "v2");
-  assert.equal(linePrize(4), 4);
+  assert.equal(linePrize("row"), 5);
+  assert.equal(linePrize("col"), 10);
   assert.equal(classic.lines?.length ?? 0, 0);
   assert.equal(v2.lines?.length, 1);
-  assert.equal(v2.lines?.[0]?.energy, 4);
+  assert.equal(v2.lines?.[0]?.energy, 5);
   assert.equal(v2.lines?.[0]?.attack, 0);
-  assert.equal(v2.energy, classic.energy + 4);
+  assert.equal(v2.energy, classic.energy + 5);
   assert.equal(v2.attack, classic.attack);
+});
+
+test("Fleet Dice 2 three of a kind down pays 10 Attack, any die size", () => {
+  const state = newMatch("match-v2-col", "4821", "secret", "host-uid", "Ada", "v2");
+  joinMatch(state, "guest-uid", "Grace");
+  const host = state.players.host;
+  host.dice = [
+    { id: "a", sides: 4, value: 2, slot: 0 },
+    { id: "b", sides: 6, value: 1, slot: 1 },
+    { id: "c", sides: 4, value: 3, slot: 2 },
+    { id: "d", sides: 8, value: 2, slot: 3 },
+    { id: "e", sides: 4, value: 5, slot: 4 },
+    { id: "f", sides: 10, value: 2, slot: 5 },
+    { id: "flag", sides: 6, value: 6, flag: true },
+  ];
+  const classic = previewTally(host);
+  const v2 = previewTally(host, undefined, "v2");
+  assert.equal(v2.lines?.length, 1);
+  assert.equal(v2.lines?.[0]?.kind, "col");
+  assert.equal(v2.lines?.[0]?.attack, 10);
+  assert.equal(v2.lines?.[0]?.energy, 0);
+  assert.equal(v2.attack, classic.attack + 10);
 });
 
 test("Fleet Dice 2 lets you unlock slot 6, 7, 8 or 9", () => {

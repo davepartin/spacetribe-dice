@@ -4,7 +4,8 @@ import {
   directOf,
   energyOf,
   flagshipUpgradeCost,
-  linePrize,
+  LINE_ACROSS_ENERGY,
+  LINE_DOWN_ATTACK,
   priceOf,
   repairOf,
   slotPrice,
@@ -169,7 +170,7 @@ export function HelpSheet({
         <div className="help-shape-grid">
           {SHAPES.map((entry) => (
             <div className="help-shape-card" key={entry.sides}>
-              <ShipHull ready sides={entry.sides} value={0} />
+              <ShipHull ready sides={entry.sides} v2={v2} value={0} />
               <strong>{entry.name}</strong>
               <span>{entry.shape}</span>
             </div>
@@ -245,7 +246,7 @@ export function HelpSheet({
         <h3>Your flagship</h3>
         <p>
           It rolls like any other die, but it never fights. Its number joins your
-          straight{v2 ? ", and it counts as a d6 in a formation through the middle of the board" : ""}, and whichever face it lands on <b>adds a bonus to the matching
+          straight{v2 ? ", and it can complete a three of a kind through the middle of the board" : ""}, and whichever face it lands on <b>adds a bonus to the matching
           ships</b> — 2, 3 and 4 match that exact number; 5 boosts every odd shield
           and 6 boosts every even attack. Those dice get a thin ring in the
           flagship&apos;s colour so you can see it happening. The <b>#1</b> face is
@@ -267,7 +268,7 @@ export function HelpSheet({
             const detail = flagFaceDetail(face, flagLevel);
             return (
               <div className="help-flag-card" key={face}>
-                <FlagHull value={face} />
+                <FlagHull v2={v2} value={face} />
                 <strong style={{ color: detail.fill }}>
                   #{face} · {detail.label}
                 </strong>
@@ -317,20 +318,16 @@ export function HelpSheet({
 
       {v2 ? (
         <article className="reference-card">
-          <h3>Formation lines{standalone ? " · Fleet Dice 2" : ""}</h3>
+          <h3>Three of a kind{standalone ? " · Fleet Dice 2" : ""}</h3>
           <p>
-            Three dice of the <b>same size</b> showing the <b>same number</b> — including
-            the flagship as a <b>d6</b> in the centre row or centre column — pay a bonus.
-            Bigger ships pay more, because matching is rarer. The face number does not
-            change the prize: three 2s on d4s pay the same as three 4s. Centre lines
-            only work with <b>d6s</b>, because that is what the flagship is.
+            Three dice showing the <b>same number</b> — any mix of d4, d6, d8 or d10 —
+            pay a flat bonus. The flagship in the middle counts. That is the whole rule.
           </p>
           <p>
-            <b className="energy-text">Across</b> pays Energy — a yellow bar on top of
-            the cards. <b className="damage-text">Down</b> pays Attack — a red bar on
-            the right. The orange bar on the bottom is still a straight. You can have
-            more than one at once. You start with three d4s across the top, so a d4
-            row can happen from round one.
+            <b className="energy-text">Across</b> is <b>{LINE_ACROSS_ENERGY} Energy</b> —
+            a yellow bar on top of the cards. <b className="damage-text">Down</b> is{" "}
+            <b>{LINE_DOWN_ATTACK} Attack</b> — a red bar on the right. The orange bar
+            on the bottom is still a straight. You can have more than one at once.
           </p>
           <p>
             Locked cells are yours to pick. In the shipyard tap slot <b>6, 7, 8 or 9</b>.
@@ -341,25 +338,18 @@ export function HelpSheet({
           <table className="straight-help-table">
             <thead>
               <tr>
-                <th>Die size</th>
-                <th>d4</th>
-                <th>d6</th>
-                <th>d8</th>
-                <th>d10</th>
+                <th></th>
+                <th>Bonus</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Across · Energy</td>
-                {([4, 6, 8, 10] as DieSize[]).map((sides) => (
-                  <td key={`nrg-${sides}`}>{linePrize(sides)}⚡</td>
-                ))}
+                <td>{LINE_ACROSS_ENERGY}⚡</td>
               </tr>
               <tr>
                 <td>Down · Attack</td>
-                {([4, 6, 8, 10] as DieSize[]).map((sides) => (
-                  <td key={`atk-${sides}`}>{linePrize(sides)}</td>
-                ))}
+                <td>{LINE_DOWN_ATTACK}</td>
               </tr>
             </tbody>
           </table>

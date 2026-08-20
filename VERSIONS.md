@@ -43,6 +43,12 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · 2.18 — three of a kind is a flat bonus (prototype)
+
+Versus now uses the solid tumbling dice from solo, and the totals boxes keep
+their colours. Three of a kind is simpler: same number, any die size. Across is
+always 5 Energy. Down is always 10 Attack. The flagship in the middle still counts.
+
 ### Fleet Dice 2 · versus — same rooms, formation lines, pick-a-slot
 
 Fleet Dice 2 now has Battle a friend. It uses the same Firebase rooms and

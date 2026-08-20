@@ -180,14 +180,14 @@ export function HomeScreen() {
                     <span className="home-mode-label">Play solo</span>
                     <span aria-hidden="true">→</span>
                   </span>
-                  <small>New dice, and three in a row pays Energy or Attack.</small>
+                  <small>New dice, and three of a kind pays Energy or Attack.</small>
                 </Link>
                 <Link className="home-mode-action home-mode-v2-versus" href="/versus-v2/">
                   <span className="home-mode-topline">
                     <span className="home-mode-label">Battle a friend</span>
                     <span aria-hidden="true">→</span>
                   </span>
-                  <small>Same live rooms — pick a slot and hunt formation lines.</small>
+                  <small>Same live rooms — pick a slot and hunt three of a kind.</small>
                 </Link>
               </div>
             </section>

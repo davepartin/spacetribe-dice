@@ -322,8 +322,13 @@ export function nextUnlockCost(player: PlayerState): number {
   return slotPrice(opened + 1);
 }
 
-export function linePrize(sides: number): number {
-  return Math.round((sides * sides) / 4);
+/** Three of a kind across the board. Any die size. */
+export const LINE_ACROSS_ENERGY = 5;
+/** Three of a kind down the board. Any die size. */
+export const LINE_DOWN_ATTACK = 10;
+
+export function linePrize(kind: "row" | "col" = "row"): number {
+  return kind === "col" ? LINE_DOWN_ATTACK : LINE_ACROSS_ENERGY;
 }
 
 export function flagshipUpgradeCost(level: number): number | null {
@@ -781,15 +786,14 @@ export function findLines(dice: DieValue[]): FormationLine[] {
     const cells = line.idx.map((cell) => boardCell(dice, cell));
     if (cells.some((die) => !die || !die.value)) continue;
     const first = cells[0]!;
-    if (!cells.every((die) => die!.sides === first.sides && die!.value === first.value)) continue;
-    const pay = linePrize(first.sides);
+    if (!cells.every((die) => die!.value === first.value)) continue;
     hits.push({
       kind: line.kind,
       idx: line.idx.slice(),
       sides: first.sides,
       value: first.value,
-      energy: line.kind === "row" ? pay : 0,
-      attack: line.kind === "col" ? pay : 0,
+      energy: line.kind === "row" ? LINE_ACROSS_ENERGY : 0,
+      attack: line.kind === "col" ? LINE_DOWN_ATTACK : 0,
     });
   }
   return hits;

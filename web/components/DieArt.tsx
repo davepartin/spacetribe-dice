@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import type { DieSize } from "@/lib/game";
 import { directOf, energyOf, repairOf } from "@/lib/game";
 
@@ -81,17 +82,121 @@ function marks(
   ));
 }
 
+const PLASTIC: Record<
+  "attack" | "defense" | "ready",
+  { light: string; mid: string; dark: string; left: string; right: string; ink: string }
+> = {
+  attack: { light: "#ff8b96", mid: "#ff4d5e", dark: "#8f1826", left: "#c43344", right: "#6d101c", ink: "#fff7f8" },
+  defense: { light: "#8ad4ff", mid: "#3aabef", dark: "#155a8c", left: "#2b86c4", right: "#0e3f66", ink: "#f4fbff" },
+  ready: { light: "#d8e1ee", mid: "#8fa0b6", dark: "#3a4658", left: "#6b7a90", right: "#2a3444", ink: "#f4f7fb" },
+};
+
+function parsePts(pts: string) {
+  return pts.trim().split(/\s+/).map((pair) => {
+    const [x, y] = pair.split(",");
+    return { x: Number(x), y: Number(y) };
+  });
+}
+
 export function ShipHull({
   sides,
   value,
   ready = false,
+  v2 = false,
 }: {
   sides: DieSize | number;
   value: number;
   ready?: boolean;
+  v2?: boolean;
 }) {
+  const uid = useId().replace(/:/g, "");
   const hull = HULLS[sides] || HULLS[6];
   const kind = ready ? "ready" : value % 2 === 0 ? "attack" : "defense";
+  if (v2) {
+    const pal = PLASTIC[kind];
+    const top = parsePts(hull.pts);
+    const lift = 6;
+    const shown = ready || !value ? "" : String(value);
+    return (
+      <svg className="hull" viewBox="-4 -4 108 118" aria-hidden="true">
+        <defs>
+          <linearGradient id={`dg${uid}`} x1="18%" y1="6%" x2="86%" y2="94%">
+            <stop offset="0%" stopColor={pal.light} />
+            <stop offset="48%" stopColor={pal.mid} />
+            <stop offset="100%" stopColor={pal.dark} />
+          </linearGradient>
+          <clipPath id={`cl${uid}`}>
+            <polygon points={hull.pts} />
+          </clipPath>
+        </defs>
+        <ellipse cx="50" cy="104" rx="28" ry="7" fill="#000" opacity={0.4} />
+        {top.map((a, index) => {
+          const b = top[(index + 1) % top.length]!;
+          const mx = (a.x + b.x) / 2;
+          return (
+            <polygon
+              fill={mx < 50 ? pal.left : pal.right}
+              key={`side-${index}`}
+              points={`${a.x},${a.y} ${b.x},${b.y} ${b.x},${b.y + lift} ${a.x},${a.y + lift}`}
+            />
+          );
+        })}
+        <polygon
+          fill={`url(#dg${uid})`}
+          points={hull.pts}
+          stroke={pal.light}
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+        />
+        <g clipPath={`url(#cl${uid})`}>
+          <ellipse cx="38" cy="32" rx="18" ry="10" fill="#fff" opacity={0.28} />
+        </g>
+        <g className="face-ink">
+          {shown ? (
+            <text
+              fill={pal.ink}
+              fontSize={40 * hull.scale}
+              fontWeight={800}
+              paintOrder="stroke"
+              stroke="#1a1020"
+              strokeWidth={0.7}
+              style={{ fontVariantNumeric: "tabular-nums" }}
+              textAnchor="middle"
+              x="50"
+              y={hull.textY}
+            >
+              {shown}
+            </text>
+          ) : null}
+          {!ready && value
+            ? marks(energyOf(value), BOLT, "var(--energy)", hull.boltY, hull.boltR, 9 * hull.boltR, "mk")
+            : null}
+          {!ready && value
+            ? marks(
+                Math.min(repairOf(value), 4),
+                CROSS,
+                "var(--repair)",
+                hull.boltY,
+                hull.boltR * 0.52,
+                10 * hull.boltR,
+                "cr",
+              )
+            : null}
+          {!ready && value
+            ? marks(
+                Math.min(directOf(value), 4),
+                CHEV,
+                "var(--direct)",
+                hull.boltY,
+                hull.boltR * 0.9,
+                9 * hull.boltR,
+                "ch",
+              )
+            : null}
+        </g>
+      </svg>
+    );
+  }
   const col =
     kind === "attack" ? "var(--red)" : kind === "defense" ? "var(--blue)" : "var(--faint)";
   const shown = ready ? "◆" : String(value);
@@ -145,8 +250,70 @@ export function ShipHull({
   );
 }
 
-export function FlagHull({ value, ready = false }: { value: number; ready?: boolean }) {
+export function FlagHull({
+  value,
+  ready = false,
+  v2 = false,
+}: {
+  value: number;
+  ready?: boolean;
+  v2?: boolean;
+}) {
+  const uid = useId().replace(/:/g, "");
   const face = FLAG_FACE[value] || { fill: "#f2f5ff", ink: "#101828", label: "Flagship", short: () => "Flagship" };
+  if (v2) {
+    const show = ready || !value ? "" : String(value);
+    return (
+      <svg className="hull" viewBox="-6 -6 112 118" aria-hidden="true">
+        <defs>
+          <linearGradient id={`fg${uid}`} x1="18%" y1="8%" x2="88%" y2="92%">
+            <stop offset="0%" stopColor="#fff6d0" />
+            <stop offset="42%" stopColor={face.fill} />
+            <stop offset="100%" stopColor="#7a5a10" />
+          </linearGradient>
+        </defs>
+        <ellipse cx="50" cy="102" rx="30" ry="7" fill="#000" opacity={0.42} />
+        <rect x="18" y="20" width="70" height="70" rx="16" fill="#6b4e0c" />
+        <rect
+          x="11"
+          y="11"
+          width="78"
+          height="78"
+          rx="17"
+          fill={`url(#fg${uid})`}
+          stroke="#f7e7a0"
+          strokeWidth="3"
+        />
+        <rect
+          x="20"
+          y="20"
+          width="60"
+          height="60"
+          rx="11"
+          fill="none"
+          stroke={face.ink}
+          strokeOpacity={0.22}
+          strokeWidth="1"
+        />
+        <ellipse cx="36" cy="30" rx="22" ry="12" fill="#fff" opacity={0.22} />
+        {show ? (
+          <g className="face-ink">
+            <text
+              fill={face.ink}
+              fontSize={36.8}
+              fontWeight={800}
+              style={{ fontVariantNumeric: "tabular-nums" }}
+              textAnchor="middle"
+              x="50"
+              y="63"
+            >
+              {show}
+            </text>
+          </g>
+        ) : null}
+      </svg>
+    );
+  }
   return (
     <svg className="hull" viewBox="0 0 100 100" aria-hidden="true">
       <rect

@@ -512,8 +512,8 @@ function Shipyard({
             slots={you.slots}
             v2={v2}
             renderFlag={() => (
-              <div className="fleet-die shop-flag shop-flagship static">
-                <DieFace v2={v2}><FlagHull value={1} ready /></DieFace>
+              <div className={`fleet-die shop-flag shop-flagship static ${v2 ? "v2-die" : ""}`}>
+                <DieFace v2={v2}><FlagHull value={1} ready v2={v2} /></DieFace>
                 <span className="die-caption">Level {you.flag.level}</span>
                 {flagCost ? (
                   <button
@@ -572,9 +572,9 @@ function Shipyard({
               const cost = next ? priceOf(next as DieSize) - priceOf(ship.sides) : null;
               const damaged = ship.disabledRound === round;
               return (
-                <div className={`fleet-die shop-ship ${damaged ? "hurt" : ""}`} key={ship.id}>
+                <div className={`fleet-die shop-ship ${damaged ? "hurt" : ""} ${v2 ? "v2-die" : ""}`} key={ship.id}>
                   <span className="slot-badge">{slotNo(index)}</span>
-                  <DieFace v2={v2}><ShipHull ready sides={ship.sides} value={0} /></DieFace>
+                  <DieFace v2={v2}><ShipHull ready sides={ship.sides} v2={v2} value={0} /></DieFace>
                   <span className="die-caption">d{ship.sides}</span>
                   {next ? (
                     <button
@@ -638,7 +638,7 @@ function Shipyard({
                 }
                 type="button"
               >
-                <DieFace v2={v2}><ShipHull ready sides={sides} value={0} /></DieFace>
+                <DieFace v2={v2}><ShipHull ready sides={sides} v2={v2} value={0} /></DieFace>
                 <strong>d{sides}</strong>
                 <span>{priceOf(sides)}⚡</span>
               </button>
@@ -1110,7 +1110,7 @@ function BraceFleet({
             const slot = v2 ? boardLabel(index) : index + 1;
             return (
               <button
-                className={`fleet-die shield-die brace-ship-die ${picked ? "selected brace-sacrificed" : ""} ${alreadyHurt ? "hurt" : ""} ${canPick ? "" : "no-pick"}`}
+                className={`fleet-die shield-die brace-ship-die ${picked ? "selected brace-sacrificed" : ""} ${alreadyHurt ? "hurt" : ""} ${canPick ? "" : "no-pick"} ${v2 ? "v2-die" : ""}`}
                 disabled={!canPick || busy}
                 key={ship.id}
                 onClick={() => toggleShip(ship.id)}
@@ -1118,7 +1118,7 @@ function BraceFleet({
               >
                 <span className="slot-badge">{slot}</span>
                 <div className="brace-hull-wrap">
-                  <DieFace v2={v2}><ShipHull ready sides={ship.sides} value={0} /></DieFace>
+                  <DieFace v2={v2}><ShipHull ready sides={ship.sides} v2={v2} value={0} /></DieFace>
                   {picked ? (
                     <span className="brace-damage-overlay">Damaged for one round</span>
                   ) : null}
@@ -1498,9 +1498,9 @@ function FleetDie({
       {incol ? <i className="atk-line" aria-hidden="true" /> : null}
       <DieFace v2={v2}>
         {die.flag ? (
-          <FlagHull value={die.value} />
+          <FlagHull v2={v2} value={die.value} />
         ) : (
-          <ShipHull sides={die.sides as DieSize} value={die.value} />
+          <ShipHull sides={die.sides as DieSize} v2={v2} value={die.value} />
         )}
       </DieFace>
       <span
@@ -1532,7 +1532,7 @@ function ReadyDie({
     <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`} ${damaged ? "hurt" : ""} ${v2 ? "v2-die" : ""}`}>
       {slot ? <span className="slot-badge">{slot}</span> : null}
       <DieFace v2={v2}>
-        {flag ? <FlagHull value={face} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
+        {flag ? <FlagHull v2={v2} value={face} ready /> : <ShipHull sides={sides || 4} v2={v2} value={0} ready />}
       </DieFace>
       <span className={`die-caption ${flag ? "flag-caption" : ""}`}>
         {flag ? "Ready" : damaged ? "Damaged" : "Ready"}
@@ -1560,8 +1560,8 @@ function LiveTally({
       </section>
       {v2 && lines.length ? (
         <p className="line-hit-note">
-          {lines.length === 1 ? "1 formation line" : `${lines.length} formation lines`}
-          {" — yellow across is Energy, red down is Attack."}
+          {lines.length === 1 ? "Three of a kind" : `${lines.length} threes of a kind`}
+          {" — yellow across is 5 Energy, red down is 10 Attack."}
         </p>
       ) : null}
     </>
