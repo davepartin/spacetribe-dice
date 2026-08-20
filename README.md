@@ -34,7 +34,7 @@ work, and the prompt to give a new assistant.
 | File | What it holds |
 | --- | --- |
 | [HANDOFF.md](HANDOFF.md) | The entry point — rules, numbers, process |
-| [IDEAS.md](IDEAS.md) | The v77 review: what the playtests found, and five things to build |
+| [IDEAS.md](IDEAS.md) | The v83 review: what the playtests found, and five things to build |
 | [VERSIONS.md](VERSIONS.md) | Every version, newest first, with the measurements behind each change |
 | [TARGETING.md](TARGETING.md) | Designed and measured, mostly unbuilt: targeting, cannon fodder, Direct hits |
 | [PANELS.md](PANELS.md) | The flagship panel catalogue and how to price one |

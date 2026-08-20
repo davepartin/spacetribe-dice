@@ -295,23 +295,25 @@ Versus motion waits until this solo feel is approved. You start with four open
 slots and must buy width; or you can spend small amounts upgrading the four
 ships already in formation.
 
-This is a **first balance pass, not proof of balance**. Five automated policies
-played the real game against the pace-1 opponent:
+This is a **balance pass, not proof of balance**. Five automated policies
+played the real game against the pace-1 opponent (80 matches each, v83 review):
 
-| Plan | Preliminary win rate |
+| Plan | Win rate |
 | --- | ---: |
-| Unlock slots and add d4s | 34% |
-| Build a fifth d6, then upgrade the largest ship | 42% |
-| Build toward six ships, then upgrade the smallest | 34% |
-| Flagship levels first, then balanced upgrades | 38% |
-| Unlock every slot with d4s, then upgrade | 46% |
+| Unlock slots and add d4s (never upgrade) | 38% |
+| Build a fifth d6, then upgrade the largest ship | 49% |
+| Build toward six ships, then upgrade the smallest | 53% |
+| Flagship levels first, then balanced upgrades | **28%** |
+| Unlock every slot with d4s, then upgrade | **56%** |
 
-No plan swept the field; the old fill-first plan had won **100%**. With both
-Flagship Tokens in play, these matches averaged 13.3 rounds. These policies
-are deliberately simple and this is a 50-match sample per plan, still only about
-±14 points at 95% confidence. Pairwise human play,
-especially intelligent straight-tier choices and better flagship timing, is the
-next evidence that matters.
+No plan swept the field; the old fill-first plan had won **100%**. Three upgrade
+paths sit inside seven points. Flagship-first is the weak path. Matches average
+about 13.5 rounds. These policies are deliberately simple — ±11 points at 95%
+confidence on 80 matches — so treat the ordering as a signal, not a ranking.
+Frozen finished fleets still say pure width beats skinny capital; mixed fleets
+fight even. Details and next ideas live in [`IDEAS.md`](IDEAS.md). Pairwise
+human play, especially straight-tier choices and flagship timing, is still the
+evidence that matters most.
 
 **What eight ships of one size actually produce a round** (three rolls, the
 opponent's own hold logic, 4,000 rounds each):
