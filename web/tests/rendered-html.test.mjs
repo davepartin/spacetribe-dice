@@ -21,6 +21,8 @@ test("static export includes the Fleet Dice home screen", () => {
   assert.match(html, /Play solo/);
   assert.match(html, /Battle a friend/);
   assert.match(html, /Fleet Dice 2/);
+  assert.match(html, /versus-v2/);
+  assert.doesNotMatch(html, /Solo only for now/);
   assert.match(html, /Join the fight/);
   assert.match(html, /Winners from the last 30 days/);
   assert.match(html, /\/spacetribe-dice\/how-to-play\//);
@@ -31,6 +33,7 @@ for (const [segments, expected] of [
   [["solo", "index.html"], "Fleet Dice solo game"],
   [["solo-v2", "index.html"], "Fleet Dice 2 prototype"],
   [["versus", "index.html"], "Create private match"],
+  [["versus-v2", "index.html"], "Create a Fleet Dice 2 Match"],
   [["join", "index.html"], "Join a Match"],
   [["match", "index.html"], "Opening battlefield"],
   [["how-to-play", "index.html"], "Back to Fleet Dice home"],
@@ -42,6 +45,14 @@ for (const [segments, expected] of [
 
 test("versus launcher explains empty rooms get closed", () => {
   assert.match(readPage("versus", "index.html"), /empty room waiting/i);
+});
+
+test("Fleet Dice 2 versus launcher uses the same rooms with v2 rules", () => {
+  const html = readPage("versus-v2", "index.html");
+  assert.match(html, /Fleet Dice 2/i);
+  assert.match(html, /Create private match/i);
+  assert.match(html, /empty room waiting/i);
+  assert.match(html, /pick-a-slot|formation|three in a row/i);
 });
 
 test("solo-v2 iframe cache-busts the prototype file", () => {
@@ -106,6 +117,14 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   assert.match(html, /die-caption">Level /);
   assert.doesNotMatch(html, /shop-flag-lvl/);
   assert.doesNotMatch(html, /\bd12\b|\bd14\b/);
+});
+
+test("how-to-play covers Fleet Dice 2 formation lines", () => {
+  const html = readPage("how-to-play", "index.html");
+  assert.match(html, /Formation lines/);
+  assert.match(html, /Across · Energy/);
+  assert.match(html, /Down · Attack/);
+  assert.match(html, /tap slot/);
 });
 
 test("asset paths use the GitHub Pages basePath", () => {

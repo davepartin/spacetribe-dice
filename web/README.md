@@ -13,11 +13,13 @@ After Pages is enabled, the public site is:
 
 | Route | What it does |
 | --- | --- |
-| `/` | Choose Solo, create Versus, or enter a four-digit code |
-| `/solo/` | Complete v83 solo game |
-| `/versus/` | Create a private two-player room |
+| `/` | Choose Fleet Dice 1 or 2, solo or versus, or enter a four-digit code |
+| `/solo/` | Fleet Dice 1 solo |
+| `/versus/` | Create a Fleet Dice 1 two-player room |
+| `/solo-v2/` | Fleet Dice 2 solo |
+| `/versus-v2/` | Create a Fleet Dice 2 two-player room |
 | `/join/?id=…` | Accept an invite link |
-| `/match/?id=…` | Play a synchronized match |
+| `/match/?id=…` | Play a synchronized match (ruleset is on the room) |
 
 ## Local development
 

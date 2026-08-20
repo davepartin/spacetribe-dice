@@ -23,6 +23,7 @@ import {
   roleFor,
   type MatchAction,
   type MatchState,
+  type Ruleset,
   type SideId,
 } from "./game";
 
@@ -73,6 +74,7 @@ export type RememberedMatchCard = {
   round: number;
   youName: string;
   enemyName: string | null;
+  ruleset: Ruleset;
 };
 
 const ACTIVE_MATCH_KEY = "fleet-dice-active-match";
@@ -136,7 +138,10 @@ export function rememberedMatchIds(): string[] {
   return readRememberedMatchIds();
 }
 
-export async function createLiveMatch(name: string): Promise<{
+export async function createLiveMatch(
+  name: string,
+  ruleset: Ruleset = "classic",
+): Promise<{
   match: LiveMatch;
   invitePath: string;
 }> {
@@ -149,7 +154,7 @@ export async function createLiveMatch(name: string): Promise<{
     const code = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
     const codeRef = doc(db, "codes", code);
     const boardRef = doc(db, "liveBattles", matchRef.id);
-    const state = newMatch(matchRef.id, code, matchRef.id, user.uid, name);
+    const state = newMatch(matchRef.id, code, matchRef.id, user.uid, name, ruleset);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -265,6 +270,7 @@ export async function loadRememberedMatchCards(): Promise<RememberedMatchCard[]>
         round: you.round,
         youName: you.name,
         enemyName: enemy?.name ?? null,
+        ruleset: match.state.ruleset === "v2" ? "v2" : "classic",
       });
     } catch {
       clearActiveMatch(id);

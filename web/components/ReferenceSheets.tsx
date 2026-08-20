@@ -4,10 +4,12 @@ import {
   directOf,
   energyOf,
   flagshipUpgradeCost,
+  linePrize,
   priceOf,
   repairOf,
   slotPrice,
   type DieSize,
+  type Ruleset,
 } from "@/lib/game";
 import {
   FlagHull,
@@ -72,6 +74,7 @@ export function ReferenceSheets({
   slots,
   shipCount,
   onClose,
+  ruleset = "classic",
 }: {
   kind: ReferenceKind;
   energy: number;
@@ -80,15 +83,17 @@ export function ReferenceSheets({
   slots: number;
   shipCount: number;
   onClose: () => void;
+  ruleset?: Ruleset;
 }) {
   return (
     <div className="reference-overlay" role="dialog" aria-modal="true" aria-labelledby="reference-title">
       <div className="reference-sheet reference-sheet-wide">
-        {kind === "help" ? <HelpSheet flagLevel={flagLevel} /> : (
+        {kind === "help" ? <HelpSheet flagLevel={flagLevel} ruleset={ruleset} /> : (
           <CostsSheet
             baseEnergy={baseEnergy}
             energy={energy}
             flagLevel={flagLevel}
+            ruleset={ruleset}
             shipCount={shipCount}
             slots={slots}
           />
@@ -104,11 +109,14 @@ export function ReferenceSheets({
 export function HelpSheet({
   flagLevel,
   standalone = false,
+  ruleset = "classic",
 }: {
   flagLevel: number;
   standalone?: boolean;
+  ruleset?: Ruleset;
 }) {
   const mul = Math.min(4, flagLevel + 1);
+  const v2 = ruleset === "v2" || standalone;
   return (
     <>
       <p className="eyebrow">HOW TO PLAY</p>
@@ -237,7 +245,7 @@ export function HelpSheet({
         <h3>Your flagship</h3>
         <p>
           It rolls like any other die, but it never fights. Its number joins your
-          straight, and whichever face it lands on <b>adds a bonus to the matching
+          straight{v2 ? ", and it counts as a d6 in a formation through the middle of the board" : ""}, and whichever face it lands on <b>adds a bonus to the matching
           ships</b> — 2, 3 and 4 match that exact number; 5 boosts every odd shield
           and 6 boosts every even attack. Those dice get a thin ring in the
           flagship&apos;s colour so you can see it happening. The <b>#1</b> face is
@@ -307,6 +315,57 @@ export function HelpSheet({
         </p>
       </article>
 
+      {v2 ? (
+        <article className="reference-card">
+          <h3>Formation lines{standalone ? " · Fleet Dice 2" : ""}</h3>
+          <p>
+            Three dice of the <b>same size</b> showing the <b>same number</b> — including
+            the flagship as a <b>d6</b> in the centre row or centre column — pay a bonus.
+            Bigger ships pay more, because matching is rarer. The face number does not
+            change the prize: three 2s on d4s pay the same as three 4s. Centre lines
+            only work with <b>d6s</b>, because that is what the flagship is.
+          </p>
+          <p>
+            <b className="energy-text">Across</b> pays Energy — a yellow bar on top of
+            the cards. <b className="damage-text">Down</b> pays Attack — a red bar on
+            the right. The orange bar on the bottom is still a straight. You can have
+            more than one at once. You start with three d4s across the top, so a d4
+            row can happen from round one.
+          </p>
+          <p>
+            Locked cells are yours to pick. In the shipyard tap slot <b>6, 7, 8 or 9</b>.
+            The first extra slot costs 7 Energy; each one after that costs 1 more,
+            whichever cell you open. Open the cell under a column if you want Attack
+            down the board.
+          </p>
+          <table className="straight-help-table">
+            <thead>
+              <tr>
+                <th>Die size</th>
+                <th>d4</th>
+                <th>d6</th>
+                <th>d8</th>
+                <th>d10</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Across · Energy</td>
+                {([4, 6, 8, 10] as DieSize[]).map((sides) => (
+                  <td key={`nrg-${sides}`}>{linePrize(sides)}⚡</td>
+                ))}
+              </tr>
+              <tr>
+                <td>Down · Attack</td>
+                {([4, 6, 8, 10] as DieSize[]).map((sides) => (
+                  <td key={`atk-${sides}`}>{linePrize(sides)}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      ) : null}
+
       <article className="reference-card">
         <h3>Taking damage</h3>
         <p>
@@ -349,15 +408,18 @@ function CostsSheet({
   flagLevel,
   slots,
   shipCount,
+  ruleset = "classic",
 }: {
   energy: number;
   baseEnergy: number;
   flagLevel: number;
   slots: number;
   shipCount: number;
+  ruleset?: Ruleset;
 }) {
   const flagMul = Math.min(4, flagLevel + 1);
   const openFree = Math.max(0, slots - shipCount);
+  const v2 = ruleset === "v2";
   return (
     <>
       <p className="eyebrow">SHIPYARD</p>
@@ -397,9 +459,17 @@ function CostsSheet({
         <h3>Open fleet slots</h3>
         <CostTable
           rows={[5, 6, 7, 8].map((n) => ({
-            what: `Slot ${n}${n <= slots ? " · open" : ""}`,
+            what: v2
+              ? `${n === 5 ? "First extra slot" : n === 6 ? "Second extra" : n === 7 ? "Third extra" : "Fourth extra"}${n <= slots ? " · open" : ""}`
+              : `Slot ${n}${n <= slots ? " · open" : ""}`,
             price: `${slotPrice(n)}⚡`,
-            why: n <= slots ? "Already in your formation" : "Then buy a ship to fill it",
+            why: v2
+              ? n <= slots
+                ? "Already in your formation"
+                : "Tap locked cell 6, 7, 8 or 9"
+              : n <= slots
+                ? "Already in your formation"
+                : "Then buy a ship to fill it",
           }))}
         />
       </article>

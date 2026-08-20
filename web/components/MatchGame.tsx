@@ -8,17 +8,26 @@ import { InvitePanel } from "./InvitePanel";
 import { ReferenceSheets, type ReferenceKind } from "./ReferenceSheets";
 import {
   activeShips,
+  boardLabel,
+  emptyOpenSlots,
   flagshipUpgradeCost,
+  matchRuleset,
+  nextUnlockCost,
+  openMask,
   opponentOf,
   previewTally,
   priceOf,
+  shipInFleetSlot,
   slotPrice,
   straightOptions,
   type DieSize,
   type DieValue,
+  type FormationLine,
   type MatchAction,
   type PlayerState,
   type RoundReport,
+  type Ruleset,
+  type Ship,
 } from "@/lib/game";
 import {
   cancelLiveMatch,
@@ -31,6 +40,10 @@ import {
 } from "@/lib/firebase-match";
 import { withBasePath } from "@/lib/paths";
 import { FlagHull, ShipHull, flagFaceDetail } from "./DieArt";
+
+function versusPath(state: { ruleset?: Ruleset }) {
+  return matchRuleset(state) === "v2" ? "/versus-v2" : "/versus";
+}
 
 function friendlyFirebaseError(reason: unknown): string {
   const message = reason instanceof Error ? reason.message : String(reason || "The match did not load.");
@@ -158,9 +171,10 @@ export function MatchGame() {
   const you = match.state.players[match.side]!;
   const enemy = match.state.players[opponentOf(match.side)];
   const cancelled = match.state.status === "finished" && Boolean(match.state.cancelledBy);
+  const v2 = matchRuleset(match.state) === "v2";
 
   return (
-    <main className="match-shell">
+    <main className={v2 ? "match-shell match-v2" : "match-shell"}>
       <SiteHeader
         code={match.state.code}
         onCosts={() => setReference("costs")}
@@ -173,6 +187,7 @@ export function MatchGame() {
           flagLevel={you.flag.level}
           kind={reference}
           onClose={() => setReference(null)}
+          ruleset={matchRuleset(match.state)}
           shipCount={you.ships.length}
           slots={you.slots}
         />
@@ -192,7 +207,7 @@ export function MatchGame() {
             </Link>
             <Link
               className="action-button red-action"
-              href="/versus"
+              href={versusPath(match.state)}
               onClick={() => clearActiveMatch(match.id)}
             >
               New match
@@ -370,6 +385,7 @@ function MatchStage({
         onHelp={onHelp}
         play={play}
         round={you.round}
+        ruleset={matchRuleset(match.state)}
         you={you}
       />
     );
@@ -383,6 +399,7 @@ function MatchStage({
         onHelp={onHelp}
         play={play}
         round={you.round}
+        ruleset={matchRuleset(match.state)}
         you={you}
       />
     );
@@ -396,6 +413,7 @@ function MatchStage({
         onHelp={onHelp}
         play={play}
         round={you.round}
+        ruleset={matchRuleset(match.state)}
         you={you}
       />
     );
@@ -438,6 +456,7 @@ function Shipyard({
   busy,
   onHelp,
   onCancel,
+  ruleset,
 }: {
   you: PlayerState;
   enemy: PlayerState;
@@ -446,10 +465,23 @@ function Shipyard({
   busy: boolean;
   onHelp: () => void;
   onCancel: () => void;
+  ruleset: Ruleset;
 }) {
+  const v2 = ruleset === "v2";
+  const empties = emptyOpenSlots(you);
+  const [placeIx, setPlaceIx] = useState<number | null>(null);
+  const chosen =
+    placeIx != null && empties.includes(placeIx)
+      ? placeIx
+      : empties.length === 1
+        ? empties[0]
+        : null;
   const nextSlot = you.slots + 1;
-  const nextSlotCost = you.slots >= 8 ? null : slotPrice(nextSlot);
+  const nextSlotCost = v2 ? nextUnlockCost(you) : you.slots >= 8 ? null : slotPrice(nextSlot);
   const flagCost = flagshipUpgradeCost(you.flag.level);
+  const open = openMask(you);
+  const slotNo = (index: number) => (v2 ? boardLabel(index) : index + 1);
+
   return (
     <>
       <HealthBoard enemy={enemy} you={you} />
@@ -458,7 +490,9 @@ function Shipyard({
           <p className="eyebrow">SHIPYARD</p>
           <h1 className="brace-title">Upgrade fleet</h1>
           <p className="brace-lead">
-            Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll.
+            {v2
+              ? "Tap a locked slot to open it — pick 6, 7, 8 or 9 if you want a line down the board. Then upgrade, buy, or raise the flagship."
+              : "Upgrade ships, unlock the next fleet slot, or raise the flagship — then roll."}
           </p>
         </header>
         <nav className="jump-nav" aria-label="Upgrade sections">
@@ -469,15 +503,17 @@ function Shipyard({
         <section className="upgrade-section" id="fleet-upgrades">
           <div className="section-heading">
             <h2>Your ships</h2>
-            <span>{you.ships.length} / {you.slots} slots</span>
+            <span>{you.ships.length} / {open.filter(Boolean).length} slots</span>
           </div>
           <FleetFormation
             compact
+            open={open}
             ships={you.ships}
             slots={you.slots}
+            v2={v2}
             renderFlag={() => (
               <div className="fleet-die shop-flag shop-flagship static">
-                <FlagHull value={1} ready />
+                <DieFace v2={v2}><FlagHull value={1} ready /></DieFace>
                 <span className="die-caption">Level {you.flag.level}</span>
                 {flagCost ? (
                   <button
@@ -494,37 +530,51 @@ function Shipyard({
               </div>
             )}
             renderLocked={(index) => {
-              const isNext = index === you.slots && nextSlotCost != null;
-              if (!isNext) {
+              if (!v2) {
+                const isNext = index === you.slots && nextSlotCost != null;
+                if (!isNext) {
+                  return (
+                    <div className="empty-slot locked-slot" aria-hidden="true">
+                      <span>{slotNo(index)}</span>
+                      <small>locked</small>
+                    </div>
+                  );
+                }
                 return (
-                  <div className="empty-slot locked-slot" aria-hidden="true">
-                    <span>{index + 1}</span>
-                    <small>locked</small>
-                  </div>
+                  <button
+                    className="empty-slot unlock-slot"
+                    disabled={busy || nextSlotCost > you.energy}
+                    onClick={() => play({ type: "shop", operation: "slot" })}
+                    type="button"
+                  >
+                    <span className="slot-badge">{slotNo(index)}</span>
+                    <span className="unlock-slot-label">Unlock fleet slot</span>
+                    <strong className="unlock-slot-cost">{nextSlotCost}⚡</strong>
+                  </button>
                 );
               }
               return (
                 <button
                   className="empty-slot unlock-slot"
-                  disabled={busy || nextSlotCost > you.energy}
-                  onClick={() => play({ type: "shop", operation: "slot" })}
+                  disabled={busy || !nextSlotCost || nextSlotCost > you.energy}
+                  onClick={() => play({ type: "shop", operation: "slot", slotIndex: index })}
                   type="button"
                 >
-                  <span className="slot-badge">{index + 1}</span>
-                  <span className="unlock-slot-label">Unlock fleet slot</span>
+                  <span className="slot-badge">{slotNo(index)}</span>
+                  <span className="unlock-slot-label">Unlock</span>
                   <strong className="unlock-slot-cost">{nextSlotCost}⚡</strong>
                 </button>
               );
             }}
             renderShip={(index) => {
-              const ship = you.ships[index];
+              const ship = shipInFleetSlot(you, index)!;
               const next = ship.sides === 4 ? 6 : ship.sides === 6 ? 8 : ship.sides === 8 ? 10 : null;
               const cost = next ? priceOf(next as DieSize) - priceOf(ship.sides) : null;
               const damaged = ship.disabledRound === round;
               return (
                 <div className={`fleet-die shop-ship ${damaged ? "hurt" : ""}`} key={ship.id}>
-                  <span className="slot-badge">{index + 1}</span>
-                  <ShipHull ready sides={ship.sides} value={0} />
+                  <span className="slot-badge">{slotNo(index)}</span>
+                  <DieFace v2={v2}><ShipHull ready sides={ship.sides} value={0} /></DieFace>
                   <span className="die-caption">d{ship.sides}</span>
                   {next ? (
                     <button
@@ -541,24 +591,54 @@ function Shipyard({
                 </div>
               );
             }}
+            renderEmpty={(index) =>
+              v2 ? (
+                <button
+                  className={`empty-slot place-slot ${chosen === index ? "selected" : ""}`}
+                  onClick={() => setPlaceIx(index)}
+                  type="button"
+                >
+                  <span className="slot-badge">{slotNo(index)}</span>
+                  <small>{chosen === index ? "ship goes here" : "slot free"}</small>
+                </button>
+              ) : undefined
+            }
           />
         </section>
 
         <section className="upgrade-section" id="buy-ships">
           <div className="section-heading">
             <h2>Buy a ship</h2>
-            <span>{you.ships.length < you.slots ? "OPEN SLOT READY" : "OPEN A SLOT FIRST"}</span>
+            <span>
+              {empties.length
+                ? "OPEN SLOT READY"
+                : v2
+                  ? "TAP A LOCKED SLOT"
+                  : "OPEN A SLOT FIRST"}
+            </span>
           </div>
           <div className="buy-row">
             {([4, 6, 8, 10] as DieSize[]).map((sides) => (
               <button
                 className={`buy-die die-size-${sides}`}
-                disabled={busy || you.ships.length >= you.slots || priceOf(sides) > you.energy}
+                disabled={
+                  busy ||
+                  !empties.length ||
+                  priceOf(sides) > you.energy ||
+                  (v2 && chosen == null && empties.length > 1)
+                }
                 key={sides}
-                onClick={() => play({ type: "shop", operation: "buy", sides })}
+                onClick={() =>
+                  play({
+                    type: "shop",
+                    operation: "buy",
+                    sides,
+                    slotIndex: v2 ? chosen ?? undefined : undefined,
+                  })
+                }
                 type="button"
               >
-                <ShipHull ready sides={sides} value={0} />
+                <DieFace v2={v2}><ShipHull ready sides={sides} value={0} /></DieFace>
                 <strong>d{sides}</strong>
                 <span>{priceOf(sides)}⚡</span>
               </button>
@@ -592,6 +672,7 @@ function RollFleet({
   busy,
   onHelp,
   onCancel,
+  ruleset,
 }: {
   you: PlayerState;
   enemy: PlayerState;
@@ -600,20 +681,23 @@ function RollFleet({
   busy: boolean;
   onHelp: () => void;
   onCancel: () => void;
+  ruleset: Ruleset;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [rolledIds, setRolledIds] = useState<Set<string>>(() => new Set());
   const [rollPulse, setRollPulse] = useState(0);
-  const run = straightOptions(you);
+  const v2 = ruleset === "v2";
+  const run = straightOptions(you, ruleset);
   const [straightTake, setStraightTake] = useState<number | undefined>(
     run ? Math.min(run.length, 7) : undefined,
   );
   const chosenStraightTake = run
     ? Math.min(straightTake ?? run.length, run.length, 7)
     : undefined;
-  const preview = you.dice.length ? previewTally(you, chosenStraightTake) : null;
+  const preview = you.dice.length ? previewTally(you, chosenStraightTake, ruleset) : null;
   const earning = preview ? preview.energy + you.baseEnergy : 0;
   const inrunIds = straightDieIds(you.dice, preview?.run);
+  const lineMarks = lineDieMarks(you.dice, preview?.lines);
 
   useEffect(() => {
     if (!rolledIds.size) return;
@@ -707,7 +791,7 @@ function RollFleet({
               : "Free rolls are done. Fire at the top, spend Energy to reroll below, or use your Flagship Token."}
         </p>
 
-        {preview ? <LiveTally tally={preview} /> : null}
+        {preview ? <LiveTally tally={preview} v2={v2} /> : null}
 
         {run ? (
           <section className="straight-panel">
@@ -717,7 +801,7 @@ function RollFleet({
             </div>
             <div className="straight-options">
               {Array.from({ length: Math.min(run.length, 7) - 4 }, (_, index) => index + 5).map((length) => {
-                const option = previewTally(you, length).run!;
+                const option = previewTally(you, length, ruleset).run!;
                 return (
                   <button
                     className={chosenStraightTake === length ? "active" : ""}
@@ -752,43 +836,53 @@ function RollFleet({
         ) : null}
 
         <FleetFormation
+          open={openMask(you)}
           ships={you.ships}
           slots={you.slots}
+          v2={v2}
           renderFlag={() => {
-            if (you.phase === "ready") return <ReadyDie flag face={you.flag.face} />;
+            if (you.phase === "ready") return <ReadyDie flag face={you.flag.face} v2={v2} />;
             const flag = you.dice.find((die) => die.flag);
             if (!flag) return null;
             return (
               <FleetDie
                 die={flag}
                 flagLevel={you.flag.level}
+                incol={lineMarks.incol.has("flag")}
+                inline={lineMarks.inline.has("flag")}
                 inrun={inrunIds.has(flag.id)}
                 onClick={() => toggleDie(flag.id)}
                 rolled={rolledIds.has(flag.id)}
                 selected={selected.includes(flag.id)}
+                v2={v2}
               />
             );
           }}
           renderShip={(index) => {
-            const ship = you.ships[index];
+            const ship = shipInFleetSlot(you, index);
+            if (!ship) return null;
+            const slot = v2 ? boardLabel(index) : index + 1;
             const damaged = ship.disabledRound === round;
             if (you.phase === "ready") {
               return (
-                <ReadyDie damaged={damaged} sides={ship.sides} slot={index + 1} />
+                <ReadyDie damaged={damaged} sides={ship.sides} slot={slot} v2={v2} />
               );
             }
             const die = you.dice.find((entry) => entry.id === ship.id);
             if (!die) {
-              return <ReadyDie damaged sides={ship.sides} slot={index + 1} />;
+              return <ReadyDie damaged sides={ship.sides} slot={slot} v2={v2} />;
             }
             return (
               <FleetDie
                 die={die}
+                incol={lineMarks.incol.has(die.id)}
+                inline={lineMarks.inline.has(die.id)}
                 inrun={inrunIds.has(die.id)}
                 onClick={() => toggleDie(die.id)}
                 rolled={rolledIds.has(die.id)}
                 selected={selected.includes(die.id)}
-                slot={index + 1}
+                slot={slot}
+                v2={v2}
               />
             );
           }}
@@ -804,21 +898,27 @@ function RollFleet({
 function FleetFormation({
   ships,
   slots,
+  open,
   compact,
   className,
+  v2 = false,
   renderShip,
   renderFlag,
   renderLocked,
+  renderEmpty,
 }: {
-  ships: { id: string }[];
+  ships: Ship[];
   slots?: number;
+  open?: boolean[];
   compact?: boolean;
   className?: string;
+  v2?: boolean;
   renderShip: (index: number) => ReactNode;
   renderFlag: () => ReactNode;
   renderLocked?: (index: number) => ReactNode;
+  renderEmpty?: (index: number) => ReactNode;
 }) {
-  const openSlots = slots ?? Math.max(ships.length, 8);
+  const mask = open ?? Array.from({ length: 8 }, (_, index) => index < (slots ?? Math.max(ships.length, 8)));
   const cells = [];
   for (let i = 0; i < 9; i += 1) {
     if (i === 4) {
@@ -830,23 +930,31 @@ function FleetFormation({
       continue;
     }
     const index = i < 4 ? i : i - 1;
+    const ship = ships.find((entry, shipIndex) => (entry.slot ?? shipIndex) === index);
+    const label = v2 ? boardLabel(index) : index + 1;
+    let inner: ReactNode;
+    if (ship) {
+      inner = renderShip(index);
+    } else if (mask[index]) {
+      inner = renderEmpty?.(index) ?? (
+        <div className="empty-slot free-slot" aria-hidden="true">
+          <span>{label}</span>
+          <small>slot free</small>
+        </div>
+      );
+    } else {
+      inner = renderLocked ? (
+        renderLocked(index)
+      ) : (
+        <div className="empty-slot locked-slot" aria-hidden="true">
+          <span>{label}</span>
+          <small>locked</small>
+        </div>
+      );
+    }
     cells.push(
       <div className="fleet-cell" key={`slot-${index}`}>
-        {index < ships.length ? (
-          renderShip(index)
-        ) : index < openSlots ? (
-          <div className="empty-slot free-slot" aria-hidden="true">
-            <span>{index + 1}</span>
-            <small>slot free</small>
-          </div>
-        ) : renderLocked ? (
-          renderLocked(index)
-        ) : (
-          <div className="empty-slot locked-slot" aria-hidden="true">
-            <span>{index + 1}</span>
-            <small>locked</small>
-          </div>
-        )}
+        {inner}
       </div>,
     );
   }
@@ -861,6 +969,7 @@ function BraceFleet({
   busy,
   onHelp,
   onCancel,
+  ruleset,
 }: {
   you: PlayerState;
   enemy: PlayerState;
@@ -869,7 +978,9 @@ function BraceFleet({
   busy: boolean;
   onHelp: () => void;
   onCancel: () => void;
+  ruleset: Ruleset;
 }) {
+  const v2 = ruleset === "v2";
   const [selected, setSelected] = useState<string[]>([]);
   const autoBraceSent = useRef(false);
   const pickable = new Set(activeShips(you, round).map((ship) => ship.id));
@@ -967,8 +1078,10 @@ function BraceFleet({
 
         <FleetFormation
           className="brace-grid"
+          open={openMask(you)}
           ships={you.ships}
           slots={you.slots}
+          v2={v2}
           renderFlag={() => (
             <div
               className={`fleet-die brace-flag brace-flagship static ${
@@ -989,10 +1102,12 @@ function BraceFleet({
             </div>
           )}
           renderShip={(index) => {
-            const ship = you.ships[index];
+            const ship = shipInFleetSlot(you, index);
+            if (!ship) return null;
             const alreadyHurt = ship.disabledRound === round;
             const picked = selected.includes(ship.id);
             const canPick = pickable.has(ship.id) && (picked || volleyLeft > 0);
+            const slot = v2 ? boardLabel(index) : index + 1;
             return (
               <button
                 className={`fleet-die shield-die brace-ship-die ${picked ? "selected brace-sacrificed" : ""} ${alreadyHurt ? "hurt" : ""} ${canPick ? "" : "no-pick"}`}
@@ -1001,9 +1116,9 @@ function BraceFleet({
                 onClick={() => toggleShip(ship.id)}
                 type="button"
               >
-                <span className="slot-badge">{index + 1}</span>
+                <span className="slot-badge">{slot}</span>
                 <div className="brace-hull-wrap">
-                  <ShipHull ready sides={ship.sides} value={0} />
+                  <DieFace v2={v2}><ShipHull ready sides={ship.sides} value={0} /></DieFace>
                   {picked ? (
                     <span className="brace-damage-overlay">Damaged for one round</span>
                   ) : null}
@@ -1082,6 +1197,8 @@ function RoundResult({
   const won = match.state.winner === match.side;
   const draw = match.state.winner === "draw";
   const enemyStillBracing = !finished && enemy.phase === "brace";
+  const v2 = matchRuleset(match.state) === "v2";
+  const enemyLineMarks = lineDieMarks(enemy.dice, enemy.tally?.lines);
   const title = finished
     ? cancelled
       ? `${match.state.cancelledBy} ended this game.`
@@ -1126,6 +1243,7 @@ function RoundResult({
               kind="you"
               label="YOUR FLAGSHIP"
               report={you.report}
+              v2={v2}
             />
           ) : null}
           {enemy.report ? (
@@ -1139,6 +1257,7 @@ function RoundResult({
                   : undefined
               }
               report={enemy.report}
+              v2={v2}
             />
           ) : enemy.dice.length ? (
             <article className="report-side enemy">
@@ -1153,8 +1272,12 @@ function RoundResult({
                   <FleetDie
                     die={die}
                     flagLevel={enemy.flag.level}
+                    incol={enemyLineMarks.incol.has(die.id)}
+                    inline={enemyLineMarks.inline.has(die.id)}
                     key={die.id}
+                    slot={v2 && typeof die.slot === "number" ? boardLabel(die.slot) : undefined}
                     staticDie
+                    v2={v2}
                   />
                 ))}
               </div>
@@ -1163,6 +1286,12 @@ function RoundResult({
                   <p><span>ATTACK</span><b className="damage-text">{enemy.tally.attack}</b></p>
                   <p><span>SHIELDS</span><b className="shield-text">{enemy.tally.defense}</b></p>
                   <p><span>DIRECT</span><b className="direct-text">{enemy.tally.direct}</b></p>
+                  {v2 && (enemy.tally.lines ?? []).some((line) => line.energy) ? (
+                    <p><span>FORMATION ENERGY</span><b className="energy-text">{(enemy.tally.lines ?? []).reduce((sum, line) => sum + line.energy, 0)}</b></p>
+                  ) : null}
+                  {v2 && (enemy.tally.lines ?? []).some((line) => line.attack) ? (
+                    <p><span>FORMATION ATTACK</span><b className="damage-text">{(enemy.tally.lines ?? []).reduce((sum, line) => sum + line.attack, 0)}</b></p>
+                  ) : null}
                 </div>
               ) : null}
             </article>
@@ -1188,7 +1317,7 @@ function RoundResult({
             </Link>
             <Link
               className="action-button red-action"
-              href="/versus"
+              href={versusPath(match.state)}
               onClick={() => clearActiveMatch(match.id)}
             >
               New match
@@ -1226,14 +1355,19 @@ function ReportSide({
   kind,
   flagLevel = 1,
   note,
+  v2 = false,
 }: {
   report: RoundReport;
   label: string;
   kind: "you" | "enemy";
   flagLevel?: number;
   note?: string;
+  v2?: boolean;
 }) {
   const change = report.hpAfter - report.hpBefore;
+  const lineMarks = lineDieMarks(report.dice, report.tally.lines);
+  const lineEnergy = (report.tally.lines ?? []).reduce((sum, line) => sum + line.energy, 0);
+  const lineAttack = (report.tally.lines ?? []).reduce((sum, line) => sum + line.attack, 0);
   return (
     <article className={`report-side ${kind}`}>
       <h2>{label}</h2>
@@ -1253,7 +1387,16 @@ function ReportSide({
       </div>
       <div className="report-dice">
         {report.dice.map((die) => (
-          <FleetDie die={die} flagLevel={flagLevel} key={die.id} staticDie />
+          <FleetDie
+            die={die}
+            flagLevel={flagLevel}
+            incol={lineMarks.incol.has(die.id)}
+            inline={lineMarks.inline.has(die.id)}
+            key={die.id}
+            slot={v2 && typeof die.slot === "number" ? boardLabel(die.slot) : undefined}
+            staticDie
+            v2={v2}
+          />
         ))}
       </div>
       <div className="result-lines">
@@ -1262,6 +1405,8 @@ function ReportSide({
         <p><span>DIRECT</span><b className="direct-text">{report.tally.direct}</b></p>
         <p><span>REPAIR</span><b className="repair-text">{report.tally.heal}</b></p>
         <p><span>ENERGY BANKED</span><b className="energy-text">{report.energyEarned}</b></p>
+        {v2 && lineEnergy ? <p><span>FORMATION ENERGY</span><b className="energy-text">{lineEnergy}</b></p> : null}
+        {v2 && lineAttack ? <p><span>FORMATION ATTACK</span><b className="damage-text">{lineAttack}</b></p> : null}
         {report.soaked ? <p><span>BLOCKED BY SHIPS</span><b>{report.soaked}</b></p> : null}
       </div>
     </article>
@@ -1281,6 +1426,33 @@ function straightDieIds(
   return ids;
 }
 
+function lineDieMarks(
+  dice: DieValue[],
+  lines: FormationLine[] | undefined,
+) {
+  const inline = new Set<string>();
+  const incol = new Set<string>();
+  for (const line of lines ?? []) {
+    const bucket = line.kind === "row" ? inline : incol;
+    for (const cell of line.idx) {
+      if (cell === 4) {
+        const flag = dice.find((die) => die.flag);
+        if (flag) bucket.add(flag.id);
+        continue;
+      }
+      const index = cell < 4 ? cell : cell - 1;
+      const die = dice.find((entry) => !entry.flag && entry.slot === index);
+      if (die) bucket.add(die.id);
+    }
+  }
+  return { inline, incol };
+}
+
+function DieFace({ v2, children }: { v2?: boolean; children: ReactNode }) {
+  if (!v2) return children;
+  return <div className="die-3d">{children}</div>;
+}
+
 function FleetDie({
   die,
   selected = false,
@@ -1290,6 +1462,9 @@ function FleetDie({
   flagLevel = 1,
   inrun = false,
   rolled = false,
+  v2 = false,
+  inline = false,
+  incol = false,
 }: {
   die: DieValue;
   selected?: boolean;
@@ -1299,6 +1474,9 @@ function FleetDie({
   flagLevel?: number;
   inrun?: boolean;
   rolled?: boolean;
+  v2?: boolean;
+  inline?: boolean;
+  incol?: boolean;
 }) {
   const flag = die.flag ? flagFaceDetail(die.value, flagLevel) : null;
   const effect = flag
@@ -1306,20 +1484,25 @@ function FleetDie({
     : die.value % 2 === 0
       ? "Attack"
       : "Shield";
+  const spin = die.id.charCodeAt(Math.max(0, die.id.length - 1)) % 3;
   return (
     <button
-      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${inrun ? "inrun" : ""} ${rolled ? "rolled" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""}`}
+      className={`fleet-die ${die.flag ? "flag" : `die-size-${die.sides}`} ${selected ? "selected" : ""} ${staticDie ? "static" : ""} ${inrun ? "inrun" : ""} ${rolled ? "rolled" : ""} ${die.value % 2 === 0 && !die.flag ? "attack-die" : !die.flag ? "shield-die" : ""} ${v2 ? `v2-die spin-${spin}` : ""}`}
       disabled={staticDie}
       onClick={onClick}
       type="button"
     >
       {slot ? <span className="slot-badge">{slot}</span> : null}
       {selected ? <span className="reroll-mark">REROLL</span> : null}
-      {die.flag ? (
-        <FlagHull value={die.value} />
-      ) : (
-        <ShipHull sides={die.sides as DieSize} value={die.value} />
-      )}
+      {inline ? <i className="nrg-line" aria-hidden="true" /> : null}
+      {incol ? <i className="atk-line" aria-hidden="true" /> : null}
+      <DieFace v2={v2}>
+        {die.flag ? (
+          <FlagHull value={die.value} />
+        ) : (
+          <ShipHull sides={die.sides as DieSize} value={die.value} />
+        )}
+      </DieFace>
       <span
         className={`die-caption ${die.flag ? "flag-caption" : ""}`}
         style={flag ? { color: flag.fill } : undefined}
@@ -1336,17 +1519,21 @@ function ReadyDie({
   face = 1,
   damaged = false,
   slot,
+  v2 = false,
 }: {
   sides?: DieSize;
   flag?: boolean;
   face?: number;
   damaged?: boolean;
   slot?: number;
+  v2?: boolean;
 }) {
   return (
-    <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`} ${damaged ? "hurt" : ""}`}>
+    <div className={`fleet-die ready-die ${flag ? "flag" : `die-size-${sides}`} ${damaged ? "hurt" : ""} ${v2 ? "v2-die" : ""}`}>
       {slot ? <span className="slot-badge">{slot}</span> : null}
-      {flag ? <FlagHull value={face} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
+      <DieFace v2={v2}>
+        {flag ? <FlagHull value={face} ready /> : <ShipHull sides={sides || 4} value={0} ready />}
+      </DieFace>
       <span className={`die-caption ${flag ? "flag-caption" : ""}`}>
         {flag ? "Ready" : damaged ? "Damaged" : "Ready"}
       </span>
@@ -1354,14 +1541,29 @@ function ReadyDie({
   );
 }
 
-function LiveTally({ tally }: { tally: ReturnType<typeof previewTally> }) {
+function LiveTally({
+  tally,
+  v2 = false,
+}: {
+  tally: ReturnType<typeof previewTally>;
+  v2?: boolean;
+}) {
+  const lines = tally.lines ?? [];
   return (
-    <section className="tot" aria-label="Current roll totals">
-      <div className="a"><div className="n">{tally.attack}</div><div className="l">Attack</div></div>
-      <div className="d"><div className="n">{tally.defense}</div><div className="l">Shields</div></div>
-      <div className="e"><div className="n">{tally.energy}</div><div className="l">Energy</div></div>
-      <div className="h"><div className="n">{tally.heal}</div><div className="l">Repair</div></div>
-      <div className="dir"><div className="n">{tally.direct}</div><div className="l">Direct</div></div>
-    </section>
+    <>
+      <section className={`tot ${v2 ? "live-tot" : ""}`} aria-label="Current roll totals">
+        <div className="a"><div className="n">{tally.attack}</div><div className="l">Attack</div></div>
+        <div className="d"><div className="n">{tally.defense}</div><div className="l">Shields</div></div>
+        <div className="e"><div className="n">{tally.energy}</div><div className="l">Energy</div></div>
+        <div className="h"><div className="n">{tally.heal}</div><div className="l">Repair</div></div>
+        <div className="dir"><div className="n">{tally.direct}</div><div className="l">Direct</div></div>
+      </section>
+      {v2 && lines.length ? (
+        <p className="line-hit-note">
+          {lines.length === 1 ? "1 formation line" : `${lines.length} formation lines`}
+          {" — yellow across is Energy, red down is Attack."}
+        </p>
+      ) : null}
+    </>
   );
 }

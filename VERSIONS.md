@@ -43,6 +43,14 @@ The three most useful settings for the current game:
 
 ## Versions
 
+### Fleet Dice 2 · versus — same rooms, formation lines, pick-a-slot
+
+Fleet Dice 2 now has Battle a friend. It uses the same Firebase rooms and
+four-digit codes as Fleet Dice 1. The room stores which game it is, so old
+matches without a ruleset stay Fleet Dice 1. Home shows all four modes. Versus
+screens match Fleet Dice 1 except for tumbling dice, slot numbers 1–9, pick
+which cell to unlock, and yellow/red bars for three in a row.
+
 ### Fleet Dice 2 · 2.17 — pick which slot to open (prototype)
 
 Locked cells 6, 7, 8 and 9 are all tappable. The first extra slot still costs 7

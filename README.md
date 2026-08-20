@@ -13,8 +13,9 @@ turn the flagship one number up or down after the final free roll.
 ## Play it
 
 **Online (solo + versus):** [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/)  
-No OpenAI/ChatGPT sign-in. Versus rooms use a private invite link or four-digit
-code (Jackbox-style). Host stays on their room; only the friend opens the invite.
+No OpenAI/ChatGPT sign-in. Home has Fleet Dice 1 and Fleet Dice 2, each with
+solo and versus. Versus rooms use a private invite link or four-digit code
+(Jackbox-style). Host stays on their room; only the friend opens the invite.
 Details live in [`web/README.md`](web/README.md) and the **Online versus** section
 of [`HANDOFF.md`](HANDOFF.md).
 

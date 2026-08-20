@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   applyAction,
+  boardLabel,
   joinMatch,
+  linePrize,
+  matchRuleset,
   newMatch,
   previewTally,
   publicMatchView,
@@ -333,4 +336,75 @@ test("repair can keep a brace volley from counting as an inescapable kill", () =
   assert.equal(guest.phase, "brace");
   assert.ok((guest.tally?.heal ?? 0) >= 5);
   assert.ok(guest.directIncoming >= 16);
+});
+
+test("Fleet Dice 2 three d4s across the top pay 4 Energy", () => {
+  const state = newMatch("match-v2", "4821", "secret", "host-uid", "Ada", "v2");
+  joinMatch(state, "guest-uid", "Grace");
+  const host = state.players.host;
+  host.dice = [
+    { id: host.ships[0].id, sides: 4, value: 4, slot: 0 },
+    { id: host.ships[1].id, sides: 4, value: 4, slot: 1 },
+    { id: host.ships[2].id, sides: 4, value: 4, slot: 2 },
+    { id: host.ships[3].id, sides: 4, value: 1, slot: 3 },
+    { id: "flag", sides: 6, value: 1, flag: true },
+  ];
+  const classic = previewTally(host);
+  const v2 = previewTally(host, undefined, "v2");
+  assert.equal(linePrize(4), 4);
+  assert.equal(classic.lines?.length ?? 0, 0);
+  assert.equal(v2.lines?.length, 1);
+  assert.equal(v2.lines?.[0]?.energy, 4);
+  assert.equal(v2.lines?.[0]?.attack, 0);
+  assert.equal(v2.energy, classic.energy + 4);
+  assert.equal(v2.attack, classic.attack);
+});
+
+test("Fleet Dice 2 lets you unlock slot 6, 7, 8 or 9", () => {
+  const state = newMatch("match-v2-slot", "1111", "secret", "host-uid", "Ada", "v2");
+  joinMatch(state, "guest-uid", "Grace");
+  const host = state.players.host;
+  host.phase = "shop";
+  host.energy = 40;
+  applyAction(state, "host", { type: "shop", operation: "slot", slotIndex: 6 });
+  assert.equal(host.open?.[6], true);
+  assert.equal(host.slots, 5);
+  assert.equal(boardLabel(6), 8);
+  applyAction(state, "host", { type: "shop", operation: "slot", slotIndex: 4 });
+  assert.equal(host.open?.[4], true);
+  assert.equal(host.slots, 6);
+  assert.equal(boardLabel(4), 6);
+  assert.throws(
+    () => applyAction(state, "host", { type: "shop", operation: "buy", sides: 6 }),
+    /Tap a free slot/,
+  );
+  applyAction(state, "host", { type: "shop", operation: "buy", sides: 6, slotIndex: 6 });
+  assert.equal(host.ships.at(-1)?.slot, 6);
+  assert.equal(host.ships.at(-1)?.sides, 6);
+});
+
+test("Fleet Dice 1 still unlocks the next slot in order", () => {
+  const state = newMatch("match-classic-slot", "2222", "secret", "host-uid", "Ada");
+  joinMatch(state, "guest-uid", "Grace");
+  const host = state.players.host;
+  host.phase = "shop";
+  host.energy = 20;
+  applyAction(state, "host", { type: "shop", operation: "slot" });
+  assert.equal(host.slots, 5);
+  assert.equal(host.open, undefined);
+  applyAction(state, "host", { type: "shop", operation: "buy", sides: 4 });
+  assert.equal(host.ships.at(-1)?.slot, undefined);
+});
+
+test("old rooms without a ruleset stay Fleet Dice 1", () => {
+  const state = newMatch("match-old", "3333", "secret", "host-uid", "Ada");
+  delete state.ruleset;
+  joinMatch(state, "guest-uid", "Grace");
+  assert.equal(matchRuleset(state), "classic");
+  assert.equal(state.players.guest?.open, undefined);
+  const host = state.players.host;
+  host.phase = "shop";
+  host.energy = 20;
+  applyAction(state, "host", { type: "shop", operation: "slot" });
+  assert.equal(host.slots, 5);
 });

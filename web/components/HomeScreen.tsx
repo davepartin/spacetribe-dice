@@ -148,31 +148,49 @@ export function HomeScreen() {
           </h1>
           <p className="home-hero-lead">
             Every die is a ship. Roll for attack, shields, and energy, then
-            upgrade your fleet and hunt the perfect straight.
+            upgrade your fleet and hunt the perfect straight. Fleet Dice 1 and
+            Fleet Dice 2 both play solo or versus.
           </p>
 
-          <div className="home-mode-actions">
-            <Link className="home-mode-action home-mode-solo" href="/solo/">
-              <span className="home-mode-topline">
-                <span className="home-mode-label">Play solo</span>
-                <span aria-hidden="true">→</span>
-              </span>
-              <small>Learn the fleet against the enemy AI.</small>
-            </Link>
-            <Link className="home-mode-action home-mode-versus" href="/versus/">
-              <span className="home-mode-topline">
-                <span className="home-mode-label">Battle a friend</span>
-                <span aria-hidden="true">→</span>
-              </span>
-              <small>Create a private code and fight live.</small>
-            </Link>
-            <Link className="home-mode-action home-mode-v2" href="/solo-v2/">
-              <span className="home-mode-topline">
-                <span className="home-mode-label">Fleet Dice 2</span>
-                <span aria-hidden="true">→</span>
-              </span>
-              <small>Prototype — same rules, new dice. Solo only for now.</small>
-            </Link>
+          <div className="home-mode-groups">
+            <section className="home-mode-group" aria-label="Fleet Dice">
+              <p className="home-mode-kicker">FLEET DICE</p>
+              <div className="home-mode-actions">
+                <Link className="home-mode-action home-mode-solo" href="/solo/">
+                  <span className="home-mode-topline">
+                    <span className="home-mode-label">Play solo</span>
+                    <span aria-hidden="true">→</span>
+                  </span>
+                  <small>Learn the fleet against the enemy AI.</small>
+                </Link>
+                <Link className="home-mode-action home-mode-versus" href="/versus/">
+                  <span className="home-mode-topline">
+                    <span className="home-mode-label">Battle a friend</span>
+                    <span aria-hidden="true">→</span>
+                  </span>
+                  <small>Create a private code and fight live.</small>
+                </Link>
+              </div>
+            </section>
+            <section className="home-mode-group" aria-label="Fleet Dice 2">
+              <p className="home-mode-kicker">FLEET DICE 2</p>
+              <div className="home-mode-actions">
+                <Link className="home-mode-action home-mode-v2" href="/solo-v2/">
+                  <span className="home-mode-topline">
+                    <span className="home-mode-label">Play solo</span>
+                    <span aria-hidden="true">→</span>
+                  </span>
+                  <small>New dice, and three in a row pays Energy or Attack.</small>
+                </Link>
+                <Link className="home-mode-action home-mode-v2-versus" href="/versus-v2/">
+                  <span className="home-mode-topline">
+                    <span className="home-mode-label">Battle a friend</span>
+                    <span aria-hidden="true">→</span>
+                  </span>
+                  <small>Same live rooms — pick a slot and hunt formation lines.</small>
+                </Link>
+              </div>
+            </section>
           </div>
 
           <ul className="home-hero-facts" aria-label="Game details">
@@ -217,6 +235,7 @@ export function HomeScreen() {
                       : `${card.youName} · waiting`}
                   </strong>
                   <span>
+                    {card.ruleset === "v2" ? "Fleet Dice 2 · " : ""}
                     Game {card.code}
                     {card.status === "waiting"
                       ? " · waiting for opponent"
@@ -253,7 +272,8 @@ export function HomeScreen() {
           <h2 id="join-title">Join the fight.</h2>
           <p>
             Enter your display name and the four numbers from your friend. Your
-            browser remembers your seat.
+            browser remembers your seat. The same join works for Fleet Dice 1
+            and Fleet Dice 2 — the room already knows which game it is.
           </p>
         </header>
         <form className="home-join-form" onSubmit={joinByCode}>

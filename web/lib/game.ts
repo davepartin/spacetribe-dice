@@ -1,5 +1,7 @@
 export type SideId = "host" | "guest";
 export type DieSize = 4 | 6 | 8 | 10;
+/** classic = Fleet Dice 1. v2 = formation lines + pick-a-slot. */
+export type Ruleset = "classic" | "v2";
 export type PlayerPhase =
   | "waiting"
   | "shop"
@@ -14,6 +16,8 @@ export type Ship = {
   id: string;
   sides: DieSize;
   disabledRound: number | null;
+  /** Fleet index 0–7 around the flagship. Set on Fleet Dice 2. */
+  slot?: number;
 };
 
 export type DieValue = {
@@ -21,6 +25,16 @@ export type DieValue = {
   sides: number;
   value: number;
   flag?: boolean;
+  slot?: number;
+};
+
+export type FormationLine = {
+  kind: "row" | "col";
+  idx: number[];
+  sides: number;
+  value: number;
+  energy: number;
+  attack: number;
 };
 
 export type StraightReward = {
@@ -48,6 +62,8 @@ export type Tally = {
   direct: number;
   face: number;
   run: Straight | null;
+  /** Fleet Dice 2 only. Missing on older saved rooms. */
+  lines?: FormationLine[];
 };
 
 export type RoundReport = {
@@ -68,6 +84,8 @@ export type PlayerState = {
   energy: number;
   baseEnergy: number;
   slots: number;
+  /** Fleet Dice 2: which of the 8 cells around the flagship are open. */
+  open?: boolean[];
   ships: Ship[];
   flag: {
     level: number;
@@ -94,6 +112,8 @@ export type MatchState = {
   status: "waiting" | "active" | "finished";
   round: number;
   createdAt: string;
+  /** Missing on old rooms — treat as Fleet Dice 1. */
+  ruleset?: Ruleset;
   players: {
     host: PlayerState;
     guest: PlayerState | null;
@@ -105,8 +125,9 @@ export type MatchState = {
 
 export type MatchAction =
   | { type: "shop"; operation: "upgrade" | "scrap"; shipId: string }
-  | { type: "shop"; operation: "buy"; sides: DieSize }
-  | { type: "shop"; operation: "slot" | "flagship" }
+  | { type: "shop"; operation: "buy"; sides: DieSize; slotIndex?: number }
+  | { type: "shop"; operation: "slot"; slotIndex?: number }
+  | { type: "shop"; operation: "flagship" }
   | { type: "ready" }
   | { type: "roll"; dice: string[] }
   | { type: "flag-token"; direction: -1 | 1 }
@@ -118,7 +139,13 @@ const PRICES: Record<DieSize, number> = { 4: 4, 6: 6, 8: 9, 10: 13 };
 const UPGRADE: Partial<Record<DieSize, DieSize>> = { 4: 6, 6: 8, 8: 10 };
 const FLAG_COST: Record<number, number> = { 1: 10, 2: 16 };
 
-export function newPlayer(email: string, name: string, phase: PlayerPhase): PlayerState {
+export function newPlayer(
+  email: string,
+  name: string,
+  phase: PlayerPhase,
+  ruleset: Ruleset = "classic",
+): PlayerState {
+  const v2 = ruleset === "v2";
   return {
     email,
     name: commanderName(name, email),
@@ -126,10 +153,12 @@ export function newPlayer(email: string, name: string, phase: PlayerPhase): Play
     energy: 0,
     baseEnergy: 0,
     slots: 4,
+    open: v2 ? [true, true, true, true, false, false, false, false] : undefined,
     ships: Array.from({ length: 4 }, (_, index) => ({
       id: `ship-${index + 1}-${randomId(5)}`,
       sides: 4 as DieSize,
       disabledRound: null,
+      slot: v2 ? index : undefined,
     })),
     flag: { level: 1, face: 1, token: true },
     round: 1,
@@ -151,6 +180,7 @@ export function newMatch(
   inviteToken: string,
   email: string,
   name: string,
+  ruleset: Ruleset = "classic",
 ): MatchState {
   return {
     id,
@@ -159,8 +189,9 @@ export function newMatch(
     status: "waiting",
     round: 1,
     createdAt: new Date().toISOString(),
+    ruleset,
     players: {
-      host: newPlayer(email, name, "waiting"),
+      host: newPlayer(email, name, "waiting", ruleset),
       guest: null,
     },
     winner: null,
@@ -173,7 +204,8 @@ export function joinMatch(state: MatchState, email: string, name: string): Match
   if (state.players.guest) throw new Error("This match already has two commanders.");
   if (state.status !== "waiting") throw new Error("This match has already started.");
 
-  state.players.guest = newPlayer(email, name, "ready");
+  const ruleset = matchRuleset(state);
+  state.players.guest = newPlayer(email, name, "ready", ruleset);
   state.players.host.phase = "ready";
   state.status = "active";
   return state;
@@ -200,7 +232,7 @@ export function applyAction(
 
   switch (action.type) {
     case "shop":
-      handleShop(player, action);
+      handleShop(state, player, action);
       break;
     case "ready":
       if (player.phase !== "shop") throw new Error("You are not in the shipyard.");
@@ -231,12 +263,16 @@ export function applyAction(
 export function previewTally(
   player: PlayerState,
   straightTake?: number,
+  ruleset: Ruleset = "classic",
 ): Tally {
-  return tally(player.dice, player.flag.level, straightTake);
+  return tally(player.dice, player.flag.level, straightTake, ruleset);
 }
 
-export function straightOptions(player: PlayerState): Straight | null {
-  return tally(player.dice, player.flag.level).run;
+export function straightOptions(
+  player: PlayerState,
+  ruleset: Ruleset = "classic",
+): Straight | null {
+  return tally(player.dice, player.flag.level, undefined, ruleset).run;
 }
 
 export function priceOf(sides: DieSize): number {
@@ -245,6 +281,49 @@ export function priceOf(sides: DieSize): number {
 
 export function slotPrice(slotNumber: number): number {
   return slotNumber + 2;
+}
+
+export function matchRuleset(state: MatchState | { ruleset?: Ruleset } | null | undefined): Ruleset {
+  return state?.ruleset === "v2" ? "v2" : "classic";
+}
+
+/** 3×3 cell number: ships are 1–4 and 6–9. 5 is the flagship. */
+export function boardLabel(fleetIndex: number): number {
+  return fleetIndex < 4 ? fleetIndex + 1 : fleetIndex + 2;
+}
+
+export function openMask(player: PlayerState): boolean[] {
+  if (player.open && player.open.length >= 8) {
+    return player.open.slice(0, 8);
+  }
+  return Array.from({ length: 8 }, (_, index) => index < player.slots);
+}
+
+export function fleetSlotOf(ship: Ship, index: number): number {
+  return typeof ship.slot === "number" ? ship.slot : index;
+}
+
+export function shipInFleetSlot(player: PlayerState, fleetIndex: number): Ship | undefined {
+  return player.ships.find((ship, index) => fleetSlotOf(ship, index) === fleetIndex);
+}
+
+export function emptyOpenSlots(player: PlayerState): number[] {
+  const open = openMask(player);
+  const empty: number[] = [];
+  for (let index = 0; index < 8; index += 1) {
+    if (open[index] && !shipInFleetSlot(player, index)) empty.push(index);
+  }
+  return empty;
+}
+
+export function nextUnlockCost(player: PlayerState): number {
+  const opened = openMask(player).filter(Boolean).length;
+  if (opened >= 8) return 0;
+  return slotPrice(opened + 1);
+}
+
+export function linePrize(sides: number): number {
+  return Math.round((sides * sides) / 4);
 }
 
 export function flagshipUpgradeCost(level: number): number | null {
@@ -291,12 +370,28 @@ function ensurePlayerRounds(state: MatchState) {
 }
 
 function handleShop(
+  state: MatchState,
   player: PlayerState,
   action: Extract<MatchAction, { type: "shop" }>,
 ) {
   if (player.phase !== "shop") throw new Error("Shop actions are only available between rounds.");
+  const v2 = matchRuleset(state) === "v2";
 
   if (action.operation === "slot") {
+    if (v2) {
+      const ix = action.slotIndex;
+      if (ix === undefined || ix < 0 || ix > 7) {
+        throw new Error("Tap the locked slot you want to open.");
+      }
+      const open = openMask(player);
+      if (open[ix]) throw new Error("That slot is already open.");
+      const cost = nextUnlockCost(player);
+      if (!cost) throw new Error("Every fleet slot is already open.");
+      spend(player, cost);
+      player.open = open.map((value, index) => (index === ix ? true : value));
+      player.slots = player.open.filter(Boolean).length;
+      return;
+    }
     if (player.slots >= 8) throw new Error("Every fleet slot is already open.");
     const cost = slotPrice(player.slots + 1);
     spend(player, cost);
@@ -313,12 +408,25 @@ function handleShop(
   }
 
   if (action.operation === "buy") {
-    if (player.ships.length >= player.slots) throw new Error("Open a fleet slot first.");
+    const empties = emptyOpenSlots(player);
+    if (!empties.length) throw new Error("Open a fleet slot first.");
+    let ix = empties[0];
+    if (v2) {
+      if (action.slotIndex !== undefined) {
+        if (!empties.includes(action.slotIndex)) {
+          throw new Error("Tap a free slot to park this ship.");
+        }
+        ix = action.slotIndex;
+      } else if (empties.length > 1) {
+        throw new Error("Tap a free slot to park this ship.");
+      }
+    }
     spend(player, priceOf(action.sides));
     player.ships.push({
       id: `ship-${randomId(9)}`,
       sides: action.sides,
       disabledRound: null,
+      slot: v2 ? ix : undefined,
     });
     return;
   }
@@ -340,12 +448,14 @@ function handleShop(
   ship.sides = next;
 }
 
-function handleRoll(_state: MatchState, player: PlayerState, chosen: string[]) {
+function handleRoll(state: MatchState, player: PlayerState, chosen: string[]) {
+  const v2 = matchRuleset(state) === "v2";
   if (player.phase === "ready") {
     player.dice = activeShips(player, player.round).map((ship) => ({
       id: ship.id,
       sides: ship.sides,
       value: roll(ship.sides),
+      ...(v2 ? { slot: fleetSlotOf(ship, player.ships.indexOf(ship)) } : {}),
     }));
     player.flag.face = roll(6);
     player.dice.push({
@@ -390,13 +500,14 @@ function handleFlagToken(player: PlayerState, direction: -1 | 1) {
 
 function handleSubmit(state: MatchState, player: PlayerState, straightTake?: number) {
   if (player.phase !== "rolling") throw new Error("Roll your fleet before submitting.");
-  const run = tally(player.dice, player.flag.level).run;
+  const ruleset = matchRuleset(state);
+  const run = tally(player.dice, player.flag.level, undefined, ruleset).run;
   if (straightTake !== undefined) {
     if (!run || straightTake < 5 || straightTake > Math.min(run.length, 7)) {
       throw new Error("That straight reward is not available.");
     }
   }
-  player.tally = tally(player.dice, player.flag.level, straightTake);
+  player.tally = tally(player.dice, player.flag.level, straightTake, ruleset);
   player.phase = "submitted";
 }
 
@@ -469,11 +580,13 @@ function settlePlayer(_state: MatchState, player: PlayerState) {
   }
 
   const rewardShip = player.tally?.run?.reward.ship;
-  if (rewardShip && player.ships.length < player.slots) {
+  if (rewardShip && emptyOpenSlots(player).length) {
+    const slot = emptyOpenSlots(player)[0];
     player.ships.push({
       id: `ship-${randomId(9)}`,
       sides: rewardShip,
       disabledRound: null,
+      slot: typeof player.ships[0]?.slot === "number" ? slot : undefined,
     });
   }
 
@@ -585,7 +698,12 @@ function prepareRound(player: PlayerState) {
   player.report = null;
 }
 
-function tally(dice: DieValue[], flagLevel: number, chosenTake?: number): Tally {
+function tally(
+  dice: DieValue[],
+  flagLevel: number,
+  chosenTake?: number,
+  ruleset: Ruleset = "classic",
+): Tally {
   const result: Tally = {
     attack: 0,
     defense: 0,
@@ -594,6 +712,7 @@ function tally(dice: DieValue[], flagLevel: number, chosenTake?: number): Tally 
     direct: 0,
     face: dice.find((die) => die.flag)?.value ?? 1,
     run: null,
+    lines: [],
   };
 
   for (const die of dice) {
@@ -612,6 +731,14 @@ function tally(dice: DieValue[], flagLevel: number, chosenTake?: number): Tally 
     result.energy += run.reward.energy ?? 0;
   }
 
+  if (ruleset === "v2") {
+    result.lines = findLines(dice);
+    for (const line of result.lines) {
+      result.attack += line.attack;
+      result.energy += line.energy;
+    }
+  }
+
   const multiplier = flagMultiplier(flagLevel);
   const fleet = dice.filter((die) => !die.flag);
   if (result.face === 2) {
@@ -627,6 +754,45 @@ function tally(dice: DieValue[], flagLevel: number, chosenTake?: number): Tally 
   }
 
   return result;
+}
+
+const FLEET_LINES: { kind: "row" | "col"; idx: number[] }[] = [
+  { kind: "row", idx: [0, 1, 2] },
+  { kind: "row", idx: [3, 4, 5] },
+  { kind: "col", idx: [0, 3, 6] },
+  { kind: "col", idx: [1, 4, 7] },
+  { kind: "row", idx: [6, 7, 8] },
+  { kind: "col", idx: [2, 5, 8] },
+];
+
+function boardCell(dice: DieValue[], cell: number): DieValue | undefined {
+  if (cell === 4) {
+    const flag = dice.find((die) => die.flag);
+    if (!flag) return undefined;
+    return { ...flag, sides: 6 };
+  }
+  const ix = cell < 4 ? cell : cell - 1;
+  return dice.find((die) => !die.flag && die.slot === ix);
+}
+
+export function findLines(dice: DieValue[]): FormationLine[] {
+  const hits: FormationLine[] = [];
+  for (const line of FLEET_LINES) {
+    const cells = line.idx.map((cell) => boardCell(dice, cell));
+    if (cells.some((die) => !die || !die.value)) continue;
+    const first = cells[0]!;
+    if (!cells.every((die) => die!.sides === first.sides && die!.value === first.value)) continue;
+    const pay = linePrize(first.sides);
+    hits.push({
+      kind: line.kind,
+      idx: line.idx.slice(),
+      sides: first.sides,
+      value: first.value,
+      energy: line.kind === "row" ? pay : 0,
+      attack: line.kind === "col" ? pay : 0,
+    });
+  }
+  return hits;
 }
 
 function bestRun(dice: DieValue[], chosenTake?: number): Straight | null {

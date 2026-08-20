@@ -3,18 +3,23 @@
 This is the single entry point for anyone new to the project, human or AI.
 Everything you need to be useful is either here or pointed at from here.
 
-**There are three ways to play now:**
+**There are four ways to play now:**
 
 | Track | What it is | Where |
 | --- | --- | --- |
 | **Solo (Fleet Dice 1)** | The live single-player game people are enjoying | `simple.html` (v88) — online at `/solo/` |
-| **Solo (Fleet Dice 2)** | Same core rules, versus layout + new dice, plus formation lines | `simple-v2.html` (2.17) — online at `/solo-v2/` |
-| **Versus (online)** | Two humans, private room, Jackbox-style code, live sync | `web/` → [davepartin.github.io/spacetribe-dice](https://davepartin.github.io/spacetribe-dice/) |
+| **Versus (Fleet Dice 1)** | Two humans, private room, Jackbox-style code, live sync | `/versus/` then `/match/?id=` |
+| **Solo (Fleet Dice 2)** | Same core rules, tumbling dice, pick-a-slot, formation lines | `simple-v2.html` (2.17) — online at `/solo-v2/` |
+| **Versus (Fleet Dice 2)** | Same Firebase rooms as Fleet Dice 1, with v2 rules on the room | `/versus-v2/` then `/match/?id=` |
+
+All four sit on the home page. Join-by-code is shared: the room stores
+`state.ruleset` (`classic` or `v2`). Old rooms with no ruleset stay Fleet Dice 1.
 
 Versus is **not** an auto-conversion of `simple.html`. It is a separate Next.js /
 React app under `web/` that reimplements the same rules in TypeScript
 (`web/lib/game.ts`) and aims to **feel** like solo — same 3×3 fleet, same hull
-shapes, same colours, same how-to depth.
+shapes, same colours, same how-to depth. Fleet Dice 2 versus uses that same
+match UI, plus tumbling dice, pick-a-slot, and yellow/red formation bars.
 
 **Dave is not a developer.** Prefer plain words. When a change is ready to play,
 push it to `main` so the phone site updates — he gave standing permission.
@@ -369,7 +374,7 @@ join a room without getting stuck.
 | Versus brace endgame | Inescapable volleys auto-finish for both players; brace button warns when damage exceeds current HP |
 | Scrap in shipyard | **Removed from versus / Fleet Dice 2 UI** (engine still has it; Fleet Dice 1 still shows scrap) |
 | Upgrade labels readable on 3×3 cells | Done (stacked label + cost) |
-| Guided first-match tips | Removed — How to play carries the teaching |
+| Fleet Dice 2 versus | Same screens as Fleet Dice 1 versus, plus tumbling dice, pick-a-slot, and formation bars |
 
 ### Jackbox join / Firebase lessons
 
@@ -394,14 +399,15 @@ join a room without getting stuck.
 
 | Path | Role |
 | --- | --- |
-| `web/lib/game.ts` | Rules engine (shared truth for online) |
-| `web/lib/firebase-match.ts` | Create / join / play / watch / cancel |
+| `web/lib/game.ts` | Rules engine (shared truth for online). `ruleset: "classic" \| "v2"` |
+| `web/lib/firebase-match.ts` | Create / join / play / watch / cancel. `createLiveMatch(name, ruleset)` |
 | `web/lib/firebase.ts` | Anonymous auth + config (`space-tribes`) |
 | `web/firestore.rules` | Security rules — deploy separately from Pages |
-| `web/components/MatchGame.tsx` | All match screens + dock |
+| `web/components/MatchGame.tsx` | All match screens + dock (classic and v2) |
 | `web/components/DieArt.tsx` | Ship / flagship SVGs + mark icons |
 | `web/components/ReferenceSheets.tsx` | How to play + upgrade costs |
-| `web/components/HomeScreen.tsx` | Landing + code join |
+| `web/components/HomeScreen.tsx` | Landing + four modes + code join |
+| `web/app/versus-v2/page.tsx` | Fleet Dice 2 create-room launcher |
 | `web/public/fleet-dice-key-art.png` | Brand key art |
 | `web/public/fleet-dice-v88.html` | Fleet Dice 1 solo file shipped inside the online app |
 | `web/public/fleet-dice-2.html` | Fleet Dice 2 prototype (copy of `simple-v2.html`) |
@@ -486,7 +492,9 @@ pnpm dev
    `VERSIONS.md`.
 4. If it's **versus UX / online**, edit `web/`, keep copy plain, match solo
    visuals when that's the ask, then **commit and push to `main`** so he can
-   play it on the phone.
+   play it on the phone. Fleet Dice 2 versus lives in `web/lib/game.ts` +
+   `MatchGame.tsx` (not the solo iframe). A `ruleset` of `"v2"` on the room is
+   what turns on formation lines and pick-a-slot; missing ruleset stays classic.
 5. If join/create breaks with permissions, check **rules deploy** before rewriting
    the client.
 
