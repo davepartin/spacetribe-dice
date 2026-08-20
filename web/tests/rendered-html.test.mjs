@@ -99,7 +99,7 @@ test("static export includes the Fleet Dice 2 prototype", () => {
   assert.match(html, /Three of a kind/);
   assert.match(html, /Across · Energy/);
   assert.match(html, /Down · Attack/);
-  assert.match(html, /flagship is a <b>d6<\/b>/);
+  assert.match(html, /It is a <b>d6<\/b>/);
   assert.match(html, /Same number, any size/);
   assert.match(html, /idx:\[3,4,5\]/);
   assert.match(html, /idx:\[1,4,7\]/);
